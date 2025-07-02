@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+  <h1>Online Examination System</h1>
+  <p class="login-subtitle">Welcome to Online Examination System!</p>
+
+  <form method="POST" action="/login">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="input-group">
+      <i class="fas fa-id-card"></i>
+      <input type="text" name="user_id" placeholder="User ID" required pattern="[0-9]{7}" maxlength="7">
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" name="password" id="login-password" placeholder="Password" required>
+      <i class="fas fa-eye-slash toggle-password" style="margin-left: 85%; margin-top: 3px;" onclick="togglePassword('login-password', this)"></i>
+    </div>
+
+    <div class="user-type-info">
+      <i class="fas fa-info-circle"></i>
+      <span>Both students and lecturers can login here</span>
+    </div>
+
+    <div class="form-footer" style="flex-direction: column; align-items: stretch;">
+      <button type="submit" class="login-btn" style="margin-top: -10px;">Login</button>
+
+      <div style="margin-top: 5px; display: flex; justify-content: space-between; align-items: center;">
+        <label style="font-size: 14px;"><input type="checkbox" name="remember"> Keep me signed in</label>
+        <a href="{{ url_for('forgot_password') }}" style="font-size: 14px; color: #667eea;">Forgot Password?</a>
+      </div>
+    </div>
+  </form>
+
+  <p style="margin-top: 20px; text-align: center;">
+    Don’t have an account? <a href="{{ url_for('register') }}">Register</a>
+  </p>
+</div>
+{% endblock %}

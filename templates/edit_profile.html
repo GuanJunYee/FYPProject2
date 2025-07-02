@@ -1,0 +1,61 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+{% block breadcrumb %}Edit Profile{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="profile-header">
+  <h1 style="padding-left:20px;">Edit Profile</h1>
+  <hr />
+</div>
+
+<div class="profile-container">
+  <form method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data">
+    <div class="profile-header">
+      <div class="profile-image-container">
+        <img src="{{ user.photo_url or url_for('static', filename='img/default-profile.png') }}" class="profile-img" alt="Profile Picture">
+        <label for="photo" class="camera-icon">
+          <i class="fa fa-camera"></i>
+        </label>
+        <input type="file" id="photo" name="photo" class="hidden-file-input" accept=".jpg,.jpeg,.png" />
+      </div>
+
+      <h2>{{ user.name }}</h2>
+      <div class="user-id">
+        <strong>User ID:</strong> {{ user.user_id }}
+      </div>
+    </div>
+
+    <div class="profile-details" style="margin-left: 150px;">
+      <div class="detail-group">
+        <label>Full Name:</label>
+        <input type="text" name="name" value="{{ user.name }}" class="form-control" required />
+      </div>
+      <div class="detail-group">
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ user.email }}" class="form-control" required />
+      </div>
+      <div class="detail-group">
+        <label>Phone:</label>
+        <input type="tel" name="phone" value="{{ user.phone }}" pattern="^(\+?6?01)[0-46-9]-*[0-9]{7,8}$" class="form-control" required />
+      </div>
+      <div class="detail-group">
+        <label>Gender:</label>
+        <select name="gender" class="form-control" required>
+          <option value="Male" {{ 'selected' if user.gender == 'Male' else '' }}>Male</option>
+          <option value="Female" {{ 'selected' if user.gender == 'Female' else '' }}>Female</option>
+          <option value="Other" {{ 'selected' if user.gender == 'Other' else '' }}>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <br />
+    <a href="{{ url_for('profile') }}" class="btn-reset" style="outline: none; text-decoration: none;">Back</a>
+    <button type="submit" class="btn-save">Save Changes</button>
+  </form>
+</div>
+{% endblock %}
+

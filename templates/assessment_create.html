@@ -1,0 +1,48 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Create Assessment{% endblock %}
+{% block breadcrumb %}Programme > Assessment Management > Create Assessment{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assessment.css') }}">
+<script>
+  // Auto-hide error messages after 5 seconds
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+      document.querySelectorAll(".error").forEach(el => {
+        el.style.transition = "opacity 0.5s ease-out";
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);  // remove from DOM
+      });
+    }, 5000);
+  });
+</script>
+
+<h2>Create New Assessment</h2>
+<hr>
+<form method="POST" enctype="multipart/form-data" style="margin-top: 25px;">
+  <div style="margin: 20px;">
+    <div class="detail-group">
+    <label>Assessment Code:</label>
+    <input type="text" name="assessment_code" required />
+    {% if errors.assessment_code %}
+        <div class="error">{{ errors.assessment_code }}</div>
+    {% endif %}
+    </div>
+
+    <label>Assessment Title:</label><br>
+    <input type="text" name="title" required><br><br>
+
+    <label>Select Course(s):</label><br>
+    {% for course in courses %}
+      <label style="font-weight: normal; font-size: 14px;"><input type="checkbox" name="course_codes" value="{{ course.course_code }}"> {{ course.course_code }} - {{ course.course_name }}</label><br>
+    {% endfor %}
+    <br>
+
+    <label>Upload Question (PDF only):</label><br>
+    <input type="file" name="question_pdf" accept="application/pdf" required><br><br>
+    <a href="{{ url_for('assessment_manage') }}" class="btn-reset">Cancel</a>
+    <button type="submit" class="btn-save">Create</button>
+    
+  </div>
+</form>
+
+{% endblock %}

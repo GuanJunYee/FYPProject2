@@ -1,0 +1,72 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Exam Timetable{% endblock %}
+{% block breadcrumb %}Examinations > Exam Timetable{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+<style>
+  .exam-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+  .exam-card {
+    display: flex;
+    border-left: 6px solid #004080;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    padding: 12px;
+    background: #fff;
+    align-items: center;
+  }
+  .exam-date {
+    width: 80px;
+    text-align: center;
+    font-weight: bold;
+    margin-right: 16px;
+  }
+  .exam-date .day {
+    font-size: 18px;
+    color: #004080;
+  }
+  .exam-date .date {
+    font-size: 14px;
+    color: #666;
+  }
+  .exam-details {
+    flex: 1;
+  }
+  .exam-details .time {
+    color:#004080;
+    font-weight: 600;
+  }
+  .exam-details .title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .exam-details .code {
+    font-size: 13px;
+  }
+</style>
+
+<h2 style="margin-left: 20px;">Exam Timetable</h2>
+<hr>
+<div class="exam-cards">
+  {% for t in exam_timetables %}
+  <div class="exam-card">
+    <div class="exam-date">
+      <div class="day">{{ t.exam_date | datetimeformat('%b') }}<br>{{ t.exam_date | datetimeformat('%d') }}</div>
+      <div class="date">{{ t.exam_date | datetimeformat('%A') }}</div>
+    </div>
+    <div class="exam-details">
+      <div class="time">{{ t.start_time }} - {{ t.end_time }}</div>
+      <div class="title">{{ assessment_map[t.assessment_code] }}</div>
+      <div class="code">({{ t.assessment_code }})</div>
+    </div>
+  </div>
+  {% else %}
+    <p style="margin-left: 20px;">No upcoming exams found.</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Join Exam{% endblock %}
+{% block breadcrumb %}Examinations > Join Exam{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+<style>
+    /* Save button styling */
+    .btn-save {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-save:hover {
+    background-color: #218838;
+}
+
+/* Cancel button styling */
+.btn-reset {
+    background-color: rgb(241, 50, 50);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-submitted {
+    background-color: #004080;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+</style>
+
+<h2 style="margin-left: 20px;">Join Exam</h2>
+<hr />
+
+<table class="studentList">
+  <thead>
+    <tr>
+      <th>No.</th>
+      <th>Assessment Code</th>
+      <th>Assessment Title</th>
+      <th>Exam Date</th>
+      <th>Start Time</th>
+      <th>End Time</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for exam in exam_timetables %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ exam.assessment_code }}</td>
+        <td>{{ assessment_map[exam.assessment_code] }}</td>
+        <td>{{ exam.exam_date }}</td>
+        <td>{{ exam.start_time }}</td>
+        <td>{{ exam.end_time }}</td>
+
+        {% set exam_datetime = exam.exam_date + ' ' + exam.start_time %}
+        {% set exam_end = exam.exam_date + ' ' + exam.end_time %}
+
+        {% if exam.exam_date == today and exam.start_time <= now <= exam.end_time %}
+          {% if exam.assessment_code in submitted_codes %}
+            <td><button class="btn-submitted" disabled style="padding: 5px 12px;">Submitted</button></td>
+          {% else %}
+            <td><a href="{{ url_for('student_exam_interface', assessment_code=exam.assessment_code) }}" class="btn-save" style="padding: 5px 12px;">Join</a></td>
+          {% endif %}
+        {% else %}
+          <td><button class="btn-reset" disabled style="padding: 5px 12px;">Not Available</button></td>
+        {% endif %}
+
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="7" style="text-align: center;">No upcoming exams.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

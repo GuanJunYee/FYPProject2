@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="form-container">
+  <h1>Online Examination System</h1>
+  <p class="login-subtitle">Welcome to Online Examination System!</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="/register">
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+        <div class="progress-step active"><div class="step-circle">1</div><div class="step-label">Account</div></div>
+        <div class="progress-step"><div class="step-circle">2</div><div class="step-label">Personal</div></div>
+        <div class="progress-step"><div class="step-circle">3</div><div class="step-label">Verification</div></div>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="form-step active" id="step-1">
+      <div class="input-group">
+        <i class="fas fa-id-card"></i>
+        <input type="text" name="user_id" placeholder="Student ID (7 digits)" required pattern="[0-9]{7}" maxlength="7">
+      </div>
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" name="email" placeholder="Email" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" name="password" id="register-password" placeholder="Password" 
+        required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+       title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character.">
+        <i class="fas fa-eye-slash toggle-password" style="margin-left: 85%; margin-top: 3px;" onclick="togglePassword('register-password', this)"></i>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="confirm-password" placeholder="Confirm Password" 
+        required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+       title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character.">
+        <i class="fas fa-eye-slash toggle-password" style="margin-left: 85%; margin-top: 3px;" onclick="togglePassword('confirm-password', this)"></i>
+      </div>
+      <div id="password-error" style="color: red; font-size: 14px; margin-top: 2px;"></div>
+      
+      <div class="step-buttons">
+        <div></div>
+        <button type="button" class="btn-next" onclick="nextStep(1)">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="form-step" id="step-2">
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" name="name" placeholder="Full Name" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-phone"></i>
+        <input type="tel" name="phone" placeholder="e.g. 012-3456789" pattern="01[0-9]-[0-9]{7,8}" maxlength="12" required>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-venus-mars"></i>
+        <select name="gender" required>
+          <option value="" disabled selected>Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-user-graduate"></i>
+        <input type="text" name="role" value="student" readonly>
+      </div>
+      <div class="step-buttons">
+        <button type="button" class="btn-prev" onclick="prevStep(2)">Previous</button>
+        <button type="button" class="btn-next" onclick="nextStep(2)">Next</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="form-step" id="step-3">
+      <div class="input-group" style="display: flex; gap: 10px;">
+        <div style="flex: 1; position: relative;">
+          <i class="fas fa-key" style="position: absolute; left: 12px; top: 14px; color: #aaa;"></i>
+          <input type="text" id="otp" name="otp" placeholder="Enter OTP Code" pattern="[0-9]{6}" maxlength="6" required
+                 style="padding-left: 38px; width: 100%; height: 44px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+        <button type="button" id="get-code-btn" onclick="sendVerificationCode()" style="height: 44px;">Get Code</button>
+      </div>
+      <div id="otp-error" style="color: red; font-size: 14px; margin-top: 2px;"></div>
+
+      <div class="input-group">
+        <i class="fas fa-info-circle"></i>
+        <p style="margin-left: 20px; padding: 12px; color: #666;">By clicking Submit, you agree to our Terms of Service.</p>
+      </div>
+
+      <div class="step-buttons">
+        <button type="button" class="btn-prev" onclick="prevStep(3)">Previous</button>
+        <button type="button" class="btn-submit" onclick="nextStep(3)">Submit</button>
+      </div>
+    </div>
+  </form>
+  <p style="margin-top: 20px; text-align: center;">
+  Already have an account? <a href="{{ url_for('login') }}">Back to Login</a>
+</p>
+
+</div>
+{% endblock %}

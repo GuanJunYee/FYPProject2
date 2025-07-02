@@ -1,0 +1,98 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}My Submissions{% endblock %}
+{% block breadcrumb %}Examinations > My Submissions{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+<style>
+  .btn-request {
+    background-color: #ffc107;
+    color: black;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 10px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-download {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 10px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-request:hover {
+    background-color: #e0a800;
+  }
+
+  .btn-download:hover {
+    background-color: #0056b3;
+  }
+  
+</style>
+
+<h2 style="margin-left: 20px;">My Submissions</h2>
+<hr />
+
+<table class="studentList">
+  <thead>
+    <tr>
+      <th>No.</th>
+      <th>Assessment Code</th>
+      <th>Assessment Title</th>
+      <th>Submitted File</th>
+      <th>Submitted At</th>
+      <th>Download</th>
+      <th>Resubmission</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in submissions %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ s.assessment_code }}</td>
+        <td>{{ assessment_map[s.assessment_code] }}</td>
+        <td style="max-width: 200px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; cursor: help;" 
+          title="{{ s.filename }}">
+          {{ s.filename }}
+        </td>
+        <td>{{ s.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+        <td>
+          <a href="{{ url_for('static', filename='uploads/submissions/' + s.filename) }}" class="btn-download" download>Download</a>
+        </td>
+        <td>
+            {% if s.status %}
+            {% set bg_color = (
+              '#ffc107' if s.status == 'Pending' else
+              '#28a745' if s.status == 'Approved' else
+              '#dc3545' if s.status == 'Rejected' else
+              '#6c757d'
+            ) %}
+            <span class="btn-request" style="cursor: default; background-color: {{bg_color}}; color: white;">
+              {{ s.status }}
+            </span>
+    </span>
+  {% elif s.can_request_resubmission %}
+    <a href="{{ url_for('student_request_resubmission', submission_id=s._id) }}" class="btn-request">Request</a>
+  {% else %}
+    <button class="btn-reset" disabled style="padding: 5px 12px;">Not Available</button>
+  {% endif %}
+</td>
+
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="6" style="text-align: center;">No submissions found.</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

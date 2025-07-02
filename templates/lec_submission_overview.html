@@ -1,0 +1,59 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Exam Submissions Overview{% endblock %}
+{% block breadcrumb %}Examinations > Exam Submissions{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+<h2 style="margin-left: 20px;">Exam Submissions</h2>
+<hr>
+
+<table class="studentList">
+  <thead>
+    <tr>
+      <th>No.</th>
+      <th>Assessment Code</th>
+      <th>Assessment Title</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in assessments %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ a.assessment_code }}</td>
+      <td>{{ a.title }}</td>
+      <td>
+        <a href="{{ url_for('lecturer_view_submissions', assessment_code=a.assessment_code) }}" class="btn-download">
+          View
+        </a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" style="text-align:center;">No assessments found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<style>
+  .btn-download {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 12px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-download:hover {
+    background-color: #0056b3;
+  }
+
+  .studentList th, .studentList td {
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+</style>
+{% endblock %}

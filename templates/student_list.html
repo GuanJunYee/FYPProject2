@@ -1,0 +1,66 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Student List{% endblock %}
+{% block breadcrumb %}User Management > Student List{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+
+<div class="profile-header">
+  <h2 style="margin-left: 20px;">Student List</h2>
+
+  <div style="float: right; margin-top: -48px; margin-right: 40px;">
+    <div class="tooltip" style="display:inline-block; margin-right: 860px;">
+      <a href="#"><i class="fas fa-chart-bar"></i></a>
+      <span class="tooltiptext">Student Register Trends Report</span>
+    </div>
+    <form method="POST" action="#" style="display:inline-block;">
+      <button type="submit" class="excel-export">Export</button>
+    </form>
+  </div>
+</div>
+
+<hr style="width: 100%;">
+
+<form method="GET" action="{{ url_for('student_list') }}">
+  <select name="gender" class="ddl">
+    <option value="">Select Gender</option>
+    <option value="Male" {% if selected_gender == 'Male' %}selected{% endif %}>Male</option>
+    <option value="Female" {% if selected_gender == 'Female' %}selected{% endif %}>Female</option>
+  </select>
+  <button type="submit" class="btnCreate">Filter</button>
+</form>
+
+
+<div id="studentList">
+  <table class="studentList">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Gender</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for student in students %}
+      <tr>
+        <td>{{ student.user_id }}</td>
+        <td>{{ student.name }}</td>
+        <td>{{ student.email }}</td>
+        <td>{{ student.phone }}</td>
+        <td>{{ student.gender }}</td>
+        <td class="btnUpdate">
+          <a href="{{ url_for('edit_student', student_id=student['_id']) }}"><i class="fas fa-edit"></i></a>
+        </td>
+        <td class="btnDelete">
+          <a href="#"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

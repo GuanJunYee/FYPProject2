@@ -1,0 +1,73 @@
+{% extends 'base_lecdashboard.html' %}
+
+{% block title %}Lecturer Dashboard{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin: 20px;">
+  <h1>Welcome, {{ session.name or "Lecturer" }}</h1>
+  <p>This is your dashboard. Use the sidebar to manage courses, monitor exams, and view student information.</p>
+
+  <div class="dashboard-grid">
+    <div class="dashboard-card">
+      <i class="fas fa-book-open fa-2x"></i>
+      <h3>Manage Courses</h3>
+      <p>Create and update course information</p>
+      <a href="#">Go to Courses</a>
+    </div>
+
+    <div class="dashboard-card">
+      <i class="fas fa-users fa-2x"></i>
+      <h3>Student List</h3>
+      <p>View enrolled students by course</p>
+      <a href="#">View Students</a>
+    </div>
+
+    <div class="dashboard-card">
+      <i class="fas fa-clipboard-list fa-2x"></i>
+      <h3>Manage Exams</h3>
+      <p>Schedule and monitor exams</p>
+      <a href="#">Setup Exam</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.dashboard-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  transition: 0.3s ease;
+}
+
+.dashboard-card i {
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.dashboard-card h3 {
+  margin-bottom: 5px;
+}
+
+.dashboard-card a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

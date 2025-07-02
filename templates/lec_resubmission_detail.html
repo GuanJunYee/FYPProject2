@@ -1,0 +1,144 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Resubmission Request{% endblock %}
+{% block breadcrumb %}Examinations > Resubmission > {{ resub.assessment_code }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+
+<h2 style="margin-left: 20px;">Resubmission Request</h2>
+<hr style="width: 100%;">
+<a href="{{ url_for('lecturer_view_submissions', assessment_code=resub.assessment_code) }}" class="btn-reset" style="float: left; margin-top: 10px; margin-bottom: 15px;">← Back</a>
+
+<div class="form-container">
+  <form method="POST">
+    <label>Assessment Code:</label>
+    <input type="text" value="{{ resub.assessment_code }}" readonly>
+
+    <label>Student ID:</label>
+    <input type="text" value="{{ resub.student_id }}" readonly>
+
+    <label>Student Name:</label>
+    <input type="text" value="{{ student.name }}" readonly>
+
+    <label>Submitted At:</label>
+    <input type="text" value="{{ resub.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}" readonly>
+
+    <label>Original File:</label>
+    <a href="{{ url_for('static', filename='uploads/submissions/' + resub.old_filename) }}" target="_blank" class="btn-download">View Original</a>
+
+    <label>New File:</label>
+    <a href="{{ url_for('static', filename='uploads/submissions/' + resub.new_filename) }}" target="_blank" class="btn-download">View Resubmission</a>
+    
+    <label>Similarity Check:</label>
+    {% if resub.similarity_score is defined %}
+    <a href="{{ url_for('check_similarity', submission_id=resub.submission_id) }}" class="btn-download">View Similarity Report</a>
+    {% else %}
+    <a href="{{ url_for('check_similarity', submission_id=resub.submission_id) }}" class="btn-download" style="background-color: orange;">Run Similarity Check</a>
+    {% endif %}
+
+    <label>Reason:</label>
+    <textarea readonly>{{ resub.reason }}</textarea>
+
+    <label>Status:</label>
+    <input type="text" value="{{ resub.status }}" readonly>
+
+    <div class="form-actions">
+      {% if resub.status == 'Pending' %}
+      <button name="action" value="Approved" class="btn-save" onclick="return confirm('Approve this resubmission?')">Approve</button>
+      <button name="action" value="Rejected" class="btn-delete" onclick="return confirm('Reject this resubmission?')">Reject</button>
+      {% else %}
+      <p style="color: green;"><strong>Already {{ resub.status }}</strong></p>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<style>
+  .form-container {
+    width: 65%;
+    margin: 30px auto;
+    padding: 25px;
+    border: 1px solid #ccc;
+    background-color: #fdfdfd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .form-container label {
+    display: block;
+    margin-top: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .form-container input,
+  .form-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+  }
+
+  .form-container textarea {
+    height: 100px;
+    resize: vertical;
+  }
+
+  .form-actions {
+    margin-top: 30px;
+    text-align: right;
+  }
+
+  .btn-save {
+    background-color: #28a745;
+    color: white;
+    border: 1px solid #28a745;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  .btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  .btn-download {
+    display: inline-block;
+    margin-top: 8px;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+  }
+
+  .btn-reset {
+    background-color: #6c757d;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 14px;
+    text-decoration: none;
+  }
+
+  .btn-download:hover {
+    background-color: #0056b3;
+  }
+</style>
+{% endblock %}

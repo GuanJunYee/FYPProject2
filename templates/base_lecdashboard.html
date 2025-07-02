@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}ProctorTrack{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='image/favicon_io/favicon.ico') }}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="{{ url_for('static', filename='js/fontawesome/all.js') }}"></script>
+  <script>
+    $(document).ready(function () {
+      $(".sidebar .menu-item").click(function () {
+        $(".sidebar .submenu").slideUp("fast");
+        if (!$(this).find(".submenu").is(":visible")) {
+          $(this).find(".submenu").slideDown("fast");
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <div class="logo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" />
+      <span style="font-weight: bold;">ProctorTrack</span>
+    </div>
+    <div class="user-info">
+      <div class="dropdown">
+        <button class="dropbtn">
+          <div class="user-box">
+            <img src="{{ user.photo_url or url_for('static', filename='img/default-profile.png') }}" class="profile-img" alt="Profile">
+            <div class="user-text">
+              <div class="welcome-text">Welcome,</div>
+              <div class="full-name">{{ session.name or "Lecturer" }}</div>
+            </div>
+          </div>
+        </button>
+        <div class="dropdown-content">
+          <a href="{{ url_for('lec_profile') }}"><i class="fas fa-user" ></i>&nbsp&nbsp Profile</a>
+          <a href="{{ url_for('lec_edit_profile') }}"><i class="fas fa-user-edit"></i>&nbsp Edit Profile</a>
+          <a href="{{ url_for('lec_reset_password') }}"><i class="fas fa-key" ></i>&nbsp&nbsp Set Password</a>
+          <a href="{{ url_for('logout') }}"><i class="fas fa-power-off"></i>&nbsp&nbsp Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <ul class="side-menu">
+      <li class="menu-item"><a href="{{ url_for('lec_dashboard') }}"><i class="fas fa-tachometer-alt" style="padding-right: 12px;"></i>Dashboard</a></li>
+      <li class="menu-item">
+        <a href="javascript:void(0)"><i class="fas fa-user-cog" style="padding-right: 12px;"></i>User Management
+          <i class="fa fa-caret-down" style="margin-left: 10px;"></i></a>
+        <ul class="submenu">
+          <li><a href="{{ url_for('lec_register') }}">User Registration</a></li>
+          <li><a href="{{ url_for('student_list') }}">Student List</a></li>
+          <li><a href="{{ url_for('lec_list') }}">Lecturer List</a></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        <a href="javascript:void(0)"><i class="fas fa-chalkboard-teacher" style="padding-right: 12px;"></i>Programme
+          <i class="fa fa-caret-down" style="margin-left: 57.5px;"></i></a>
+        <ul class="submenu">
+          <li><a href="{{ url_for('course_manage') }}">Courses Management</a></li>
+          <li><a href="{{ url_for('assessment_manage') }}">Assessments Management</a></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        <a href="javascript:void(0)"><i class="fas fa-graduation-cap" style="padding-right: 12px;"></i>Examinations
+          <i class="fa fa-caret-down" style="margin-left: 47.5px;"></i></a>
+        <ul class="submenu">
+          <li><a href="{{ url_for('exam_timetable') }}">Exam Timetable</a></li>
+          <li><a href="#">Exam Environment</a></li>
+          <li><a href="{{ url_for('lecturer_submission_overview') }}">Exam Submissions</a></li>
+          <li><a href="{{ url_for('lecturer_exam_violations') }}">Exam Violation</a></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        <a href="javascript:void(0)"><i class="fa fa-file-alt" style="padding-right: 20px;"></i>Report
+          <i class="fa fa-caret-down" style="margin-left: 93.5px;"></i></a>
+        <ul class="submenu">
+          <li><a href="#">Exam Setup</a></li>
+          <li><a href="#">Exam Timetable</a></li>
+          <li><a href="#">Exam Environment</a></li>
+          <li><a href="#">Exam Submissions</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <div id="siteMap">
+      <i class="fa fa-home"></i>
+      <span class="siteMapPath">Home > {% block breadcrumb %}{% endblock %}</span>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-data" style="display: none;">
+          {% for category, msg in messages %}
+            <div class="flash-msg" data-category="{{ category }}" data-message="{{ msg }}"></div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <div id="footer">
+    <p>Copyright &copy; {{ current_year }} ProctorTrack Sdn. Bhd. All rights reserved.</p>
+  </div>
+
+  <!-- SweetAlert Auto Trigger -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const flashMessages = document.querySelectorAll("#flash-data .flash-msg");
+
+      flashMessages.forEach((el) => {
+        const category = el.dataset.category;
+        const message = el.dataset.message;
+
+        if (category === "success_redirect") {
+          Swal.fire({
+            title: "Success!",
+            text: message,
+            icon: "success",
+            confirmButtonText: "OK"
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "{{ url_for('lec_profile') }}";
+            }
+          });
+        
+        } 
+        else if (category === "danger") {
+          Swal.fire({
+            title: "Error!",
+            text: message,
+            icon: 'error',
+            confirmButtonText: "OK"
+          });
+          
+        
+        } 
+        else  {
+          Swal.fire({
+            title: category === "success" ? "Success!" : category.charAt(0).toUpperCase() + category.slice(1),
+            text: message,
+            icon: category,
+            confirmButtonText: "OK"
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

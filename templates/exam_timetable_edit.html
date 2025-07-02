@@ -1,0 +1,64 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Edit Exam Timetable{% endblock %}
+{% block breadcrumb %}Programme > Exam Timetable > Edit Exam Timetable{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/examtimetable.css') }}">
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const today = new Date();
+    today.setDate(today.getDate() + 2); // tomorrow only
+    const minDate = today.toISOString().split("T")[0];
+    document.getElementById("exam_date").setAttribute("min", minDate);
+  });
+</script>
+
+<script>
+  // Auto-hide error messages after 5 seconds
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+      document.querySelectorAll(".error").forEach(el => {
+        el.style.transition = "opacity 0.5s ease-out";
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);  // remove from DOM
+      });
+    }, 5000);
+  });
+</script>
+
+<div class="profile-header"><h2>Edit Exam Timetable</h2><hr></div>
+
+<form method="POST" class="form-container">
+  <label>Assessment:</label>
+  <select name="assessment_code" required>
+    <option value="">-- Select Assessment --</option>
+    {% for assessment in assessments %}
+      <option value="{{ assessment.assessment_code }}"
+        {% if timetable.assessment_code == assessment.assessment_code %}selected{% endif %}>
+        {{ assessment.assessment_code }} - {{ assessment.title }}
+      </option>
+    {% endfor %}
+  </select>
+  {% if errors.assessment_code %}
+    <div class="error">{{ errors.assessment_code }}</div>
+  {% endif %}
+
+  <label>Exam Date:</label>
+  <input type="date" id="exam_date" name="exam_date" value="{{ timetable.exam_date }}" required>
+
+  <label>Start Time:</label>
+  <input type="time" name="start_time" value="{{ timetable.start_time }}" required>
+
+  <label>End Time:</label>
+  <input type="time" name="end_time" value="{{ timetable.end_time }}" required>
+  {% if errors.end_time %}
+    <div class="error">{{ errors.end_time }}</div>
+  {% endif %}
+
+  <div class="form-actions">
+    <a href="{{ url_for('exam_timetable') }}" class="btn-reset_edit">Cancel</a>
+    <button type="submit" class="btn-save">Update</button>
+  </div>
+</form>
+{% endblock %}

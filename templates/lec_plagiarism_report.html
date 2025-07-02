@@ -1,0 +1,627 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Plagiarism Report{% endblock %}
+{% block breadcrumb %}Examinations > Submissions > Plagiarism Report{% endblock %}
+
+{% block content %}
+
+<style>
+.report-container {
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.student-info-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-item {
+    padding: 10px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+.info-item.filename {
+    grid-column: 1 / -1;
+}
+
+/* Score Summary Styles */
+.score-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.score-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.main-score {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.score-display {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.score-display.secondary {
+    font-size: 2em;
+    color: #6c757d;
+}
+
+.score-description {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.badge-success { background-color: #28a745; color: white; }
+.badge-warning { background-color: #ffc107; color: #212529; }
+.badge-danger { background-color: #dc3545; color: white; }
+
+/* Report Layout */
+.report-layout {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 1024px) {
+    .report-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Text Analysis Panel */
+.text-analysis-panel {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.text-content {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 20px;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
+    font-size: 16px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.plagiarized-text {
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+    padding: 2px 4px;
+    margin: 2px 0;
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+}
+
+.plagiarized-text:hover {
+    background-color: #ffcdd2;
+}
+
+.quoted-text {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 2px 4px;
+    margin: 2px 0;
+    border-radius: 3px;
+    position: relative;
+}
+
+.source-indicator {
+    display: inline-block;
+    background: #f44336;
+    color: white;
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-left: 2px;
+    vertical-align: super;
+}
+
+.quote-indicator {
+    display: inline-block;
+    background: #2196f3;
+    color: white;
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    margin-left: 2px;
+    vertical-align: super;
+}
+
+/* Sources Panel */
+.sources-panel {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.source-item {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.source-item:hover {
+    background: #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.source-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.source-number {
+    background: #f44336;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.source-percent {
+    background: #6c757d;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+}
+
+.source-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.source-url {
+    margin-bottom: 5px;
+}
+
+.source-url a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9em;
+    word-break: break-all;
+}
+
+.source-url a:hover {
+    text-decoration: underline;
+}
+
+.source-description {
+    color: #6c757d;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+/* Legend */
+.legend {
+    background: #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.legend-items {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+
+.legend-plagiarism {
+    background-color: #ffebee;
+    border-left: 4px solid #f44336;
+}
+
+.legend-quote {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.legend-original {
+    background-color: white;
+    border: 1px solid #dee2e6;
+}
+
+/* External Report */
+.external-report {
+    background: #e7f3ff;
+    border: 1px solid #b3d7ff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.btn-external-report {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.btn-external-report:hover {
+    background-color: #0056b3;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn-back, .btn-external {
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-back:hover {
+    background-color: #545b62;
+}
+
+.btn-external {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.btn-external:hover {
+    background-color: #138496;
+}
+
+/* Statistics */
+.statistics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #495057;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.no-content {
+    text-align: center;
+    color: #6c757d;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px dashed #dee2e6;
+}
+</style>
+
+<h2 style="margin-left: 20px;">Plagiarism Report</h2>
+<hr>
+
+<div class="report-container">
+    <!-- Student Information -->
+    <div class="student-info-card">
+        <h3>Submission Details</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Student ID:</strong> {{ student_info.user_id }}
+            </div>
+            <div class="info-item">
+                <strong>Student Name:</strong> {{ student_info.name }}
+            </div>
+            <div class="info-item">
+                <strong>Course:</strong> {{ student_info.course }}
+            </div>
+            <div class="info-item filename">
+                <strong>Filename:</strong> {{ student_info.filename }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Summary -->
+    <div class="score-summary">
+        <div class="score-card main-score">
+            <h3>Overall Similarity</h3>
+            <div class="score-display" style="color: {% if plagiarism_score > 50 %}#dc3545{% elif plagiarism_score > 25 %}#ffc107{% else %}#28a745{% endif %};">
+                {{ plagiarism_score + quotes_score }}%
+            </div>
+            <div class="score-interpretation">
+                {% if plagiarism_score > 50 %}
+                    <span class="badge badge-danger">High Risk</span>
+                {% elif plagiarism_score > 25 %}
+                    <span class="badge badge-warning">Moderate Risk</span>
+                {% else %}
+                    <span class="badge badge-success">Low Risk</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if quotes_score > 0 %}
+        <div class="score-card">
+            <h3>Quotes</h3>
+            <div class="score-display secondary">
+                {{ quotes_score }}%
+            </div>
+            <p class="score-description">Properly cited quotations</p>
+        </div>
+        {% endif %}
+
+        <div class="score-card">
+            <h3>Sources</h3>
+            <div class="score-display secondary">
+                {{ sources|length }}
+            </div>
+            <p class="score-description">Matching sources detected</p>
+        </div>
+
+        {% if report_data %}
+        <div class="score-card">
+            <h3>Words</h3>
+            <div class="score-display secondary">
+                {{ report_data.get('length', 0) }}
+            </div>
+            <p class="score-description">Total characters</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Document Statistics -->
+    {% if report_data %}
+    <div class="statistics">
+        <div class="stat-item">
+            <div class="stat-value">{{ report_data.get('matched_length', 0) }}</div>
+            <div class="stat-label">Matched Characters</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ (report_data.nodes|length) if report_data.nodes else 0 }}</div>
+            <div class="stat-label">Text Segments</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">{{ report_data.get('external_queries', 0) }}</div>
+            <div class="stat-label">Database Queries</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Legend -->
+    <div class="legend">
+        <strong>Legend:</strong>
+        <div class="legend-items">
+            <div class="legend-item">
+                <div class="legend-color legend-plagiarism"></div>
+                <span>Plagiarized Text</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-quote"></div>
+                <span>Quoted Text</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color legend-original"></div>
+                <span>Original Text</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Report Layout -->
+    <div class="report-layout">
+        <!-- Text Analysis Panel -->
+        <div class="text-analysis-panel">
+            <h3>Document Analysis</h3>
+            
+            {% if report_data and report_data.nodes %}
+            <div class="text-content">
+                {% for node in report_data.nodes %}
+                    {% if node.enabled %}
+                        {% if node.quotes %}
+                            <span class="quoted-text">{{ node.text }}<span class="quote-indicator">Q</span></span>
+                        {% elif node.sources %}
+                            <span class="plagiarized-text">{{ node.text }}
+                                {% for source_id in node.sources %}
+                                    <span class="source-indicator">{{ source_id + 1 }}</span>
+                                {% endfor %}
+                            </span>
+                        {% else %}
+                            {{ node.text }}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-content">
+                <p>Detailed text analysis is not available.</p>
+                <p>Please view the external report for complete analysis.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sources Panel -->
+        <div class="sources-panel">
+            <h3>Sources ({{ sources|length }})</h3>
+            
+            {% if sources and sources|length > 0 %}
+                {% for source in sources %}
+                <div class="source-item">
+                    <div class="source-header">
+                        <span class="source-number">{{ loop.index }}</span>
+                        {% if source.plagiarism_percent %}
+                            <span class="source-percent">{{ source.plagiarism_percent }}%</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if source.link and source.link.name %}
+                        <div class="source-title">{{ source.link.name }}</div>
+                    {% endif %}
+                    
+                    {% if source.source %}
+                        <div class="source-url">
+                            <a href="{{ source.source }}" target="_blank">{{ source.source }}</a>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="source-description">
+                        <strong>Content Type:</strong> {{ source.content_type|default('Unknown') }}<br>
+                        <strong>Match Length:</strong> {{ source.plagiarism_length|default(0) }} characters
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="no-content">
+                <p>No matching sources found.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- External Report Link -->
+    {% if plagiarism_report_url %}
+    <div class="external-report">
+        <h3>Complete Report</h3>
+        <p>View the full plagiarism report with advanced features and detailed analysis:</p>
+        <a href="{{ plagiarism_report_url }}" target="_blank" class="btn-external-report">
+            🔗 Open Full Report on PlagiarismCheck.org
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="javascript:history.back()" class="btn-back">← Back to Submissions</a>
+        {% if plagiarism_report_url %}
+        <a href="{{ plagiarism_report_url }}" target="_blank" class="btn-external">View External Report</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Add interactivity for highlighting text and sources
+document.addEventListener('DOMContentLoaded', function() {
+    // Highlight corresponding source when plagiarized text is clicked
+    const plagiarizedTexts = document.querySelectorAll('.plagiarized-text');
+    const sourceItems = document.querySelectorAll('.source-item');
+    
+    plagiarizedTexts.forEach(text => {
+        text.addEventListener('mouseenter', function() {
+            const sourceIndicators = this.querySelectorAll('.source-indicator');
+            sourceIndicators.forEach(indicator => {
+                const sourceNumber = parseInt(indicator.textContent);
+                if (sourceItems[sourceNumber - 1]) {
+                    sourceItems[sourceNumber - 1].style.backgroundColor = '#fff3cd';
+                    sourceItems[sourceNumber - 1].style.borderColor = '#ffc107';
+                }
+            });
+        });
+        
+        text.addEventListener('mouseleave', function() {
+            sourceItems.forEach(item => {
+                item.style.backgroundColor = '';
+                item.style.borderColor = '';
+            });
+        });
+    });
+    
+    // Highlight text when source is hovered
+    sourceItems.forEach((item, index) => {
+        item.addEventListener('mouseenter', function() {
+            const sourceNumber = index + 1;
+            const indicators = document.querySelectorAll(`.source-indicator:contains('${sourceNumber}')`);
+            indicators.forEach(indicator => {
+                const parentText = indicator.closest('.plagiarized-text');
+                if (parentText) {
+                    parentText.style.backgroundColor = '#fff3cd';
+                }
+            });
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            const plagiarizedTexts = document.querySelectorAll('.plagiarized-text');
+            plagiarizedTexts.forEach(text => {
+                text.style.backgroundColor = '';
+            });
+        });
+    });
+});
+</script>
+
+{% endblock %}

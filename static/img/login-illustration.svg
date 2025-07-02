@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!-- Background -->
+  <rect x="0" y="0" width="800" height="600" fill="#f5f7fa" />
+  
+  <!-- Decorative elements -->
+  <circle cx="400" cy="300" r="200" fill="#667eea" opacity="0.1" />
+  <circle cx="500" cy="200" r="100" fill="#764ba2" opacity="0.1" />
+  <circle cx="300" cy="400" r="150" fill="#667eea" opacity="0.1" />
+  
+  <!-- Laptop -->
+  <rect x="300" y="250" width="200" height="140" rx="5" fill="#2c3e50" />
+  <rect x="310" y="260" width="180" height="110" fill="#ecf0f1" />
+  <rect x="280" y="390" width="240" height="10" rx="5" fill="#2c3e50" />
+  <rect x="350" y="390" width="100" height="5" rx="2" fill="#34495e" />
+  
+  <!-- Screen content -->
+  <rect x="330" y="280" width="140" height="10" rx="2" fill="#3498db" opacity="0.7" />
+  <rect x="330" y="300" width="100" height="10" rx="2" fill="#3498db" opacity="0.5" />
+  <rect x="330" y="320" width="120" height="10" rx="2" fill="#3498db" opacity="0.5" />
+  <rect x="330" y="340" width="80" height="10" rx="2" fill="#3498db" opacity="0.5" />
+  
+  <!-- Books -->
+  <rect x="520" y="340" width="60" height="80" rx="2" fill="#e74c3c" />
+  <rect x="525" y="345" width="50" height="5" rx="1" fill="white" opacity="0.5" />
+  <rect x="525" y="355" width="40" height="5" rx="1" fill="white" opacity="0.5" />
+  
+  <rect x="510" y="320" width="60" height="100" rx="2" fill="#3498db" />
+  <rect x="515" y="325" width="50" height="5" rx="1" fill="white" opacity="0.5" />
+  <rect x="515" y="335" width="40" height="5" rx="1" fill="white" opacity="0.5" />
+  
+  <rect x="530" y="300" width="60" height="120" rx="2" fill="#2ecc71" />
+  <rect x="535" y="305" width="50" height="5" rx="1" fill="white" opacity="0.5" />
+  <rect x="535" y="315" width="40" height="5" rx="1" fill="white" opacity="0.5" />
+  
+  <!-- Pencils -->
+  <line x1="220" y1="320" x2="220" y2="400" stroke="#f1c40f" stroke-width="8" stroke-linecap="round" />
+  <polygon points="220,310 215,320 225,320" fill="#e67e22" />
+  
+  <line x1="240" y1="330" x2="240" y2="400" stroke="#3498db" stroke-width="8" stroke-linecap="round" />
+  <polygon points="240,320 235,330 245,330" fill="#e67e22" />
+  
+  <line x1="200" y1="340" x2="200" y2="400" stroke="#2ecc71" stroke-width="8" stroke-linecap="round" />
+  <polygon points="200,330 195,340 205,340" fill="#e67e22" />
+  
+  <!-- Graduation cap -->
+  <rect x="400" y="150" width="100" height="20" fill="#34495e" />
+  <polygon points="450,150 400,130 500,130" fill="#34495e" />
+  <circle cx="450" cy="130" r="10" fill="#34495e" />
+  <line x1="450" y1="130" x2="480" y2="100" stroke="#34495e" stroke-width="3" />
+  <circle cx="480" cy="100" r="8" fill="#e74c3c" />
+  
+  <!-- Text elements -->
+  <text x="400" y="480" font-family="Arial" font-size="24" fill="#2c3e50" text-anchor="middle" font-weight="bold">Online Examination System</text>
+  <text x="400" y="510" font-family="Arial" font-size="16" fill="#7f8c8d" text-anchor="middle">Learn, Test, Succeed</text>
+</svg>

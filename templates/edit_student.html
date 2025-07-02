@@ -1,0 +1,35 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Edit Student{% endblock %}
+{% block breadcrumb %}User Management > Edit Student{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_student.css') }}">
+<h2 style="margin-left: 20px;">Edit Student</h2>
+<hr style="width: 100%;">
+
+<form method="POST" class="edit-form">
+<div class="form-group">
+  <label>Full Name:</label>
+  <input type="text" name="name" value="{{ student.name }}" required>
+</div>
+<div class="form-group">
+  <label>Email:</label>
+  <input type="email" name="email" value="{{ student.email }}" required>
+</div>
+<div class="form-group">
+  <label>Phone:</label>
+  <input type="text" name="phone" value="{{ student.phone }}" required>
+</div>
+  <div class="form-group">
+  <label>Gender:</label>
+  <select name="gender" required>
+    <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male</option>
+    <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
+  </select>
+</div>
+<div class="form-actions">
+    <a href="{{ url_for('student_list') }}" class="btn-reset">Cancel</a>
+  <button type="submit" class="btn-save">Save</button>
+  </div>
+</form>
+{% endblock %}

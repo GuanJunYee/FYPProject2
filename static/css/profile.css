@@ -1,0 +1,290 @@
+* {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+/* Profile Page Styling */
+.profile-container {
+    background-color: #ffffff;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+    .profile-header .profile-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #007bff;
+        margin-bottom: 15px;
+    }
+
+.profile-image-container {
+    position: relative;
+    display: inline-block;
+}
+
+    .profile-image-container .profile-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #007bff;
+        margin-bottom: 15px;
+    }
+
+.camera-icon {
+    position: absolute;
+    bottom: 15px;
+    right: 10px;
+    background-color: #3498db;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+}
+
+    .camera-icon i {
+        color: white;
+        font-size: 18px;
+    }
+
+.hidden-file-input {
+    display: none;
+}
+
+.profile-header h2 {
+    margin: 10px 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.user-id {
+    background-color: #007bff;
+    color: #fff;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.profile-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.detail-group {
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+}
+
+    .detail-group .error {
+        color: red;
+        background-image: url(../image/error.png);
+        background-repeat: no-repeat;
+        background-position: left center;
+        padding: 8px;
+        padding-left: 20px;
+        font-size: 10px;
+        display: inline-block;
+    }
+
+
+    .detail-group label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    .detail-group span {
+        font-size: 14px;
+        color: #333;
+    }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-details {
+        flex-direction: column;
+    }
+
+    .detail-group {
+        width: 100%;
+    }
+}
+
+
+/* Breadcrumb Navigation */
+.breadcrumb {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+    .breadcrumb a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+.breadcrumb-active {
+    color: #333;
+    font-weight: bold;
+}
+
+.profile-header {
+    margin-bottom: 20px;
+}
+
+    .profile-header h1 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+    .profile-header hr {
+        border: none;
+        border-top: 2px solid #ccc;
+        margin-top: 0;
+    }
+
+/* Save button styling */
+.btn-save {
+    margin-left: 78%;
+    background-color: #28a745;
+    color: white;
+    border: 1px solid #28a745;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+    .btn-save:hover {
+        background-color: #218838;
+    }
+
+/* Cancel button styling (Reset) */
+.btn-reset {
+    background-color: #e1e4e8;
+    color: #24292e;
+    border: 1px solid #d1d5da;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+    .btn-reset:hover {
+        background-color: #d1d5da;
+        border-color: #c6cbd1;
+    }
+
+/* update Student Record*/
+
+/*Delete Student Record*/
+.btnBack {
+    float: right;
+    background-color: #aab5be;
+    color: #fff;
+    border: none;
+    padding: 15px 35px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+
+.btnBack:hover {
+    background-color: #8898a5;
+}
+
+
+.btnDeleteStu {
+    float: left;
+    background-color: #28a745;
+    border: none;
+    color: white;
+    padding: 15px 35px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+/* General styling for text boxes */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+/* Style the table cells */
+#deleteFormTable td {
+    padding: 10px;
+}
+
+    /* Align labels to the left */
+    #deleteFormTable td:first-child {
+        text-align: left;
+        padding-right: 15px;
+        vertical-align: middle;
+    }
+
+/* Styling for the buttons */
+.btnDeleteStu {
+    background-color: #28a745;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 20px 10px 0 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.btnBack {
+    background-color: #aab5be;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 20px 0 0 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+    .btnBack:hover {
+        background-color: #8898a5;
+    }

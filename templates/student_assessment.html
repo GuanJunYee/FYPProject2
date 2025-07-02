@@ -1,0 +1,85 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}My Assessments{% endblock %}
+{% block breadcrumb %}Programme > My Assessments{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+<style>
+    .btn-save {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.btn-save:hover {
+    background-color: #218838;
+}
+</style>
+
+<!-- Enrolled Assessments -->
+<div class="profile-header"><h2 style="margin-left: 20px;">Enrolled Assessments</h2></div>
+<hr>
+<table class="studentList">
+  <thead>
+    <tr>
+      <th>No.</th>
+      <th>Assessment Code</th>
+      <th>Assessment Title</th>
+      <th>Course(s)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in enrolled %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ a.assessment_code }}</td>
+      <td>{{ a.title }}</td>
+      <td>{{ a.course_codes | join(', ') }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" style="text-align:center;">No enrolled assessments.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Divider -->
+<hr style="margin: 40px 0; border-top: 2px dashed #ccc;">
+
+<!-- Eligible for Self-Enrollment -->
+<div class="profile-header"><h2 style="margin-left: 20px;">Available Assessments for Enrollment</h2></div>
+<hr>
+<table class="studentList">
+  <thead>
+    <tr>
+      <th>No.</th>
+      <th>Assessment Code</th>
+      <th>Assessment Title</th>
+      <th>Course(s)</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in available %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ a.assessment_code }}</td>
+      <td>{{ a.title }}</td>
+      <td>{{ a.course_codes | join(', ') }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('enroll_assessment', code=a.assessment_code) }}">
+          <button type="submit" class="btn-save" style="padding: 5px 12px;">Enroll</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" style="text-align:center;">No assessments available for enrollment.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

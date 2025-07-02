@@ -1,0 +1,43 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block breadcrumb %}User Profile{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+
+<div class="profile-header">
+  <h1 style="padding-left:20px;">Profile</h1>
+  <hr />
+</div>
+
+<div class="profile-container">
+  <div class="profile-header">
+    <img src="{{ user.photo_url or url_for('static', filename='img/default-profile.png') }}" class="profile-img" alt="Profile Picture">
+    <h2>{{ user.name }}</h2>
+    <div class="user-id">
+      <strong>User ID:</strong> {{ user.user_id }}
+    </div>
+  </div>
+
+  <div class="profile-details" style="margin-left: 320px;">
+    <div class="detail-group">
+      <label>Full Name:</label>
+      <span>{{ user.name }}</span>
+    </div>
+    <div class="detail-group">
+      <label>Email:</label>
+      <span>{{ user.email }}</span>
+    </div>
+    <div class="detail-group">
+      <label>Phone Number:</label>
+      <span>{{ user.phone }}</span>
+    </div>
+    <div class="detail-group">
+      <label>Gender:</label>
+      <span>{{ user.gender }}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

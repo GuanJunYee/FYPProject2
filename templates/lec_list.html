@@ -1,0 +1,62 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Lecturer List{% endblock %}
+{% block breadcrumb %}User Management > Lecturer List{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+
+<div class="profile-header">
+  <h2 style="margin-left: 20px;">Lecturer List</h2>
+
+  <div style="float: right; margin-top: -48px; margin-right: 40px;">
+    <form method="POST" action="#" style="display:inline-block;">
+      <button type="submit" class="excel-export">Export</button>
+    </form>
+  </div>
+</div>
+
+<hr style="width: 100%;">
+
+<form method="GET" action="{{ url_for('lec_list') }}">
+  <select name="gender" class="ddl">
+    <option value="">Select Gender</option>
+    <option value="Male" {% if selected_gender == 'Male' %}selected{% endif %}>Male</option>
+    <option value="Female" {% if selected_gender == 'Female' %}selected{% endif %}>Female</option>
+  </select>
+  <button type="submit" class="btnCreate">Filter</button>
+</form>
+
+
+<div id="studentList">
+  <table class="studentList">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Full Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Gender</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for lecturer in lecturers %}
+      <tr>
+        <td>{{ lecturer.user_id }}</td>
+        <td>{{ lecturer.name }}</td>
+        <td>{{ lecturer.email }}</td>
+        <td>{{ lecturer.phone }}</td>
+        <td>{{ lecturer.gender }}</td>
+        <td class="btnUpdate">
+          <a href="{{ url_for('edit_lecturer', lecturer_id=lecturer['_id']) }}"><i class="fas fa-edit"></i></a>
+        </td>
+        <td class="btnDelete">
+          <a href="#"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,1496 @@
+{
+  "report": {
+    "id": 27152083,
+    "version": null,
+    "created_at": "1751382913000",
+    "source_count": 3,
+    "percent": "81.69",
+    "text_id": 27288147,
+    "group_id": null
+  },
+  "report_data": {
+    "version": "1.1",
+    "length": 901,
+    "created_at": "2025-07-01 10:15:11",
+    "nodes": [
+      {
+        "enabled": true,
+        "start": 0,
+        "end": 192,
+        "text": "Plagiarism is taking credit for someone else's writing as your own, including their language and ideas, without providing adequate credit.[1]\nThe University of Cambridge defines plagiarism as: ",
+        "sources": [
+          0,
+          1,
+          2
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 0.98
+          },
+          {
+            "source": 1,
+            "cos": 0.98
+          },
+          {
+            "source": 2,
+            "cos": 0.98
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 193,
+        "end": 356,
+        "text": "&quot;submitting as one's own work, irrespective of intent to deceive, that which derives in part or in its entirety from the work of others without due acknowledgement.",
+        "sources": [
+          0,
+          1,
+          2
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 0.98
+          },
+          {
+            "source": 1,
+            "cos": 0.98
+          },
+          {
+            "source": 2,
+            "cos": 0.98
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [
+          0
+        ],
+        "destinations_clusters": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 357,
+        "end": 357,
+        "text": "&quot;",
+        "sources": [
+          0,
+          1,
+          2
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          },
+          {
+            "source": 2,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [
+          0
+        ],
+        "destinations_clusters": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 358,
+        "end": 459,
+        "text": "[2]\nWikipedia has three core content policies, of which two make it easy to plagiarize inadvertently. ",
+        "sources": [
+          0,
+          1,
+          2
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          },
+          {
+            "source": 2,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 460,
+        "end": 613,
+        "text": "No original research prohibits us from adding our own ideas to articles, and Verifiability requires that articles be based on reliable published sources. ",
+        "sources": [
+          0,
+          1,
+          2
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          },
+          {
+            "source": 2,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 614,
+        "end": 764,
+        "text": "These policies mean that Wikipedians are highly vulnerable to accusations of plagiarism because we must stick closely to sources, but not too closely.\n",
+        "sources": [
+          0,
+          1,
+          2
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          },
+          {
+            "source": 2,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 765,
+        "end": 900,
+        "text": "Because plagiarism can occur without an intention to deceive, concerns should focus on educating the editor and cleaning up the article.",
+        "sources": [
+          0,
+          1,
+          2
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          },
+          {
+            "source": 2,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1,
+          2
+        ]
+      }
+    ],
+    "indexes": [
+      {
+        "id": 0,
+        "db_id": 5,
+        "name": "",
+        "status": "success",
+        "queries": 1,
+        "type": "external"
+      },
+      {
+        "id": 1,
+        "db_id": 7,
+        "name": "",
+        "status": "success",
+        "queries": 2,
+        "type": "external"
+      }
+    ],
+    "references": [],
+    "header": [],
+    "quotes": [
+      {
+        "id": 0,
+        "length": 165
+      }
+    ],
+    "sources": [
+      {
+        "dst_pos_success": true,
+        "content_type": "text/html",
+        "index": 0,
+        "source": "https://si.m.wikipedia.org/wiki/%E0%B7%80%E0%B7%92%E0%B6%9A%E0%B7%92%E0%B6%B4%E0%B7%93%E0%B6%A9%E0%B7%92%E0%B6%BA%E0%B7%8F:Plagiarism",
+        "length": 1802,
+        "percent": 200,
+        "link": {
+          "name": "si.m.wikipedia.org",
+          "urls": [
+            "https://si.m.wikipedia.org/wiki/%E0%B7%80%E0%B7%92%E0%B6%9A%E0%B7%92%E0%B6%B4%E0%B7%93%E0%B6%A9%E0%B7%92%E0%B6%BA%E0%B7%8F:Plagiarism"
+          ]
+        },
+        "tf_idf": false,
+        "plagiarism_length": 736,
+        "plagiarism_percent": 81.69
+      },
+      {
+        "dst_pos_success": true,
+        "content_type": "text/html",
+        "index": 1,
+        "source": "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_WikiFundi_Content/Wikipedia:Plagiarism",
+        "length": 1802,
+        "percent": 200,
+        "link": {
+          "name": "en.wikipedia.org",
+          "urls": [
+            "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_WikiFundi_Content/Wikipedia:Plagiarism"
+          ]
+        },
+        "tf_idf": false,
+        "plagiarism_length": 736,
+        "plagiarism_percent": 81.69
+      },
+      {
+        "dst_pos_success": true,
+        "content_type": "text/html",
+        "index": 1,
+        "source": "https://en.wikipedia.org/wiki/Wikipedia:Plagiarism",
+        "length": 1802,
+        "percent": 200,
+        "link": {
+          "name": "en.wikipedia.org",
+          "urls": [
+            "https://en.wikipedia.org/wiki/Wikipedia:Plagiarism"
+          ]
+        },
+        "tf_idf": false,
+        "plagiarism_length": 736,
+        "plagiarism_percent": 81.69
+      }
+    ],
+    "sources_count": 3,
+    "matched_length": 736,
+    "matched_percent": 81.69,
+    "external_queries": 3,
+    "destinations_clusters": [
+      {
+        "source": 0,
+        "id": 0,
+        "offsets": [
+          {
+            "start": 47350,
+            "end": 47564,
+            "cos": 0.98
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 1
+          },
+          {
+            "start": 47717,
+            "end": 47730,
+            "cos": 1
+          },
+          {
+            "start": 47901,
+            "end": 47927,
+            "cos": 1
+          },
+          {
+            "start": 47932,
+            "end": 47988,
+            "cos": 1
+          },
+          {
+            "start": 48177,
+            "end": 48196,
+            "cos": 1
+          },
+          {
+            "start": 48201,
+            "end": 48257,
+            "cos": 1
+          },
+          {
+            "start": 48432,
+            "end": 48444,
+            "cos": 1
+          },
+          {
+            "start": 48449,
+            "end": 48512,
+            "cos": 1
+          },
+          {
+            "start": 48513,
+            "end": 48650,
+            "cos": 1
+          },
+          {
+            "start": 48654,
+            "end": 48664,
+            "cos": 1
+          },
+          {
+            "start": 48669,
+            "end": 48670,
+            "cos": 1
+          },
+          {
+            "start": 48671,
+            "end": 48807,
+            "cos": 1
+          },
+          {
+            "start": 47350,
+            "end": 47564,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 47565,
+            "end": 47565,
+            "cos": 0.4
+          },
+          {
+            "start": 48177,
+            "end": 48186,
+            "cos": 0.4
+          },
+          {
+            "start": 48177,
+            "end": 48196,
+            "cos": 0.4
+          },
+          {
+            "start": 48177,
+            "end": 48196,
+            "cos": 0.4
+          },
+          {
+            "start": 48177,
+            "end": 48196,
+            "cos": 0.4
+          },
+          {
+            "start": 48177,
+            "end": 48196,
+            "cos": 0.4
+          },
+          {
+            "start": 48177,
+            "end": 48196,
+            "cos": 0.4
+          },
+          {
+            "start": 48177,
+            "end": 48196,
+            "cos": 0.4
+          },
+          {
+            "start": 48177,
+            "end": 48196,
+            "cos": 0.4
+          },
+          {
+            "start": 48513,
+            "end": 48650,
+            "cos": 0.4
+          },
+          {
+            "start": 48513,
+            "end": 48526,
+            "cos": 0.4
+          },
+          {
+            "start": 48671,
+            "end": 48807,
+            "cos": 0.4
+          }
+        ]
+      },
+      {
+        "source": 1,
+        "id": 1,
+        "offsets": [
+          {
+            "start": 47382,
+            "end": 47596,
+            "cos": 0.98
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 1
+          },
+          {
+            "start": 47749,
+            "end": 47846,
+            "cos": 1
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 1
+          },
+          {
+            "start": 47957,
+            "end": 48013,
+            "cos": 1
+          },
+          {
+            "start": 48086,
+            "end": 48098,
+            "cos": 1
+          },
+          {
+            "start": 48103,
+            "end": 48166,
+            "cos": 1
+          },
+          {
+            "start": 48167,
+            "end": 48305,
+            "cos": 1
+          },
+          {
+            "start": 48309,
+            "end": 48319,
+            "cos": 1
+          },
+          {
+            "start": 48324,
+            "end": 48325,
+            "cos": 1
+          },
+          {
+            "start": 48326,
+            "end": 48462,
+            "cos": 1
+          },
+          {
+            "start": 47382,
+            "end": 47596,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47942,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 48167,
+            "end": 48180,
+            "cos": 0.4
+          },
+          {
+            "start": 48167,
+            "end": 48305,
+            "cos": 0.4
+          },
+          {
+            "start": 48326,
+            "end": 48462,
+            "cos": 0.4
+          }
+        ]
+      },
+      {
+        "source": 2,
+        "id": 2,
+        "offsets": [
+          {
+            "start": 76033,
+            "end": 76247,
+            "cos": 0.98
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 1
+          },
+          {
+            "start": 76400,
+            "end": 76413,
+            "cos": 1
+          },
+          {
+            "start": 76502,
+            "end": 76528,
+            "cos": 1
+          },
+          {
+            "start": 76533,
+            "end": 76589,
+            "cos": 1
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 1
+          },
+          {
+            "start": 76700,
+            "end": 76763,
+            "cos": 1
+          },
+          {
+            "start": 76836,
+            "end": 76848,
+            "cos": 1
+          },
+          {
+            "start": 76853,
+            "end": 76916,
+            "cos": 1
+          },
+          {
+            "start": 76917,
+            "end": 77054,
+            "cos": 1
+          },
+          {
+            "start": 77058,
+            "end": 77068,
+            "cos": 1
+          },
+          {
+            "start": 77073,
+            "end": 77074,
+            "cos": 1
+          },
+          {
+            "start": 77075,
+            "end": 77211,
+            "cos": 1
+          },
+          {
+            "start": 76033,
+            "end": 76247,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76692,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76917,
+            "end": 77054,
+            "cos": 0.4
+          },
+          {
+            "start": 76917,
+            "end": 76930,
+            "cos": 0.4
+          },
+          {
+            "start": 77075,
+            "end": 77211,
+            "cos": 0.4
+          }
+        ]
+      }
+    ]
+  }
+}

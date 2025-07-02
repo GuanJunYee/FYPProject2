@@ -1,0 +1,85 @@
+/* Reset default browser styles */
+/* Body styling */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f7fb;
+  color: #333;
+}
+
+/* Header styling */
+hr {
+  border: 1px solid #ddd;
+}
+
+/* Form container */
+
+
+/* Inputs and select */
+.edit-form {
+    width: 600px;
+    margin: 20px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.form-group input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.form-group select{
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Button styles */
+.btn-save {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    margin-left: 69%;
+}
+
+.btn-reset {
+    background-color: #e1e4e8;
+    color: #24292e;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    text-decoration: none;
+}
+

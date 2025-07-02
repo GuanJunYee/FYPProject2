@@ -1,0 +1,126 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Assessment Submissions{% endblock %}
+{% block breadcrumb %}Examinations > Submissions > {{ assessment.assessment_code }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+<h2 style="margin-left: 20px;">Submissions for {{ assessment.assessment_code }} - {{ assessment.title }}</h2>
+<hr style="width: 100%;">
+<a href="{{ url_for('lecturer_submission_overview') }}" class="btn-reset" style="float: left; margin-top: 10px; margin-bottom: 15px;">← Back</a>
+
+
+<table class="studentList">
+  <thead>
+    <tr>
+      <th>No.</th>
+      <th>Student ID</th>
+      <th>Name</th>
+      <th>Course</th>
+      <th>Filename</th>
+      <th>Submitted At</th>
+      <th>View</th>
+      <th>Resubmission Status</th>
+      <th>Plagiarism</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in submissions %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ s.student_id }}</td>
+      <td>{{ s.student_name }}</td>
+      <td>{{ s.student_course }}</td>
+      <td style="max-width: 200px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; cursor: help;" 
+          title="{{ s.filename }}">
+          {{ s.filename }}
+      </td>
+      <td>{{ s.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>
+        <a href="{{ url_for('static', filename='uploads/submissions/' + s.filename) }}" class="btn-download" target="_blank">
+          View
+        </a>
+      </td>
+    <td>
+      {% if s.status %}
+        {% set bg_color = (
+          '#ffc107' if s.status == 'Pending' else
+          '#28a745' if s.status == 'Approved' else
+          'red' if s.status == 'Rejected' else
+          '#6c757d'
+        ) %}
+        <a href="{{ url_for('lecturer_view_resubmission', submission_id=s._id) }}"
+          class="btn-request"
+          style="cursor: pointer; background-color: {{ bg_color }}; color: white;">
+          {{ s.status }}
+        </a>
+      {% else %}
+        <span style="color: #999;">-</span>
+      {% endif %}
+    </td>
+    <td>
+      {% if s.plagiarism_score is defined  %}
+        {% set bg_color = (
+          'red' if s.plagiarism_score > 50 else
+          'green'
+        ) %}
+        <a href="{{ url_for('lecturer_view_plagiarism_report', submission_id=s._id) }}"
+          class="btn-request"
+          style="cursor: pointer; background-color: {{ bg_color }}; color: white;">
+          {{ s.plagiarism_score + s.quotes_score }}%
+        </a>
+      {% else %}
+        <form method="POST" action="{{ url_for('check_plagiarism_request', submission_id=s._id) }}">
+            <button type="submit" class="btn-request" style="padding:4px 10px;">Check</button>
+          </form>
+      {% endif %}
+    </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8" style="text-align:center;">No submissions found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<style>
+  .btn-download {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 10px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-download:hover {
+    background-color: #0056b3;
+  }
+
+  .btn-reset {
+    background-color: #6c757d;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 14px;
+    text-decoration: none;
+  }
+
+  .btn-request {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .studentList th, .studentList td {
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+</style>
+{% endblock %}

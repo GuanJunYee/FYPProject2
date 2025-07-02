@@ -1,0 +1,64 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Assessment Management{% endblock %}
+{% block breadcrumb %}Programme > Assessment Management{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+
+<div class="profile-header">
+  <h2 style="margin-left: 20px;">Assessment Management</h2>
+  <div style="float: right; margin-top: -48px; margin-right: 40px;">
+    <div class="cs_tooltip" style="display:inline-block; margin-right: 795px; margin-top: 3px;">
+      <a href="#"><i class="fas fa-chart-bar"></i></a>
+      <span class="tooltiptext">Assessment Report</span>
+    </div>
+  </div>
+</div>
+
+<hr style="width: 100%;">
+
+<form method="GET" action="{{ url_for('assessment_create') }}">
+  <button type="submit" class="btnCreate" style="margin-left: 90%;">Create</button>
+</form>
+
+<div id="studentList">
+  <table class="studentList">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th style="width: 15%;">Assessment Code</th>
+        <th>Assessment Title</th>
+        <th>Course(s)</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for assessment in assessments %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ assessment.assessment_code }}</td>
+        <td>{{ assessment.title }}</td>
+        <td>
+        {% if assessment.course_codes %}
+            {{ assessment.course_codes | join(', ') }}
+        {% else %}
+            -
+        {% endif %}
+        </td>
+        <td class="btnUpdate">
+          <a href="{{ url_for('assessment_edit', assessment_code=assessment.assessment_code) }}"><i class='fas fa-edit'></i></a>
+        </td>
+        <td class="btnDelete">
+          <a href="#" onclick="return confirm('Delete this assessment?');"><i class='fa fa-solid fa-trash'></i></a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" style="text-align:center;">No assessments available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Online Examination System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+</head>
+<script>
+  // Automatically hide flash messages after 5 seconds
+  setTimeout(() => {
+    const messages = document.querySelectorAll('.flash');
+    messages.forEach(msg => {
+      msg.style.transition = 'opacity 0.5s ease-out';
+      msg.style.opacity = '0';
+      setTimeout(() => msg.remove(), 500);
+    });
+  }, 5000);
+</script>
+<body>
+  <div class="login-page-container">
+    <!-- Left form panel -->
+    <div class="login-left-panel">
+      {% block content %}{% endblock %}
+    </div>
+
+    <!-- Right illustration panel -->
+    <div class="login-right-panel">
+      <img src="{{ url_for('static', filename='img/login-illustration.svg') }}" class="login-illustration" alt="Online Examination System">
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

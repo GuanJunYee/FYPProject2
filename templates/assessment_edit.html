@@ -1,0 +1,80 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Edit Assessment{% endblock %}
+{% block breadcrumb %}Programme > Assessment Management > Edit Assessment{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/assessment_edit.css') }}">
+<script>
+  // Auto-hide error messages after 5 seconds
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+      document.querySelectorAll(".error").forEach(el => {
+        el.style.transition = "opacity 0.5s ease-out";
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);  // remove from DOM
+      });
+    }, 5000);
+  });
+</script>
+
+<div class="profile-header">
+  <h2 style="margin-left: 20px;">Edit Assessment</h2>
+</div>
+
+<hr style="width: 100%;">
+
+<form method="POST" action="{{ url_for('assessment_edit', assessment_code=assessment.assessment_code) }}" enctype="multipart/form-data">
+  <div class="form-section">
+<label>Assessment Code:</label>
+<input type="text" name="assessment_code" class="form-control" value="{{ assessment.assessment_code }}" required>
+{% if errors.assessment_code %}
+  <div class="error">{{ errors.assessment_code }}</div>
+{% endif %}
+
+
+    <label>Assessment Title:</label>
+    <input type="text" name="title" class="form-control" value="{{ assessment.title }}" required>
+
+    <label>Courses:</label>
+    {% for course in courses %}
+      <div class="form-check" style="font-weight: normal; font-size: 14px; margin-top: 3px;">
+        <input type="checkbox" name="course_codes" value="{{ course.course_code }}"
+          {% if course.course_code in assessment.course_codes %}checked{% endif %}>
+        {{ course.course_code }} - {{ course.course_name }}
+      </div>
+    {% endfor %}
+
+    <label>Search Student:</label>
+    <input type="text" id="searchInput" placeholder="Search by ID or name" style="margin-bottom: 15px;">
+
+    <div id="studentCheckboxes">
+      {% for student in all_students %}
+        <label class="student-check" style="font-weight: normal; font-size: 14px; margin-top: 3px;">
+          <input type="checkbox" name="students" value="{{ student.user_id }}"
+            {% if student.user_id in assessment.students %}checked{% endif %}>
+          {{ student.user_id }} - {{ student.name }}
+        </label>
+      {% endfor %}
+    </div>
+
+    <label>Replace Question PDF (optional):</label>
+    <input type="file" name="question_pdf" accept=".pdf" class="form-control">
+
+    <br>
+      <div class="form-actions">
+    <a href="{{ url_for('assessment_manage') }}" class="btn-reset">Cancel</a>
+    <button type="submit" class="btn-save">Update</button>
+      </div>
+  </div>
+</form>
+
+<script>
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const keyword = this.value.toLowerCase();
+    document.querySelectorAll("#studentCheckboxes label").forEach(label => {
+      const text = label.textContent.toLowerCase();
+      label.style.display = text.includes(keyword) ? "block" : "none";
+    });
+  });
+</script>
+{% endblock %}

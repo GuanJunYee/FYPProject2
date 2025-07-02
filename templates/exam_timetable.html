@@ -1,0 +1,68 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Exam Timetable{% endblock %}
+{% block breadcrumb %}Examinations > Exam Timetable{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+
+<div class="profile-header">
+  <h2 style="margin-left: 20px;">Exam Timetable</h2>
+  <div style="float: right; margin-top: -48px; margin-right: 40px;">
+    <div class="cs_tooltip" style="display:inline-block; margin-right: 905px; margin-top: 3px;">
+      <a href="#"><i class="fas fa-calendar-alt"></i></a>
+      <span class="tooltiptext">Exam Schedule</span>
+    </div>
+  </div>
+</div>
+
+<hr style="width: 100%;">
+
+<form method="GET" action="{{ url_for('exam_timetable_create') }}">
+  <button type="submit" class="btnCreate" style="margin-left: 90%;">Create</button>
+</form>
+
+<div id="studentList">
+  <table class="studentList">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>Assessment Code</th>
+        <th>Assessment Title</th>
+        <th>Exam Date</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for timetable in exam_timetables %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ timetable.assessment_code }}</td>
+        <td>
+          {% for a in assessments %}
+            {% if a.assessment_code == timetable.assessment_code %}
+              {{ a.title }}
+            {% endif %}
+          {% endfor %}
+        </td>
+        <td>{{ timetable.exam_date }}</td>
+        <td>{{ timetable.start_time }}</td>
+        <td>{{ timetable.end_time }}</td>
+        <td class="btnUpdate">
+          <a href="{{ url_for('exam_timetable_edit', assessment_code=timetable.assessment_code) }}"><i class='fas fa-edit'></i></a>
+        </td>
+        <td class="btnDelete">
+          <a href="#" onclick="return confirm('Delete this timetable?');"><i class='fa fa-solid fa-trash'></i></a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="8" style="text-align:center;">No exam timetables available.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base_dashboard.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h2>Welcome, {{ session.name }}!</h2>
+        <p>You are logged in as a <strong>{{ session.role|capitalize }}</strong>.</p>
+    </div>
+    <div class="card-body">
+        <h3>Quick Actions</h3>
+        <ul style="list-style-type: disc; padding-left: 20px;">
+            <li><a href="#">View Timetable</a></li>
+            <li><a href="#">Check Attendance</a></li>
+            <li><a href="#">Billing History</a></li>
+            <li><a href="#">Submit Feedback</a></li>
+        </ul>
+        <br />
+        <h3>Latest Announcements</h3>
+        <ul>
+            <li>📢 Orientation Briefing: 20 June 2025</li>
+            <li>📝 Midterm Schedule Released</li>
+            <li>📌 Lab Rules & Safety Guidelines</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

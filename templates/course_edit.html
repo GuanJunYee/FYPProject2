@@ -1,0 +1,70 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Edit Course{% endblock %}
+{% block breadcrumb %}Programme > Course Management > Edit Course{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/courseManage.css') }}">
+<script>
+  // Auto-hide error messages after 5 seconds
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+      document.querySelectorAll(".error").forEach(el => {
+        el.style.transition = "opacity 0.5s ease-out";
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);  // remove from DOM
+      });
+    }, 5000);
+  });
+</script>
+<div class="profile-header">
+  <h2 style="margin-left: 20px;">Edit Course</h2>
+  <hr />
+</div>
+
+<form method="POST" class="edit-form">
+<div class="form-group">
+  
+  <label>Course Code:</label>
+  <input type="text" name="course_code" value="{{ course.course_code }}" required />
+  {% if errors.course_code %}
+    <div class="error">{{ errors.course_code }}</div>
+  {% endif %}
+</div>
+
+  <div class="form-group">
+    <label>Course Name:</label>
+    <input type="text" name="course_name" value="{{ course.course_name }}" required />
+  </div>
+
+  <div class="form-group">
+    <label>Search Student:</label>
+    <input type="text" id="studentSearch" onkeyup="filterStudents()" placeholder="Search by ID or name">
+  </div>
+
+  <div class="form-group" id="studentList">
+    {% for student in all_students %}
+      <label class="student-check" style="font-weight: normal; font-size: 13px;">
+        <input type="checkbox" name="students" value="{{ student.user_id }}"
+               {% if student.user_id in course.students %}checked{% endif %}>
+        {{ student.user_id }} - {{ student.name }}
+      </label>
+    {% endfor %}
+  </div>
+
+  <div class="form-actions">
+    <a href="{{ url_for('course_manage') }}" class="btn-reset">Cancel</a>
+    <button type="submit" class="btn-save">Update</button>
+  </div>
+</form>
+
+<script>
+  function filterStudents() {
+    const input = document.getElementById("studentSearch").value.toLowerCase();
+    const students = document.querySelectorAll("#studentList label");
+    students.forEach(function(label) {
+      const text = label.textContent.toLowerCase();
+      label.style.display = text.includes(input) ? "block" : "none";
+    });
+  }
+</script>
+{% endblock %}
