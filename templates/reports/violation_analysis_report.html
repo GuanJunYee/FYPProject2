@@ -1,0 +1,997 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Violation Analysis Report{% endblock %}
+{% block breadcrumb %}Reports > Violation Analysis{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user_registration_report.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="profile-header">
+    <h2 style="margin-left: 20px;">Violation Analysis Report</h2>
+</div>
+
+<hr style="width: 100%;">
+
+<div class="report-container">
+    <!-- Controls Section -->
+    <div class="controls-section">
+        <div class="controls-grid">
+            <div class="control-group">
+                <label for="assessment-filter">Assessment Filter</label>
+                <select id="assessment-filter" onchange="updateReport()">
+                    <option value="all">All Assessments</option>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="violation-type">Violation Type</label>
+                <select id="violation-type" onchange="updateReport()">
+                    <option value="all">All Types</option>
+                    <option value="looking_away">Looking Away</option>
+                    <option value="TAB_SWITCH">Tab Switch</option>
+                    <option value="SCREEN_SHARE_STOPPED">Screen Share Stopped</option>
+                    <option value="WEBCAM_DENIED">Webcam Denied</option>
+                    <option value="FORBIDDEN_SHORTCUT">Forbidden Shortcut</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="status-filter">Status</label>
+                <select id="status-filter" onchange="updateReport()">
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="dismissed">Dismissed</option>
+                </select>
+            </div>
+        </div>
+        <div class="control-actions">
+            <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+            <button class="btn btn-primary" id="refresh-btn" onclick="updateReport()">
+                <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Section for High Priority -->
+    <div class="alert-section" id="alert-section" style="display: none;">
+        <div class="alert-card alert-priority">
+            <div class="alert-header">
+                <i class="fas fa-exclamation-triangle alert-icon"></i>
+                <span class="alert-title">High Priority Violations</span>
+            </div>
+            <div class="alert-content" id="alert-content">
+                <!-- Dynamic alert content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card total-violations">
+                <div class="stat-number" id="total-violations">Loading...</div>
+                <div class="stat-label">Total Violations</div>
+                <div class="stat-change positive" id="total-change">Loading...</div>
+            </div>
+            <div class="stat-card pending-review">
+                <div class="stat-number" id="pending-count">Loading...</div>
+                <div class="stat-label">Pending Review</div>
+                <div class="stat-change neutral" id="pending-change">Loading...</div>
+            </div>
+            <div class="stat-card false-positive">
+                <div class="stat-number" id="false-positive-rate">Loading...</div>
+                <div class="stat-label">False Positive Rate</div>
+                <div class="stat-change negative" id="false-positive-change">Loading...</div>
+            </div>
+            <div class="stat-card review-efficiency">
+                <div class="stat-number" id="review-rate">Loading...</div>
+                <div class="stat-label">Review Efficiency</div>
+                <div class="stat-change positive" id="review-change">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <div class="chart-title">Violation Types Distribution</div>
+                <canvas id="violationTypeChart" class="chart-canvas"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">Violations by Exam</div>
+                <canvas id="violationsByExamChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Additional Charts -->
+        <div class="charts-section">
+            <div class="chart-container" id="head-movement-container">
+                <div class="chart-title">Head Movement Timeline Analysis</div>
+                <p class="chart-subtitle">When students look away during exams (looking_away violations only)</p>
+                <canvas id="headMovementTimelineChart" class="chart-canvas"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">Status Distribution</div>
+                <canvas id="statusChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Head Movement Timeline Analysis Table -->
+        <div class="data-table-section" id="head-movement-table-section">
+            <div class="table-header">
+                <div class="table-title">Head Movement Timeline Analysis - Detailed View</div>
+                <div class="table-actions">
+                    <button class="btn btn-success" onclick="exportHeadMovementData()">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Exam</th>
+                            <th>Timeline Stage</th>
+                            <th>Progress</th>
+                            <th>Head Pose</th>
+                            <th>Risk Level</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="head-movement-details-body">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">Loading head movement data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Assessment Risk Analysis -->
+        <div class="data-table-section" style="margin-top: 30px;">
+            <div class="table-header">
+                <div class="table-title">Assessment Risk Analysis</div>
+                <div class="table-actions">
+                    <button class="btn btn-success" onclick="exportAnalyticsData()">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Assessment Code</th>
+                        <th>Assessment Title</th>
+                        <th>Total Violations</th>
+                        <th>Pending</th>
+                        <th>False Positive Rate</th>
+                        <th>Review Progress</th>
+                        <th>Students Affected</th>
+                        <th>Risk Level</th>
+                    </tr>
+                </thead>
+                <tbody id="assessment-breakdown-body">
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px;">Loading assessment data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Export Section -->
+    <div class="export-section">
+        <div class="export-info">
+            Last updated: <strong id="last-updated">Loading...</strong> | 
+            <small>This report focuses on system-wide analytics and head movement timeline analysis.</small>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Complete CSS for Violation Analysis Report */
+.alert-section {
+    margin: 20px;
+    margin-bottom: 30px;
+}
+
+.alert-card.alert-priority {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 1px solid #ef4444;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.alert-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.alert-icon {
+    color: #dc2626;
+    font-size: 1.5em;
+    margin-right: 12px;
+}
+
+.alert-title {
+    color: #991b1b;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.alert-content {
+    color: #7f1d1d;
+    line-height: 1.6;
+}
+
+.stat-card.total-violations {
+    background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+    border-left: 4px solid #0288d1;
+}
+
+.stat-card.pending-review {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left: 4px solid #f59e0b;
+}
+
+.stat-card.false-positive {
+    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+    border-left: 4px solid #8b5cf6;
+}
+
+.stat-card.review-efficiency {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border-left: 4px solid #22c55e;
+}
+
+.risk-critical {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.risk-high {
+    color: #ea580c;
+    font-weight: 600;
+}
+
+.risk-medium {
+    color: #d97706;
+    font-weight: 600;
+}
+
+.risk-low {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.risk-unknown {
+    color: #64748b;
+    font-weight: 600;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #f1f5f9;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #22c55e;
+    transition: width 0.3s ease;
+}
+
+.chart-subtitle {
+    font-size: 0.9em;
+    color: #666;
+    margin: 5px 0 15px 0;
+    font-style: italic;
+}
+
+.table-subtitle {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Timeline stage badges */
+.timeline-early {
+    background: #dcfce7;
+    color: #166534;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.timeline-middle {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.timeline-late {
+    background: #fecaca;
+    color: #991b1b;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.timeline-unknown {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+/* Status badges */
+.status-pending {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.status-reviewed {
+    background: #f0fdf4;
+    color: #16a34a;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.status-dismissed {
+    background: #f1f5f9;
+    color: #64748b;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.badge {
+    display: inline-block;
+    font-size: 0.85em;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+.bg-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.text-muted {
+    color: #6b7280;
+}
+</style>
+
+<script>
+let violationTypeChart, violationsByExamChart, headMovementTimelineChart, statusChart;
+let currentReportData = null;
+let currentHeadMovementData = null;
+
+// Initialize charts
+function initCharts() {
+    // 1. Violation Type Chart (VERTICAL BAR CHART)
+    const typeCtx = document.getElementById('violationTypeChart').getContext('2d');
+    violationTypeChart = new Chart(typeCtx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Number of Violations',
+                data: [],
+                backgroundColor: function(context) {
+                    const label = context.parsed ? context.chart.data.labels[context.dataIndex] : null;
+                    const colors = {
+                        'TAB_SWITCH': '#ef4444',           // Red
+                        'SCREEN_SHARE_STOPPED': '#f59e0b', // Orange  
+                        'WEBCAM_DENIED': '#8b5cf6',        // Purple
+                        'FORBIDDEN_SHORTCUT': '#06b6d4',   // Cyan
+                        'looking_away': '#22c55e'          // Green
+                    };
+                    return colors[label] || '#64748b';
+                },
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const label = context.label;
+                            const descriptions = {
+                                'TAB_SWITCH': 'Student switched browser tabs',
+                                'SCREEN_SHARE_STOPPED': 'Screen sharing was interrupted',
+                                'WEBCAM_DENIED': 'Student denied webcam access',
+                               'FORBIDDEN_SHORTCUT': 'Student used blocked keyboard shortcuts',
+                               'looking_away': 'Student looked away from screen (head movement)'
+                           };
+                           return descriptions[label] || '';
+                       }
+                   }
+               }
+           },
+           scales: {
+               y: {
+                   beginAtZero: true,
+                   title: {
+                       display: true,
+                       text: 'Number of Violations'
+                   }
+               },
+               x: {
+                   title: {
+                       display: true,
+                       text: 'Violation Types'
+                   }
+               }
+           }
+       }
+   });
+
+   // 2. Violations by Exam Chart (HORIZONTAL BAR CHART)
+   const examCtx = document.getElementById('violationsByExamChart').getContext('2d');
+   violationsByExamChart = new Chart(examCtx, {
+       type: 'bar',
+       data: {
+           labels: [],
+           datasets: [{
+               label: 'Number of Violations',
+               data: [],
+               backgroundColor: '#f59e0b',
+               borderRadius: 6,
+               borderSkipped: false,
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           indexAxis: 'y', // This makes it horizontal
+           plugins: {
+               legend: {
+                   display: false
+               }
+           },
+           scales: {
+               x: {
+                   beginAtZero: true,
+                   title: {
+                       display: true,
+                       text: 'Number of Violations'
+                   }
+               },
+               y: {
+                   title: {
+                       display: true,
+                       text: 'Exam Codes'
+                   }
+               }
+           }
+       }
+   });
+
+   // 3. Head Movement Timeline Chart (BAR CHART - Only for head movement)
+   const timelineCtx = document.getElementById('headMovementTimelineChart').getContext('2d');
+   headMovementTimelineChart = new Chart(timelineCtx, {
+       type: 'bar',
+       data: {
+           labels: [],
+           datasets: [{
+               label: 'Head Movement Violations',
+               data: [],
+               backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'], // Green → Yellow → Red
+               borderRadius: 6,
+               borderSkipped: false,
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           plugins: {
+               legend: {
+                   display: false
+               },
+               tooltip: {
+                   callbacks: {
+                       afterLabel: function(context) {
+                           const index = context.dataIndex;
+                           const interpretations = [
+                               'Less suspicious - May be adjusting position or natural movement',
+                               'Moderate concern - Monitor pattern for repeated behavior', 
+                               'High concern - Potential cheating behavior, investigate further'
+                           ];
+                           return interpretations[index] || '';
+                       }
+                   }
+               }
+           },
+           scales: {
+               y: {
+                   beginAtZero: true,
+                   title: {
+                       display: true,
+                       text: 'Number of Head Movements'
+                   }
+               },
+               x: {
+                   title: {
+                       display: true,
+                       text: 'Exam Timeline Stages'
+                   }
+               }
+           }
+       }
+   });
+
+   // 4. Status Chart (DOUGHNUT)
+   const statusCtx = document.getElementById('statusChart').getContext('2d');
+   statusChart = new Chart(statusCtx, {
+       type: 'doughnut',
+       data: {
+           labels: [],
+           datasets: [{
+               data: [],
+               backgroundColor: ['#f59e0b', '#22c55e', '#64748b'],
+               borderWidth: 2,
+               borderColor: '#ffffff'
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           plugins: {
+               legend: {
+                   position: 'bottom',
+               }
+           }
+       }
+   });
+}
+
+// Update report based on filters
+async function updateReport() {
+   const assessmentFilter = document.getElementById('assessment-filter').value;
+   const violationTypeFilter = document.getElementById('violation-type').value;
+   const statusFilter = document.getElementById('status-filter').value;
+   
+   // Show loading state
+   const refreshBtn = document.getElementById('refresh-btn');
+   refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+   refreshBtn.disabled = true;
+   document.querySelector('.stats-section').classList.add('loading');
+
+   try {
+       // Build API URL
+       let apiUrl = `/api/reports/violation-analysis?assessment=${assessmentFilter}&violation_type=${violationTypeFilter}&status=${statusFilter}`;
+
+       // Fetch data from backend
+       const response = await fetch(apiUrl);
+       const result = await response.json();
+
+       if (result.success) {
+           // Update charts with real data
+           updateChartsWithData(result.data.charts);
+           
+           // Update summary statistics
+           updateSummaryStats(result.data.summary);
+           
+           // Update data tables
+           updateHeadMovementDetailsTable(result.data.head_movement_details);
+           updateAssessmentBreakdown(result.data.assessment_breakdown);
+           
+           // Update alerts
+           updateAlerts(result.data.summary);
+           
+           // Update last updated time
+           document.getElementById('last-updated').textContent = new Date().toLocaleString();
+           
+           // Store data for export functions
+           currentReportData = {
+               data: result.data,
+               summary: result.data.summary,
+               filters: result.filters
+           };
+           
+       } else {
+           console.error('API Error:', result.error);
+           Swal.fire('Error', 'Error loading report data: ' + result.error, 'error');
+       }
+
+   } catch (error) {
+       console.error('Network Error:', error);
+       Swal.fire('Error', 'Error connecting to server. Please try again.', 'error');
+   } finally {
+       // Reset loading state
+       refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+       refreshBtn.disabled = false;
+       document.querySelector('.stats-section').classList.remove('loading');
+   }
+}
+
+// Update charts with real data from API
+function updateChartsWithData(chartData) {
+   // 1. Update violation type chart (VERTICAL BAR)
+   if (chartData.violation_types) {
+       violationTypeChart.data.labels = chartData.violation_types.labels;
+       violationTypeChart.data.datasets[0].data = chartData.violation_types.data;
+       violationTypeChart.update();
+   }
+
+   // 2. Update violations by exam chart (HORIZONTAL BAR)
+   if (chartData.violations_by_exam) {
+       violationsByExamChart.data.labels = chartData.violations_by_exam.labels;
+       violationsByExamChart.data.datasets[0].data = chartData.violations_by_exam.data;
+       violationsByExamChart.update();
+   }
+
+   // 3. Update head movement timeline chart (Only for head movement violations)
+   if (chartData.head_movement_timeline) {
+       const totalHeadMovements = chartData.head_movement_timeline.total_head_movements;
+       
+       if (totalHeadMovements > 0) {
+           headMovementTimelineChart.data.labels = chartData.head_movement_timeline.labels;
+           headMovementTimelineChart.data.datasets[0].data = chartData.head_movement_timeline.data;
+           headMovementTimelineChart.update();
+           
+           // Update chart title to show total count
+           document.querySelector('#head-movement-container .chart-title').innerHTML = 
+               `Head Movement Timeline Analysis (${totalHeadMovements} total)`;
+           
+           // Show both chart and table
+           document.getElementById('head-movement-container').style.display = 'block';
+           document.getElementById('head-movement-table-section').style.display = 'block';
+       } else {
+           // Hide both chart and table if no head movement data
+           document.getElementById('head-movement-container').style.display = 'none';
+           document.getElementById('head-movement-table-section').style.display = 'none';
+       }
+   }
+
+   // 4. Update status chart
+   if (chartData.status_distribution) {
+       statusChart.data.labels = chartData.status_distribution.labels;
+       statusChart.data.datasets[0].data = chartData.status_distribution.data;
+       statusChart.update();
+   }
+}
+
+// Update summary statistics cards
+function updateSummaryStats(summary) {
+   if (!summary) return;
+   
+   document.getElementById('total-violations').textContent = summary.total_violations || 0;
+   document.getElementById('pending-count').textContent = summary.pending_count || 0;
+   document.getElementById('false-positive-rate').textContent = (summary.false_positive_rate || 0) + '%';
+   document.getElementById('review-rate').textContent = (summary.review_rate || 0) + '%';
+
+   // Update change indicators
+   document.getElementById('total-change').textContent = summary.total_violations + ' system-wide';
+   document.getElementById('pending-change').textContent = summary.pending_count > 0 ? 'Requires attention' : 'All reviewed';
+   document.getElementById('false-positive-change').textContent = summary.false_positive_rate <= 10 ? 'Acceptable rate' : 'High rate';
+   document.getElementById('review-change').textContent = summary.review_rate >= 80 ? 'Good progress' : 'Needs review';
+}
+
+// Update head movement details table
+function updateHeadMovementDetailsTable(headMovementDetails) {
+   const tbody = document.getElementById('head-movement-details-body');
+   tbody.innerHTML = '';
+
+   if (!headMovementDetails || headMovementDetails.length === 0) {
+       tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #666;">No head movement violations found with current filters</td></tr>';
+       return;
+   }
+
+   // Store data for export
+   currentHeadMovementData = headMovementDetails;
+
+   headMovementDetails.forEach(violation => {
+       const row = document.createElement('tr');
+       const progress = violation.exam_progress_percent ? violation.exam_progress_percent.toFixed(1) + '%' : 'Unknown';
+       
+       // Format head pose data
+       let headPoseText = 'Unknown';
+       if (violation.head_pose_data) {
+           const { yaw, pitch, roll } = violation.head_pose_data;
+           headPoseText = `Y:${yaw?.toFixed(1)}° P:${pitch?.toFixed(1)}° R:${roll?.toFixed(1)}°`;
+       }
+       
+       // Timeline stage styling
+       const timelinePosition = violation.exam_timeline_position || 'unknown';
+       let timelineClass = '';
+       let timelineText = '';
+       
+       switch(timelinePosition) {
+           case 'exam_start':
+               timelineClass = 'timeline-early';
+               timelineText = 'Early Stage';
+               break;
+           case 'exam_middle':
+               timelineClass = 'timeline-middle';
+               timelineText = 'Middle Stage';
+               break;
+           case 'exam_end':
+               timelineClass = 'timeline-late';
+               timelineText = 'Late Stage';
+               break;
+           default:
+               timelineClass = 'timeline-unknown';
+               timelineText = 'Unknown';
+       }
+       
+       // Risk level styling
+       const riskLevel = violation.risk_level || 'Unknown';
+       let riskClass = '';
+       switch(riskLevel.toLowerCase()) {
+           case 'low':
+               riskClass = 'risk-low';
+               break;
+           case 'medium':
+               riskClass = 'risk-medium';
+               break;
+           case 'high':
+               riskClass = 'risk-high';
+               break;
+           default:
+               riskClass = 'risk-unknown';
+       }
+       
+       // Status styling
+       const status = violation.status || 'pending';
+       const statusClass = `status-${status}`;
+       
+       row.innerHTML = `
+           <td><strong>${violation.student_name}</strong></td>
+           <td>
+               <div><strong>${violation.assessment_code}</strong></div>
+               <small class="text-muted">${violation.assessment_title}</small>
+           </td>
+           <td><span class="badge ${timelineClass}">${timelineText}</span></td>
+           <td>${progress}</td>
+           <td><code style="font-size: 0.8em;">${headPoseText}</code></td>
+           <td>
+               <span class="${riskClass}">${riskLevel}</span>
+               <br><small class="text-muted">${violation.risk_interpretation}</small>
+           </td>
+           <td><span class="badge ${statusClass}">${status.toUpperCase()}</span></td>
+       `;
+       
+       tbody.appendChild(row);
+   });
+}
+
+// Update assessment breakdown table
+function updateAssessmentBreakdown(assessments) {
+   const tbody = document.getElementById('assessment-breakdown-body');
+   tbody.innerHTML = '';
+
+   if (!assessments || assessments.length === 0) {
+       tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No assessment data available</td></tr>';
+       return;
+   }
+
+   assessments.forEach(assessment => {
+       const row = document.createElement('tr');
+       
+       // Determine risk level based on total violations and false positive rate
+       let riskLevel, riskClass;
+       const falsePositiveRate = assessment.false_positive_rate || 0;
+       const totalViolations = assessment.total_violations || 0;
+       
+       if (totalViolations >= 20 || falsePositiveRate >= 50) {
+           riskLevel = 'Critical';
+           riskClass = 'risk-critical';
+       } else if (totalViolations >= 10 || falsePositiveRate >= 30) {
+           riskLevel = 'High';
+           riskClass = 'risk-high';
+       } else if (totalViolations >= 5 || falsePositiveRate >= 15) {
+           riskLevel = 'Medium';
+           riskClass = 'risk-medium';
+       } else {
+           riskLevel = 'Low';
+           riskClass = 'risk-low';
+       }
+       
+       // Create progress bar for review progress
+       const reviewProgress = assessment.review_progress || 0;
+       const progressBarHtml = `
+           <div class="progress-bar">
+               <div class="progress-fill" style="width: ${reviewProgress}%"></div>
+           </div>
+           <small>${reviewProgress}%</small>
+       `;
+       
+       row.innerHTML = `
+           <td><strong>${assessment.assessment_code}</strong></td>
+           <td>${assessment.assessment_title}</td>
+           <td>${assessment.total_violations}</td>
+           <td><span class="badge bg-warning">${assessment.pending_count}</span></td>
+           <td>${assessment.false_positive_rate}%</td>
+           <td>${progressBarHtml}</td>
+           <td>${assessment.unique_students_count}</td>
+           <td><span class="${riskClass}">${riskLevel}</span></td>
+       `;
+       
+       tbody.appendChild(row);
+   });
+}
+
+// Update alerts section
+function updateAlerts(summary) {
+   const alertSection = document.getElementById('alert-section');
+   const alertContent = document.getElementById('alert-content');
+   
+   if (!summary || summary.pending_count === 0) {
+       alertSection.style.display = 'none';
+       return;
+   }
+   
+   if (summary.pending_count >= 10) {
+       alertContent.innerHTML = `
+           <p><strong>${summary.pending_count} violations</strong> require review for optimal system performance!</p>
+           <ul>
+               <li>Review head movement timeline patterns for suspicious behavior</li>
+               <li>High false positive rate may indicate detection threshold adjustment needed</li>
+               <li>Consider reviewing assessment-specific patterns in the breakdown table</li>
+           </ul>
+       `;
+       alertSection.style.display = 'block';
+   } else {
+       alertSection.style.display = 'none';
+   }
+}
+
+function exportHeadMovementData() {
+    if (!currentHeadMovementData || currentHeadMovementData.length === 0) {
+        Swal.fire('Warning', 'No head movement data available to export. Please refresh the report first.', 'warning');
+        return;
+    }
+
+    let csvContent = 'Head Movement Timeline Analysis - Detailed Export\n';
+    csvContent += `Generated on: ${new Date().toLocaleString()}\n`;
+    csvContent += '\n';
+    csvContent += 'Student Name,Assessment Code,Assessment Title,Timeline Stage,Progress %,Head Pose (Yaw),Head Pose (Pitch),Head Pose (Roll),Risk Level,Risk Interpretation,Status,Description\n';
+    
+    currentHeadMovementData.forEach(violation => {
+        const progress = violation.exam_progress_percent ? violation.exam_progress_percent.toFixed(1) : 'Unknown';
+        const yaw = violation.head_pose_data?.yaw?.toFixed(1) || 'Unknown';
+        const pitch = violation.head_pose_data?.pitch?.toFixed(1) || 'Unknown';
+        const roll = violation.head_pose_data?.roll?.toFixed(1) || 'Unknown';
+        
+        csvContent += `"${violation.student_name}","${violation.assessment_code}","${violation.assessment_title}","${violation.exam_timeline_position || 'Unknown'}","${progress}","${yaw}","${pitch}","${roll}","${violation.risk_level}","${violation.risk_interpretation}","${violation.status}","${violation.description || ''}"\n`;
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `head_movement_analysis_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    Swal.fire('Success', 'Head movement data exported successfully!', 'success');
+}
+
+// Export analytics data
+function exportAnalyticsData() {
+   if (!currentReportData) {
+       Swal.fire('Warning', 'No data available to export. Please refresh the report first.', 'warning');
+       return;
+   }
+
+   const { data, summary, filters } = currentReportData;
+   
+   let csvContent = '';
+   
+   // Add header information
+   csvContent += `Violation Analysis Report - System Analytics\n`;
+   csvContent += `Generated on: ${new Date().toLocaleString()}\n`;
+   csvContent += `Filters Applied: Assessment=${filters.assessment}, Type=${filters.violation_type}, Status=${filters.status}\n`;
+   csvContent += `\n`;
+   
+   // Add summary statistics
+   csvContent += `Summary Statistics\n`;
+   csvContent += `Total Violations,${summary.total_violations}\n`;
+   csvContent += `Pending Review,${summary.pending_count}\n`;
+   csvContent += `False Positive Rate,${summary.false_positive_rate}%\n`;
+   csvContent += `Review Efficiency,${summary.review_rate}%\n`;
+   csvContent += `\n`;
+   
+   // Add assessment breakdown
+   if (data.assessment_breakdown && data.assessment_breakdown.length > 0) {
+       csvContent += `Assessment Risk Analysis\n`;
+       csvContent += `Assessment Code,Assessment Title,Total Violations,Pending,False Positive Rate,Review Progress,Students Affected\n`;
+       
+       data.assessment_breakdown.forEach(assessment => {
+           csvContent += `"${assessment.assessment_code}","${assessment.assessment_title}",${assessment.total_violations},${assessment.pending_count},${assessment.false_positive_rate}%,${assessment.review_progress}%,${assessment.unique_students_count}\n`;
+       });
+   }
+   
+   // Create and download file
+   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+   const link = document.createElement('a');
+   const url = URL.createObjectURL(blob);
+   
+   link.setAttribute('href', url);
+   link.setAttribute('download', `violation_analysis_${new Date().toISOString().split('T')[0]}.csv`);
+   link.style.visibility = 'hidden';
+   
+   document.body.appendChild(link);
+   link.click();
+   document.body.removeChild(link);
+   
+   Swal.fire('Success', 'Analytics data exported successfully!', 'success');
+}
+
+// Reset all filters
+function resetFilters() {
+   document.getElementById('assessment-filter').value = 'all';
+   document.getElementById('violation-type').value = 'all';
+   document.getElementById('status-filter').value = 'all';
+   updateReport();
+}
+
+// Load assessment options for filter
+async function loadAssessmentOptions() {
+   try {
+       const response = await fetch('/api/assessments/list-for-violations');
+       const result = await response.json();
+       
+       if (result.success) {
+           const select = document.getElementById('assessment-filter');
+           // Keep "All Assessments" option
+           const allOption = select.querySelector('option[value="all"]');
+           select.innerHTML = '';
+           select.appendChild(allOption);
+           
+           // Add real assessments
+           result.assessments.forEach(assessment => {
+               const option = document.createElement('option');
+               option.value = assessment.assessment_code;
+               option.textContent = `${assessment.assessment_code} - ${assessment.title}`;
+               select.appendChild(option);
+           });
+       }
+   } catch (error) {
+       console.error('Error loading assessment options:', error);
+   }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+   initCharts();
+   loadAssessmentOptions();
+   updateReport();
+});
+</script>
+
+{% endblock %}

@@ -4,4 +4,6 @@ Flask-SocketIO
 scikit-learn
 opencv-python
 mediapipe
- 
+numpy
+pandas
+requests

@@ -4,32 +4,60 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_student.css') }}">
+<script>
+  // Auto-hide errors after 5 seconds
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+      document.querySelectorAll(".error").forEach(el => {
+        el.style.transition = "opacity 0.5s ease-out";
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);
+      });
+    }, 5000);
+  });
+</script>
+
 <h2 style="margin-left: 20px;">Edit Student</h2>
 <hr style="width: 100%;">
 
 <form method="POST" class="edit-form">
-<div class="form-group">
-  <label>Full Name:</label>
-  <input type="text" name="name" value="{{ student.name }}" required>
-</div>
-<div class="form-group">
-  <label>Email:</label>
-  <input type="email" name="email" value="{{ student.email }}" required>
-</div>
-<div class="form-group">
-  <label>Phone:</label>
-  <input type="text" name="phone" value="{{ student.phone }}" required>
-</div>
   <div class="form-group">
-  <label>Gender:</label>
-  <select name="gender" required>
-    <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male</option>
-    <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
-  </select>
-</div>
-<div class="form-actions">
+    <label>Student ID:</label>
+    <input type="text" name="user_id" value="{{ request.form.user_id or student.user_id }}" placeholder="Student ID (7 digits)" pattern="[0-9]{7}" maxlength="7" title="Student ID must be 7 digits." required>
+    {% if errors.user_id %}
+      <div class="error">{{ errors.user_id }}</div>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <label>Full Name:</label>
+    <input type="text" name="name" value="{{ request.form.name or student.name }}" required>
+  </div>
+
+  <div class="form-group">
+    <label>Email:</label>
+    <input type="email" name="email" value="{{ request.form.email or student.email }}" required>
+    {% if errors.email %}
+      <div class="error">{{ errors.email }}</div>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <label>Phone:</label>
+    <input type="text" name="phone" value="{{ request.form.phone or student.phone }}" placeholder="e.g. 012-3456789" pattern="01[0-9]-[0-9]{7,8}" maxlength="12" title="Phone number must be in the format 01x-xxxxxxxx." required>
+  </div>
+
+  <div class="form-group">
+    <label>Gender:</label>
+    <select name="gender" required>
+      <option value="Male" {% if (request.form.gender or student.gender) == 'Male' %}selected{% endif %}>Male</option>
+      <option value="Female" {% if (request.form.gender or student.gender) == 'Female' %}selected{% endif %}>Female</option>
+    </select>
+  </div>
+
+  <div class="form-actions">
     <a href="{{ url_for('student_list') }}" class="btn-reset">Cancel</a>
-  <button type="submit" class="btn-save">Save</button>
+    <button type="submit" class="btn-save">Save</button>
   </div>
 </form>
 {% endblock %}

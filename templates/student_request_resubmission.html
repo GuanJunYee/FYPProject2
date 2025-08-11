@@ -46,7 +46,7 @@
   <input type="file" name="new_file" required>
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, message in messages %}
-      {% if category == 'danger' %}
+      {% if category == 'error' %}
         <div class="error">{{ message }}</div>
       {% endif %}
     {% endfor %}

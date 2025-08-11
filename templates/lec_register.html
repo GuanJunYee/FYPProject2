@@ -28,25 +28,25 @@
     <div class="profile-details">
       <div class="detail-group">
         <label>User ID:</label>
-        <input type="text" name="user_id" placeholder="1234567" class="form-control" required />
+        <input type="text" name="user_id" placeholder="User ID (7 digits) " class="form-control" required pattern="[0-9]{7}" maxlength="7" title="User ID must be 7 digits." />
         {% if errors.user_id %}
-  <div class="error">{{ errors.user_id }}</div>
-{% endif %}
+          <div class="error">{{ errors.user_id }}</div>
+        {% endif %}
       </div>
       <div class="detail-group">
         <label>Full Name:</label>
-        <input type="text" name="name" placeholder="Tan Ah Kau" class="form-control" required />
+        <input type="text" name="name" placeholder="Yee Guan Jun" class="form-control" required />
       </div>
       <div class="detail-group">
         <label>Email:</label>
         <input type="email" name="email" placeholder="abc@gmail.com" class="form-control" required />
         {% if errors.email %}
-  <div class="error">{{ errors.email }}</div>
-{% endif %}
+          <div class="error">{{ errors.email }}</div>
+        {% endif %}
       </div>
       <div class="detail-group">
         <label>Phone Number:</label>
-        <input type="tel" name="phone" placeholder="012-3456789"  class="form-control" pattern="^(\+?6?01)[0-46-9]-*[0-9]{7,8}$" required />
+        <input type="tel" name="phone" placeholder="012-3456789"  class="form-control" pattern="01[0-9]-[0-9]{7,8}" maxlength="12" title="Phone number must be in the format 01x-xxxxxxxx." required />
       </div>
       <div class="detail-group">
         <label>Gender:</label>
@@ -66,32 +66,35 @@
         </select>
       </div>
       <!-- Password Field -->
-<div class="detail-group password-group">
-  <label for="register-password">Password:</label>
-  <div class="input-icon">
-    <i class="fas fa-lock lock-icon"></i>
-    <input type="password" name="password" id="register-password" placeholder="Password"
-      required
-      pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-      title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character.">
-    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('register-password', this)"></i>
-  </div>
-</div>
+      <div class="detail-group password-group">
+        <label for="register-password">Password:</label>
+        <div class="input-icon">
+          <i class="fas fa-lock lock-icon"></i>
+          <input type="password" name="password" id="register-password" placeholder="Password"
+            required
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d\W]{8,}$"
+            title="Password must be at least 8 characters with uppercase, lowercase, number, and special character.">
+          <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('register-password', this)"></i>
+        </div>
+        {% if errors.password %}
+          <div class="error">{{ errors.password }}</div>
+        {% endif %}
+      </div>
 
-<div class="detail-group password-group">
-  <label for="confirm-password">Confirm Password:</label>
-  <div class="input-icon">
-    <i class="fas fa-lock lock-icon"></i>
-    <input type="password" name="confirm_password" id="confirm-password" placeholder="Confirm Password"
-      required
-      pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
-    <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirm-password', this)"></i>
-  </div>
-  
-  {% if errors.confirm_password %}
-    <div class="error">{{ errors.confirm_password }}</div>
-  {% endif %}
-</div>
+      <div class="detail-group password-group">
+        <label for="confirm-password">Confirm Password:</label>
+        <div class="input-icon">
+          <i class="fas fa-lock lock-icon"></i>
+          <input type="password" name="confirm_password" id="confirm-password" placeholder="Confirm Password"
+            required
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d\W]{8,}$"
+            title="Password must be at least 8 characters with uppercase, lowercase, number, and special character.">
+          <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('confirm-password', this)"></i>
+        </div>
+        {% if errors.confirm_password %}
+          <div class="error">{{ errors.confirm_password }}</div>
+        {% endif %}
+      </div>
 
 
 

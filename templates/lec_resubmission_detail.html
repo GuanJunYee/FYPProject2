@@ -4,13 +4,15 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <h2 style="margin-left: 20px;">Resubmission Request</h2>
 <hr style="width: 100%;">
 <a href="{{ url_for('lecturer_view_submissions', assessment_code=resub.assessment_code) }}" class="btn-reset" style="float: left; margin-top: 10px; margin-bottom: 15px;">← Back</a>
 
 <div class="form-container">
-  <form method="POST">
+  <form method="POST" id="resubmissionForm">
     <label>Assessment Code:</label>
     <input type="text" value="{{ resub.assessment_code }}" readonly>
 
@@ -44,12 +46,15 @@
 
     <div class="form-actions">
       {% if resub.status == 'Pending' %}
-      <button name="action" value="Approved" class="btn-save" onclick="return confirm('Approve this resubmission?')">Approve</button>
-      <button name="action" value="Rejected" class="btn-delete" onclick="return confirm('Reject this resubmission?')">Reject</button>
+      <button type="button" class="btn-save" onclick="showApproveConfirmation()">Approve</button>
+      <button type="button" class="btn-delete" onclick="showRejectConfirmation()">Reject</button>
       {% else %}
       <p style="color: green;"><strong>Already {{ resub.status }}</strong></p>
       {% endif %}
     </div>
+
+    <!-- Hidden input to store the action -->
+    <input type="hidden" name="action" id="actionInput">
   </form>
 </div>
 
@@ -140,5 +145,103 @@
   .btn-download:hover {
     background-color: #0056b3;
   }
+
+  .btn-secondary {
+    background: grey;
+    color: white;
+    border: 2px solid grey;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover {
+    background: grey;
+    color: white;
+    transform: translateY(-2px);
+}
 </style>
+
+<script>
+// SweetAlert confirmation for Approve action
+function showApproveConfirmation() {
+    Swal.fire({
+        title: 'Approve Resubmission?',
+        text: "This will approve the student's resubmission request.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#868e96',
+        confirmButtonText: 'Yes, Approve',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-secondary'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading state
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Approving resubmission request',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Set action and submit form
+            document.getElementById('actionInput').value = 'Approved';
+            document.getElementById('resubmissionForm').submit();
+        }
+    });
+}
+
+// SweetAlert confirmation for Reject action
+function showRejectConfirmation() {
+    Swal.fire({
+        title: 'Reject Resubmission?',
+        text: "This will reject the student's resubmission request. This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#868e96',
+        confirmButtonText: 'Yes, Reject',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        customClass: {
+            confirmButton: 'btn btn-danger',
+            cancelButton: 'btn btn-secondary'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading state
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Rejecting resubmission request',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Set action and submit form
+            document.getElementById('actionInput').value = 'Rejected';
+            document.getElementById('resubmissionForm').submit();
+        }
+    });
+}
+</script>
 {% endblock %}

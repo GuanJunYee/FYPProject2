@@ -26,7 +26,7 @@
 <form method="POST" action="{{ url_for('assessment_edit', assessment_code=assessment.assessment_code) }}" enctype="multipart/form-data">
   <div class="form-section">
 <label>Assessment Code:</label>
-<input type="text" name="assessment_code" class="form-control" value="{{ assessment.assessment_code }}" required>
+<input type="text" name="assessment_code" class="form-control" value="{{ assessment.assessment_code }}" placeholder="e.g., ABCD1234" pattern="[A-Z]{4}[0-9]{4}" title="4 uppercase letters followed by 4 digits (e.g., ABCD1234)" required >
 {% if errors.assessment_code %}
   <div class="error">{{ errors.assessment_code }}</div>
 {% endif %}
@@ -39,6 +39,7 @@
     {% for course in courses %}
       <div class="form-check" style="font-weight: normal; font-size: 14px; margin-top: 3px;">
         <input type="checkbox" name="course_codes" value="{{ course.course_code }}"
+          data-students="{{ course.students | join(',') }}"
           {% if course.course_code in assessment.course_codes %}checked{% endif %}>
         {{ course.course_code }} - {{ course.course_name }}
       </div>
@@ -77,4 +78,19 @@
     });
   });
 </script>
+<script>
+document.querySelectorAll('input[name="course_codes"]').forEach(courseCheckbox => {
+  courseCheckbox.addEventListener('change', () => {
+    const studentIds = courseCheckbox.dataset.students?.split(',') || [];
+
+    studentIds.forEach(studentId => {
+      const checkbox = document.querySelector(`input[name="students"][value="${studentId}"]`);
+      if (checkbox) {
+        checkbox.checked = courseCheckbox.checked;
+      }
+    });
+  });
+});
+</script>
+
 {% endblock %}

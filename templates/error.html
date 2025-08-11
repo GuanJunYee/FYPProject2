@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ error_code }} - {{ error_message }} | Online Exam Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .error-container {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+            margin: 20px;
+        }
+
+        .error-title {
+            font-size: 48px;
+            font-weight: 300;
+            color: #bbb;
+            margin-bottom: 10px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+        }
+
+        .error-subtitle {
+            font-size: 18px;
+            color: #999;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .error-code-container {
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .error-code-bg {
+            font-size: 200px;
+            font-weight: bold;
+            color: #e8e9ea;
+            line-height: 1;
+            margin: 20px 0;
+        }
+
+        .error-message {
+            font-size: 24px;
+            color: #666;
+            margin: 40px 0 20px;
+            font-weight: 400;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: #4285f4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3367d6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #4285f4;
+            border: 2px solid #4285f4;
+        }
+
+        .btn-secondary:hover {
+            background: #4285f4;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 40px 20px;
+            }
+            
+            .error-title {
+                font-size: 36px;
+                letter-spacing: 4px;
+            }
+            
+            .error-code-bg {
+                font-size: 150px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1 class="error-title">{{ error_code }} Error Page</h1>
+        <p class="error-subtitle">illustration</p>
+
+        <div class="error-code-container">
+            <div class="error-code-bg">{{ error_code }}</div>
+        </div>
+
+        <p class="error-message">Sorry, something went wrong.</p>
+
+        <div class="action-buttons">
+            <button onclick="window.history.back()" class="btn btn-secondary">
+                Go Back
+            </button>
+            <a href="{% if error_code == 401 %}/login{% else %}/{% endif %}" class="btn btn-primary">
+                {% if error_code == 401 %}Login{% else %}Go Back Home{% endif %}
+            </a>
+        </div>
+    </div>
+</body>
+</html>

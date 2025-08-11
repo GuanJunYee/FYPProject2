@@ -1,0 +1,293 @@
+.env-container {
+  padding: 20px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.env-form {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.form-header {
+  background: linear-gradient(135deg, #004080 0%, #004080 100%);
+  color: white;
+  padding: 24px;
+  text-align: center;
+}
+
+.form-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.form-header p {
+  margin: 8px 0 0 0;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.form-body {
+  padding: 32px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2D3748;
+  margin-bottom: 20px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.settings-grid {
+  display: grid;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.setting-card {
+  background: #F8F9FA;
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid #004080;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.setting-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 95, 191, 0.15);
+}
+
+.setting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.setting-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #2D3748;
+}
+
+.setting-description {
+  font-size: 14px;
+  color: #718096;
+  line-height: 1.5;
+}
+
+/* Modern Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 56px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #E2E8F0 0%, #CBD5E0 100%);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 28px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background: white;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+input:checked + .slider {
+  background: linear-gradient(135deg, #004080 0%, #004080 100%);
+  box-shadow: 0 0 20px rgba(139, 95, 191, 0.3);
+}
+
+input:checked + .slider:before {
+  transform: translateX(28px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.slider:after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+/* Number Input Styling */
+.number-input-group {
+  background: #F8F9FA;
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid #004080;
+}
+
+.number-input-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 16px;
+  color: #2D3748;
+  margin-bottom: 8px;
+}
+
+.number-input-group .input-description {
+  font-size: 14px;
+  color: #718096;
+  margin-bottom: 12px;
+}
+
+.number-input {
+  width: 100px;
+  padding: 12px 16px;
+  border: 2px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2D3748;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: #004080;
+  box-shadow: 0 0 0 3px rgba(139, 95, 191, 0.1);
+}
+
+/* Save Button */
+.form-actions {
+  text-align: center;
+  padding-top: 24px;
+  border-top: 1px solid #E2E8F0;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #28a745 0%, #28a745 100%);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(139, 95, 191, 0.3);
+  min-width: 160px;
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 95, 191, 0.4);
+}
+
+.btn-save:active {
+  transform: translateY(0);
+}
+
+/* Status Indicators */
+.status-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #E2E8F0;
+  transition: all 0.3s ease;
+}
+
+.setting-card.active .status-indicator {
+  background: #48BB78;
+  box-shadow: 0 0 8px rgba(72, 187, 120, 0.4);
+}
+
+/* Icons */
+.setting-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  opacity: 0.7;
+  color: #8B5FBF;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .env-container {
+    padding: 10px;
+  }
+  
+  .form-body {
+    padding: 20px;
+  }
+  
+  .setting-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .switch {
+    align-self: flex-end;
+  }
+  
+  .settings-grid {
+    gap: 16px;
+  }
+  
+  .setting-card {
+    padding: 16px;
+  }
+}
+
+/* Animation for settings cards */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.setting-card {
+  animation: slideIn 0.5s ease forwards;
+}
+
+.setting-card:nth-child(1) { animation-delay: 0.1s; }
+.setting-card:nth-child(2) { animation-delay: 0.2s; }
+.setting-card:nth-child(3) { animation-delay: 0.3s; }
+.setting-card:nth-child(4) { animation-delay: 0.4s; }
+.setting-card:nth-child(5) { animation-delay: 0.5s; }
+.setting-card:nth-child(6) { animation-delay: 0.6s; }

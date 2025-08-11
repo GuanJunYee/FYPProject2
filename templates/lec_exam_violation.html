@@ -1,46 +1,77 @@
 {% extends 'base_lecdashboard.html' %}
 {% block title %}Exam Violations{% endblock %}
-{% block breadcrumb %}Examination > Violations{% endblock %}
+{% block breadcrumb %}Examinations > Exam Violations{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
-<h2 style="margin-left: 20px;">Exam Violations</h2>
-<hr>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/violations.css') }}">
 
-<table class="studentList">
-  <thead>
-    <tr>
-      <th>Assessment</th>
-      <th>Student</th>
-      <th>Violation Type</th>
-      <th>Description</th>
-      <th>Time</th>
-      <th>Evidence</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for v in violations %}
-    <tr>
-      <td>{{ v.assessment_code }}</td>
-      <td>{{ v.student_name }} ({{ v.student_id }})</td>
-      <td>{{ v.violation_type }}</td>
-      <td>{{ v.description }}</td>
-      <td>{{ v.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-      <td>
-        {% if v.evidence %}
-          {% for file in v.evidence.files %}
-            {% if file.type == 'screenshot' %}
-              <a href="{{ url_for('static', filename='evidence/screenshots/' ~ file.filename) }}" target="_blank">📷 Screenshot</a><br>
-            {% elif file.type == 'video' %}
-              <a href="{{ url_for('static', filename='evidence/videos/' ~ file.filename) }}" target="_blank">🎥 Video</a><br>
-            {% endif %}
-          {% endfor %}
-        {% else %}
-          No evidence
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<h2 style="margin-left: 20px;">Violations for {{ assessment_code }} - {{ assessment.title if assessment }}</h2>
+<hr>
+<a href="{{ url_for('lecturer_violation_assessments') }}" class="btn-reset" style="float: left; margin-top: 10px; margin-bottom: 15px;">← Back</a>
+  
+{% if violations %}
+<div style="margin-top: 20px;">
+  <table class="studentList">
+    <thead>
+      <tr>
+        <th>Assessment</th>
+        <th>Student</th>
+        <th>Violation Type</th>
+        <th>Description</th>
+        <th>Time</th>
+        <th>Evidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in violations %}
+      <tr class="violation-row-enhanced">
+        <td>{{ v.assessment_code }}</td>
+        <td>
+          <div class="student-info">
+            <div class="student-name-enhanced">{{ v.student_name }}</div>
+            <div class="student-id-enhanced">({{ v.student_id }})</div>
+          </div>
+        </td>
+        <td>
+          <div class="violation-type-display">{{ v.violation_type }}</div>
+        </td>
+        <td>{{ v.description }}</td>
+        <td>
+          <div class="time-display">
+            <div class="time-main">{{ v.timestamp.strftime('%H:%M:%S') }}</div>
+            <div class="time-date">{{ v.timestamp.strftime('%Y-%m-%d') }}</div>
+          </div>
+        </td>
+        <td>
+          {% if v.evidence %}
+            <div class="evidence-links-enhanced">
+              {% for file in v.evidence.files %}
+                {% if file.type == 'screenshot' %}
+                  <a href="{{ url_for('static', filename='evidence/screenshots/' ~ file.filename) }}" target="_blank" class="evidence-link-enhanced screenshot">
+                    📷 Screenshot
+                  </a>
+                {% elif file.type == 'video' %}
+                  <a href="{{ url_for('static', filename='evidence/videos/' ~ file.filename) }}" target="_blank" class="evidence-link-enhanced video">
+                    🎥 Video
+                  </a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <span class="no-evidence-enhanced">No evidence</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="no-violations-enhanced">
+  <div class="no-violations-icon">✅</div>
+  <h3>No Violations Found</h3>
+  <p>This assessment was completed without any detected violations.</p>
+</div>
+{% endif %}
 {% endblock %}

@@ -378,8 +378,8 @@
 </style>
 
 <h2 style="margin-left: 20px;">Plagiarism Report</h2>
-<hr>
-
+<hr style="margin-bottom: 25px;">
+<a href="javascript:history.back()" class="btn-back">← Back to Submissions</a>
 <div class="report-container">
     <!-- Student Information -->
     <div class="student-info-card">
@@ -564,14 +564,6 @@
         </a>
     </div>
     {% endif %}
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-        <a href="javascript:history.back()" class="btn-back">← Back to Submissions</a>
-        {% if plagiarism_report_url %}
-        <a href="{{ plagiarism_report_url }}" target="_blank" class="btn-external">View External Report</a>
-        {% endif %}
-    </div>
 </div>
 
 <script>

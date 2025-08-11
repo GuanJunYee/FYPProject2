@@ -1,0 +1,167 @@
+{% extends 'base_lecdashboard.html' %}
+
+{% block title %}Edit Announcement{% endblock %}
+{% block breadcrumb %}Announcements > Edit Announcement{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/course.css') }}">
+
+<script>
+// Auto-hide error messages after 5 seconds
+document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+        document.querySelectorAll(".error").forEach(el => {
+            el.style.transition = "opacity 0.5s ease-out";
+            el.style.opacity = "0";
+            setTimeout(() => el.remove(), 500);
+        });
+    }, 5000);
+});
+</script>
+
+<style>
+/* Keep all your existing form styles */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.form-input {
+    width: 94%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #004080;
+    box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+    width: 92%;
+}
+
+.form-select {
+    width: 98%;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: #004080;
+    box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+}
+
+.char-counter {
+    font-size: 12px;
+    color: #6b7280;
+    text-align: right;
+    margin-top: 4px;
+    margin-right: 20px;
+}
+
+.priority-info {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+</style>
+
+<!-- CHANGED: Simple header like course edit -->
+<div class="profile-header">
+  <h2 style="margin-left: 20px;">Edit Announcement</h2>
+  <hr />
+</div>
+
+<!-- Keep your beautiful form design -->
+<div class="form-container">
+    <form method="POST" action="{{ url_for('lec_announcement_edit', announcement_id=announcement._id) }}">
+        <div class="form-group">
+            <label class="form-label" for="title">
+                <i class="fas fa-heading"></i> Announcement Title *
+            </label>
+            <input type="text" id="title" name="title" class="form-input" 
+                   placeholder="Enter announcement title..." 
+                   maxlength="100" required
+                   value="{{ announcement.title }}"
+                   oninput="updateCharCount('title', 'title-count', 100)">
+            <div id="title-count" class="char-counter">0/100 characters</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="content">
+                <i class="fas fa-align-left"></i> Content *
+            </label>
+            <textarea id="content" name="content" class="form-input form-textarea" 
+                      placeholder="Write your announcement content here..."
+                      maxlength="1000" required
+                      oninput="updateCharCount('content', 'content-count', 1000)">{{ announcement.content }}</textarea>
+            <div id="content-count" class="char-counter">0/1000 characters</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="priority">
+                <i class="fas fa-flag"></i> Priority Level
+            </label>
+            <select id="priority" name="priority" class="form-select">
+                <option value="low" {% if announcement.priority == 'low' %}selected{% endif %}>Low - General information</option>
+                <option value="normal" {% if announcement.priority == 'normal' %}selected{% endif %}>Normal - Standard announcement</option>
+                <option value="high" {% if announcement.priority == 'high' %}selected{% endif %}>High - Important/Urgent</option>
+            </select>
+            <div class="priority-info">High priority announcements will be highlighted for students</div>
+        </div>
+
+        <!-- CHANGED: Simple buttons like course edit -->
+        <div class="form-actions">
+            <a href="{{ url_for('lec_announcements') }}" class="btn-reset">Cancel</a>
+            <button type="submit" class="btn-save">Update</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function updateCharCount(inputId, counterId, maxLength) {
+    const input = document.getElementById(inputId);
+    const counter = document.getElementById(counterId);
+    const currentLength = input.value.length;
+    
+    counter.textContent = `${currentLength}/${maxLength} characters`;
+    
+    if (currentLength > maxLength * 0.9) {
+        counter.style.color = '#ef4444';
+    } else if (currentLength > maxLength * 0.7) {
+        counter.style.color = '#f59e0b';
+    } else {
+        counter.style.color = '#6b7280';
+    }
+}
+
+// Initialize character counters
+document.addEventListener('DOMContentLoaded', function() {
+    updateCharCount('title', 'title-count', 100);
+    updateCharCount('content', 'content-count', 1000);
+});
+</script>
+
+{% endblock %}

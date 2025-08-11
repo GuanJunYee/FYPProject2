@@ -8,10 +8,11 @@
 
 body {
     background: linear-gradient(135deg, #667eea, #764ba2);
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    padding: 30px 0; /* ensures spacing above/below */
+    overflow-y: auto; /* enables scroll */
 }
 
 .container {
@@ -25,12 +26,16 @@ body {
     display: flex;
     width: 90%;
     max-width: 1000px;
-    height: 600px;
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+
+    /* ✅ Allow content height */
+    flex-grow: 1;
+    flex-wrap: wrap;
 }
+
 
 .login-left-panel {
     flex: 1;
@@ -38,6 +43,8 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    overflow-y: auto;
+    max-height: 600px; /* match the login page height */
 }
 
 .login-right-panel {
@@ -61,7 +68,10 @@ body {
     padding: 35px;
     position: relative;
     z-index: 1;
+    overflow-y: auto;
+    max-height: 100%;
 }
+
 
 h1 {
     text-align: center;
@@ -310,6 +320,7 @@ a {
     color: #667eea;
     text-decoration: none;
     font-size: 14px;
+    font-weight: 500;
 }
 
 a:hover {

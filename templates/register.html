@@ -28,24 +28,24 @@
     <div class="form-step active" id="step-1">
       <div class="input-group">
         <i class="fas fa-id-card"></i>
-        <input type="text" name="user_id" placeholder="Student ID (7 digits)" required pattern="[0-9]{7}" maxlength="7">
+        <input type="text" name="user_id" placeholder="Student ID (7 digits)" required pattern="[0-9]{7}" maxlength="7" title="Student ID must be 7 digits.">
       </div>
       <div class="input-group">
         <i class="fas fa-envelope"></i>
         <input type="email" name="email" placeholder="Email" required>
       </div>
-      <div class="input-group">
+     <div class="input-group">
         <i class="fas fa-lock"></i>
         <input type="password" name="password" id="register-password" placeholder="Password" 
-        required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-       title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character.">
+        required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d\W]{8,}$"
+      title="Password must be at least 8 characters with uppercase, lowercase, number, and special character.">
         <i class="fas fa-eye-slash toggle-password" style="margin-left: 85%; margin-top: 3px;" onclick="togglePassword('register-password', this)"></i>
       </div>
       <div class="input-group">
         <i class="fas fa-lock"></i>
         <input type="password" id="confirm-password" placeholder="Confirm Password" 
-        required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-       title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character.">
+        required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])[A-Za-z\d\W]{8,}$"
+      title="Password must be at least 8 characters with uppercase, lowercase, number, and special character.">
         <i class="fas fa-eye-slash toggle-password" style="margin-left: 85%; margin-top: 3px;" onclick="togglePassword('confirm-password', this)"></i>
       </div>
       <div id="password-error" style="color: red; font-size: 14px; margin-top: 2px;"></div>
@@ -64,15 +64,15 @@
       </div>
       <div class="input-group">
         <i class="fas fa-phone"></i>
-        <input type="tel" name="phone" placeholder="e.g. 012-3456789" pattern="01[0-9]-[0-9]{7,8}" maxlength="12" required>
+        <input type="tel" name="phone" placeholder="e.g. 012-3456789" pattern="01[0-9]-[0-9]{7,8}" maxlength="12" title="Phone number must be in the format 01x-xxxxxxxx." required>
       </div>
       <div class="input-group">
         <i class="fas fa-venus-mars"></i>
         <select name="gender" required>
           <option value="" disabled selected>Select Gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
         </select>
       </div>
       <div class="input-group">

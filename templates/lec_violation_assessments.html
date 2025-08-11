@@ -1,0 +1,60 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Exam Violations Overview{% endblock %}
+{% block breadcrumb %}Examinations > Exam Violations{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+
+<h2 style="margin-left: 20px;">Exam Violations</h2>
+<hr>
+
+<table class="studentList">
+  <thead>
+    <tr>
+      <th>No.</th>
+      <th>Assessment Code</th>
+      <th>Assessment Title</th>
+      <th>Violation Count</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in assessments %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ a._id }}</td>
+      <td>{{ a.title }}</td>
+      <td>{{ a.count }}</td>
+      <td>
+        <a href="{{ url_for('lecturer_exam_violations', assessment_code=a._id) }}" class="btn-download">View</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" style="text-align:center;">No violation found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<style>
+  .btn-download {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 12px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-download:hover {
+    background-color: #0056b3;
+  }
+
+  .studentList th, .studentList td {
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+</style>
+{% endblock %}

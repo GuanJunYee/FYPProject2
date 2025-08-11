@@ -8,14 +8,12 @@
 <div class="profile-header">
   <h2 style="margin-left: 20px;">Student List</h2>
 
-  <div style="float: right; margin-top: -48px; margin-right: 40px;">
+  <div style="float: right; margin-top: -52px; margin-right: 40px;">
     <div class="tooltip" style="display:inline-block; margin-right: 860px;">
-      <a href="#"><i class="fas fa-chart-bar"></i></a>
+      <a href="{{ url_for('user_registration_report') }}"><i class="fas fa-chart-bar"></i></a>
       <span class="tooltiptext">Student Register Trends Report</span>
     </div>
-    <form method="POST" action="#" style="display:inline-block;">
-      <button type="submit" class="excel-export">Export</button>
-    </form>
+    <button id="exportBtn" class="excel-export">Export</button>
   </div>
 </div>
 
@@ -26,6 +24,7 @@
     <option value="">Select Gender</option>
     <option value="Male" {% if selected_gender == 'Male' %}selected{% endif %}>Male</option>
     <option value="Female" {% if selected_gender == 'Female' %}selected{% endif %}>Female</option>
+    <option value="Other" {% if selected_gender == 'Other' %}selected{% endif %}>Other</option>
   </select>
   <button type="submit" class="btnCreate">Filter</button>
 </form>
@@ -56,11 +55,97 @@
           <a href="{{ url_for('edit_student', student_id=student['_id']) }}"><i class="fas fa-edit"></i></a>
         </td>
         <td class="btnDelete">
-          <a href="#"><i class="fas fa-trash"></i></a>
+          <a href="#" class="delete-btn"
+            data-id="{{ student._id }}"
+            data-userid="{{ student.user_id }}"
+            data-name="{{ student.name }}"
+            data-email="{{ student.email }}"
+            data-phone="{{ student.phone }}"
+            data-gender="{{ student.gender }}">
+            <i class="fas fa-trash"></i>
+          </a>
         </td>
+
+
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
+
+<script>
+document.getElementById('exportBtn').addEventListener('click', function () {
+  const gender = "{{ selected_gender or '' }}";
+  const url = "{{ url_for('export_student_list') }}" + (gender ? `?gender=${gender}` : '');
+
+  // Use a hidden iframe to trigger the download
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = url;
+  document.body.appendChild(iframe);
+
+  // Refresh the page after a short delay to show flash message
+  setTimeout(() => {
+    location.reload();
+  }, 1500);  // Wait for download to trigger first
+});
+</script>
+
+<!-- Delete student confirmation -->
+<script>
+  $(document).on('click', '.delete-btn', function (e) {
+    e.preventDefault();
+
+    const studentId = $(this).data('id');
+    const userId = $(this).data('userid');
+    const name = $(this).data('name');
+    const email = $(this).data('email');
+    const phone = $(this).data('phone');
+    const gender = $(this).data('gender');
+
+    Swal.fire({
+      title: 'Delete This Student?',
+      html: `
+      <span style="color: #dc2626;">This action cannot be undone.</span>
+        <table style="width:100%; font-size: 16px; text-align: left; padding-left: 105px; line-height: 1.8;">
+          <tr><td style="font-weight: bold; width: 30%;">ID:</td><td>${userId}</td></tr>
+          <tr><td style="font-weight: bold;">Name:</td><td>${name}</td></tr>
+          <tr><td style="font-weight: bold;">Email:</td><td>${email}</td></tr>
+          <tr><td style="font-weight: bold;">Phone:</td><td>${phone}</td></tr>
+          <tr><td style="font-weight: bold;">Gender:</td><td>${gender}</td></tr>
+        </table>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Send AJAX DELETE request
+        $.ajax({
+          url: '/lec/student/delete/' + studentId,
+          type: 'DELETE',
+          success: function (res) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: res.message
+            }).then(() => {
+              location.reload();
+            });
+          },
+          error: function (xhr) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: xhr.responseJSON?.message || 'An error occurred.'
+            });
+          }
+        });
+      }
+    });
+  });
+</script>
+
 {% endblock %}

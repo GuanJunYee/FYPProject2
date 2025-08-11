@@ -1,0 +1,970 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Assessment Enrollment Report{% endblock %}
+{% block breadcrumb %}Reports > Assessment Enrollment Analytics{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user_registration_report.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<div class="profile-header">
+    <h2 style="margin-left: 20px;">Assessment Enrollment Analytics Report</h2>
+</div>
+
+<hr style="width: 100%;">
+
+<div class="report-container">
+    <!-- Controls Section -->
+    <div class="controls-section">
+        <div class="controls-grid">
+            <div class="control-group">
+                <label for="assessment-filter">Assessment Filter</label>
+                <select id="assessment-filter" onchange="updateReport()">
+                    <option value="all">All Assessments</option>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="enrollment-type">Enrollment Type</label>
+                <select id="enrollment-type" onchange="updateReport()">
+                    <option value="all">All Methods</option>
+                    <option value="self">Self-Enrolled Only</option>
+                    <option value="lecturer">Lecturer-Enrolled Only</option>
+                </select>
+            </div>
+        </div>
+        <div class="control-actions">
+            <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+            <button class="btn btn-primary" id="refresh-btn" onclick="updateReport()">
+                <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Section for Missing Students -->
+    <div class="alert-section" id="alert-section" style="display: none;">
+        <div class="alert-card">
+            <div class="alert-header">
+                <i class="fas fa-exclamation-triangle alert-icon"></i>
+                <span class="alert-title">Students Requiring Attention</span>
+            </div>
+            <div class="alert-content" id="alert-content">
+                <!-- Dynamic alert content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card total-assessments">
+                <div class="stat-number" id="total-assessments">Loading...</div>
+                <div class="stat-label">Total Assessments</div>
+                <div class="stat-change positive" id="total-change">Loading...</div>
+            </div>
+            <div class="stat-card coverage-rate">
+                <div class="stat-number" id="coverage-rate">Loading...</div>
+                <div class="stat-label">Average Coverage Rate</div>
+                <div class="stat-change positive" id="coverage-change">Loading...</div>
+            </div>
+            <div class="stat-card self-enrolled">
+                <div class="stat-number" id="self-enrolled">Loading...</div>
+                <div class="stat-label">Self-Enrollment Rate</div>
+                <div class="stat-change positive" id="self-change">Loading...</div>
+            </div>
+            <div class="stat-card left-out">
+                <div class="stat-number" id="left-out">Loading...</div>
+                <div class="stat-label">Students Left Out</div>
+                <div class="stat-change negative" id="left-out-change">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <div class="chart-title">Self-Enrollment by Assessment</div>
+                <canvas id="selfEnrollmentChart" class="chart-canvas"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">Enrollment Method Distribution</div>
+                <canvas id="methodsChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Data Tables Section -->
+        <div class="data-table-section">
+            <div class="table-header">
+                <div class="table-title">Assessment Coverage Analysis</div>
+                <div class="table-actions">
+                    <button class="btn btn-success" onclick="exportTableData('coverage-table', 'assessment_coverage')">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportTablePDF('coverage-table', 'Assessment Coverage Analysis')">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                </div>
+            </div>
+            <table id="coverage-table" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Assessment Code</th>
+                        <th>Assessment Title</th>
+                        <th>Course Students</th>
+                        <th>Enrolled Students</th>
+                        <th>Coverage Rate</th>
+                        <th>Self-Enrolled</th>
+                        <th>Lecturer-Enrolled</th>
+                        <th>Students Left Out</th>
+                    </tr>
+                </thead>
+                <tbody id="coverage-table-body">
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px;">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Students Left Out Table - REMOVED ACTION COLUMN -->
+        <div class="data-table-section" style="margin-top: 30px;">
+            <div class="table-header">
+                <div class="table-title">Students Left Out Details</div>
+                <div class="table-actions">
+                    <button class="btn btn-success" onclick="exportTableData('left-out-table', 'students_left_out')">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportTablePDF('left-out-table', 'Students Left Out Details')">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                </div>
+            </div>
+            <table id="left-out-table" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Course</th>
+                        <th>Missing Assessment</th>
+                    </tr>
+                </thead>
+                <tbody id="left-out-table-body">
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px;">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Enrollment Methods Analysis -->
+        <div class="data-table-section" style="margin-top: 30px;">
+            <div class="table-header">
+                <div class="table-title">Enrollment Method Analysis</div>
+                <div class="table-actions">
+                    <button class="btn btn-success" onclick="exportTableData('methods-table', 'enrollment_methods')">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportTablePDF('methods-table', 'Enrollment Methods Analysis')">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                </div>
+            </div>
+            <table id="methods-table" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Assessment Code</th>
+                        <th>Assessment Title</th>
+                        <th>Total Enrolled</th>
+                        <th>Self-Enrolled</th>
+                        <th>Lecturer-Enrolled</th>
+                        <th>Self-Enrollment %</th>
+                        <th>Effectiveness</th>
+                    </tr>
+                </thead>
+                <tbody id="methods-table-body">
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px;">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Export Section -->
+    <div class="export-section">
+        <div class="export-info">
+            Last updated: <strong id="last-updated">Loading...</strong>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Additional CSS for Assessment Enrollment Report */
+.alert-section {
+    margin: 20px;
+    margin-bottom: 30px;
+}
+
+.alert-card {
+    background: linear-gradient(135deg, #fef3cd 0%, #fde68a 100%);
+    border: 1px solid #f59e0b;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.alert-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.alert-icon {
+    color: #d97706;
+    font-size: 1.5em;
+    margin-right: 12px;
+}
+
+.alert-title {
+    color: #92400e;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.alert-content {
+    color: #78350f;
+    line-height: 1.6;
+}
+
+.alert-content ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.stat-card.total-assessments {
+    background: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+    border-left: 4px solid #0288d1;
+}
+
+.stat-card.total-assessments .stat-number { color: #0277bd; }
+.stat-card.total-assessments .stat-label { color: #01579b; }
+
+.stat-card.coverage-rate {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-left: 4px solid #3b82f6;
+}
+
+.stat-card.coverage-rate .stat-number { color: #1d4ed8; }
+.stat-card.coverage-rate .stat-label { color: #1e40af; }
+
+.stat-card.self-enrolled {
+    background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+    border-left: 4px solid #8b5cf6;
+}
+
+.stat-card.self-enrolled .stat-number { color: #7c3aed; }
+.stat-card.self-enrolled .stat-label { color: #6b21a8; }
+
+.stat-card.left-out {
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    border-left: 4px solid #ef4444;
+}
+
+.stat-card.left-out .stat-number { color: #dc2626; }
+.stat-card.left-out .stat-label { color: #b91c1c; }
+
+.status-excellent {
+    background: #f0fdf4;
+    color: #16a34a;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.status-good {
+    background: #f0f9ff;
+    color: #0284c7;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.status-needs-attention {
+    background: #fef3c7;
+    color: #d97706;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.status-critical {
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.effectiveness-high {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.effectiveness-medium {
+    color: #d97706;
+    font-weight: 600;
+}
+
+.effectiveness-low {
+    color: #dc2626;
+    font-weight: 600;
+}
+</style>
+
+<script>
+let selfEnrollmentChart, methodsChart;
+let currentReportData = null; // Global variable to store report data for PDF export
+
+// Initialize charts
+function initCharts() {
+    // Self-Enrollment by Assessment Chart (Bar Chart)
+    const selfEnrollmentCtx = document.getElementById('selfEnrollmentChart').getContext('2d');
+    selfEnrollmentChart = new Chart(selfEnrollmentCtx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Self-Enrolled Students',
+                data: [],
+                backgroundColor: '#8b5cf6',
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Self-Enrolled Students'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Assessments'
+                    }
+                }
+            }
+        }
+    });
+
+    // Methods Chart (Doughnut Chart) - Only 2 types
+    const methodsCtx = document.getElementById('methodsChart').getContext('2d');
+    methodsChart = new Chart(methodsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Self-Enrolled', 'Lecturer-Enrolled'],
+            datasets: [{
+                data: [0, 0],
+                backgroundColor: ['#8b5cf6', '#3b82f6'],
+                borderWidth: 3,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} students (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update report based on filters
+async function updateReport() {
+    const assessmentFilter = document.getElementById('assessment-filter').value;
+    const enrollmentType = document.getElementById('enrollment-type').value;
+    
+    // Show loading state
+    const refreshBtn = document.getElementById('refresh-btn');
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    refreshBtn.disabled = true;
+    document.querySelector('.stats-section').classList.add('loading');
+
+    try {
+        // Build API URL
+        let apiUrl = `/api/reports/assessment-enrollment?assessment=${assessmentFilter}&enrollment_type=${enrollmentType}`;
+
+        // Fetch data from backend
+        const response = await fetch(apiUrl);
+        const result = await response.json();
+
+        if (result.success) {
+            // Update charts with real data
+            updateChartsWithData(result.data);
+            
+            // Update summary statistics
+            updateSummaryStats(result.data.summary);
+            
+            // Update data tables
+            updateCoverageTable(result.data.coverage);
+            updateLeftOutTable(result.data.left_out);
+            updateMethodsTable(result.data.methods);
+            
+            // Update alerts
+            updateAlerts(result.data.left_out);
+            
+            // Update last updated time
+            document.getElementById('last-updated').textContent = new Date().toLocaleString();
+            
+            // Store data for export functions
+            currentReportData = {
+                data: result.data,
+                summary: result.data.summary,
+                filters: result.filters
+            };
+            
+        } else {
+            console.error('API Error:', result.error);
+            Swal.fire('Error', 'Error loading report data: ' + result.error, 'error');
+        }
+
+    } catch (error) {
+        console.error('Network Error:', error);
+        Swal.fire('Error', 'Error connecting to server. Please try again.', 'error');
+    } finally {
+        // Reset loading state
+        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+        refreshBtn.disabled = false;
+        document.querySelector('.stats-section').classList.remove('loading');
+    }
+}
+
+// Update charts with real data from API
+function updateChartsWithData(data) {
+    // Update self-enrollment by assessment chart
+    if (data.self_enrollment_by_assessment) {
+        const chartData = data.self_enrollment_by_assessment;
+        selfEnrollmentChart.data.labels = chartData.labels;
+        selfEnrollmentChart.data.datasets[0].data = chartData.self_enrolled_counts;
+        selfEnrollmentChart.update();
+    }
+
+    // Update methods chart - Only 2 categories
+    if (data.methods && data.methods.totals) {
+        const totals = data.methods.totals;
+        methodsChart.data.datasets[0].data = [
+            totals.self_enrolled,
+            totals.lecturer_enrolled
+        ];
+        methodsChart.update();
+    }
+}
+
+// Update summary statistics cards
+function updateSummaryStats(summary) {
+    if (!summary) return;
+    
+    document.getElementById('total-assessments').textContent = summary.total_assessments || 0;
+    document.getElementById('coverage-rate').textContent = (summary.average_coverage_rate || 0) + '%';
+    document.getElementById('self-enrolled').textContent = (summary.self_enrollment_rate || 0) + '%';
+    document.getElementById('left-out').textContent = summary.students_left_out || 0;
+
+    // Update change indicators
+    document.getElementById('total-change').textContent = summary.total_assessments + ' active';
+    document.getElementById('coverage-change').textContent = (summary.average_coverage_rate >= 90 ? 'Excellent' : summary.average_coverage_rate >= 70 ? 'Good' : 'Needs attention');
+    document.getElementById('self-change').textContent = (summary.self_enrollment_rate > 0 ? 'Active' : 'No self-enrollment');
+    document.getElementById('left-out-change').textContent = (summary.students_left_out > 0 ? 'Action needed' : 'All enrolled');
+}
+
+// Update coverage table
+function updateCoverageTable(coverageData) {
+    const tbody = document.getElementById('coverage-table-body');
+    tbody.innerHTML = '';
+
+    if (!coverageData || !coverageData.assessments || coverageData.assessments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No data available</td></tr>';
+        return;
+    }
+
+    coverageData.assessments.forEach(assessment => {
+        const row = document.createElement('tr');
+        
+        // Calculate students left out
+        const leftOutStudents = Math.max(0, assessment.course_students - assessment.enrolled_students);
+        
+        row.innerHTML = `
+            <td><strong>${assessment.assessment_code}</strong></td>
+            <td>${assessment.assessment_title}</td>
+            <td>${assessment.course_students}</td>
+            <td>${assessment.enrolled_students}</td>
+            <td>${assessment.coverage_rate}%</td>
+            <td>${assessment.self_enrolled}</td>
+            <td>${assessment.lecturer_enrolled}</td>
+            <td><strong>${leftOutStudents}</strong></td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+// Update left out students table - REMOVED ACTION COLUMN AND ENROLL BUTTON
+function updateLeftOutTable(leftOutData) {
+    const tbody = document.getElementById('left-out-table-body');
+    tbody.innerHTML = '';
+
+    if (!leftOutData || !leftOutData.students || leftOutData.students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px;">No students left out - Great!</td></tr>';
+        return;
+    }
+
+    leftOutData.students.forEach(student => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td>${student.student_id}</td>
+            <td>${student.student_name}</td>
+            <td>${student.course_code}</td>
+            <td>${student.assessment_code}</td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+// Update methods table
+function updateMethodsTable(methodsData) {
+    const tbody = document.getElementById('methods-table-body');
+    tbody.innerHTML = '';
+
+    if (!methodsData || !methodsData.assessments || methodsData.assessments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">No data available</td></tr>';
+        return;
+    }
+
+    methodsData.assessments.forEach(assessment => {
+        const row = document.createElement('tr');
+        
+        const effectivenessClass = assessment.self_enrollment_rate >= 20 ? 'effectiveness-high' :
+                                  assessment.self_enrollment_rate >= 10 ? 'effectiveness-medium' : 'effectiveness-low';
+        
+        row.innerHTML = `
+            <td><strong>${assessment.assessment_code}</strong></td>
+            <td>${assessment.assessment_title}</td>
+            <td>${assessment.total_enrolled}</td>
+            <td>${assessment.self_enrolled}</td>
+            <td>${assessment.lecturer_enrolled}</td>
+            <td>${assessment.self_enrollment_rate}%</td>
+            <td><span class="${effectivenessClass}">${assessment.effectiveness}</span></td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+// Update alerts section
+function updateAlerts(leftOutData) {
+    const alertSection = document.getElementById('alert-section');
+    const alertContent = document.getElementById('alert-content');
+    
+    if (!leftOutData || !leftOutData.students || leftOutData.students.length === 0) {
+        alertSection.style.display = 'none';
+        return;
+    }
+    
+    const totalLeftOut = leftOutData.students.length;
+    
+    alertContent.innerHTML = `
+        <p><strong>${totalLeftOut} students</strong> are currently not enrolled in assessments they should be taking.</p>
+        <ul>
+            <li>Students missing from assessments: ${leftOutData.affected_courses ? leftOutData.affected_courses.join(', ') : 'Multiple courses'}</li>
+            <li>Recommended action: Review and enroll missing students manually</li>
+        </ul>
+    `;
+    
+    alertSection.style.display = 'block';
+}
+
+// Reset all filters
+function resetFilters() {
+    document.getElementById('assessment-filter').value = 'all';
+    document.getElementById('enrollment-type').value = 'all';
+    updateReport();
+}
+
+// Export table data as CSV
+function exportTableData(tableId, filename) {
+    const table = document.getElementById(tableId);
+    const rows = Array.from(table.querySelectorAll('tr'));
+    
+    let csv = '';
+    rows.forEach(row => {
+        const cols = Array.from(row.querySelectorAll('th, td'));
+        const csvRow = cols.map(col => `"${col.textContent.trim()}"`).join(',');
+        csv += csvRow + '\n';
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// Test function to check if data is loaded - FOR DEBUGGING
+function testDataLoaded() {
+    console.log('=== DATA TEST ===');
+    console.log('currentReportData:', currentReportData);
+    if (currentReportData) {
+        console.log('Data exists!', {
+            hasData: !!currentReportData.data,
+            hasSummary: !!currentReportData.summary,
+            hasFilters: !!currentReportData.filters,
+            summaryValues: currentReportData.summary
+        });
+    } else {
+        console.log('No data found - need to refresh report');
+    }
+}
+
+// Export table as PDF - SIMPLIFIED WORKING VERSION
+function exportTablePDF(tableId, title) {
+    console.log('PDF Export called for:', tableId, title);
+    console.log('Current Report Data:', currentReportData);
+    
+    // If no data, try to get it from the current page
+    if (!currentReportData) {
+        console.log('No stored data found, trying to extract from page...');
+        
+        // Try to get summary data from the displayed cards
+        const totalAssessments = document.getElementById('total-assessments')?.textContent || '0';
+        const coverageRate = document.getElementById('coverage-rate')?.textContent?.replace('%', '') || '0';
+        const selfEnrolled = document.getElementById('self-enrolled')?.textContent?.replace('%', '') || '0';
+        const leftOut = document.getElementById('left-out')?.textContent || '0';
+        
+        // Check if we have real data (not "Loading...")
+        if (totalAssessments !== 'Loading...' && totalAssessments !== '0') {
+            console.log('Found page data, creating basic export...');
+            
+            // Create minimal data structure for export
+            currentReportData = {
+                data: {
+                    coverage: { assessments: [] },
+                    left_out: { students: [] },
+                    methods: { assessments: [] }
+                },
+                summary: {
+                    total_assessments: parseInt(totalAssessments) || 0,
+                    average_coverage_rate: parseFloat(coverageRate) || 0,
+                    self_enrollment_rate: parseFloat(selfEnrolled) || 0,
+                    students_left_out: parseInt(leftOut) || 0
+                },
+                filters: {
+                    assessment: 'all',
+                    enrollment_type: 'all'
+                }
+            };
+        } else {
+            Swal.fire('Warning', 'No data available to export. Please wait for the report to load completely, then try again.', 'warning');
+            return;
+        }
+    }
+
+    try {
+        // Create print-friendly version in new tab
+        const printWindow = window.open('', '_blank');
+        
+        if (!printWindow) {
+            Swal.fire('Error', 'Unable to open print window. Please check your popup blocker.', 'error');
+            return;
+        }
+
+        const { data, summary, filters } = currentReportData;
+        
+        // Provide safe fallbacks
+        const safeData = data || {};
+        const safeSummary = summary || {
+            total_assessments: 0,
+            average_coverage_rate: 0,
+            self_enrollment_rate: 0,
+            students_left_out: 0
+        };
+        const safeFilters = filters || { assessment: 'all', enrollment_type: 'all' };
+        
+        // Get table data based on tableId
+        let tableData = [];
+        let tableHeaders = [];
+        let reportTitle = title;
+        
+        if (tableId === 'coverage-table') {
+            tableData = safeData.coverage?.assessments || [];
+            tableHeaders = ['Assessment Code', 'Assessment Title', 'Course Students', 'Enrolled Students', 'Coverage Rate', 'Self-Enrolled', 'Lecturer-Enrolled', 'Students Left Out'];
+            reportTitle = 'Assessment Coverage Analysis';
+        } else if (tableId === 'left-out-table') {
+            tableData = safeData.left_out?.students || [];
+            tableHeaders = ['Student ID', 'Student Name', 'Course', 'Missing Assessment'];
+            reportTitle = 'Students Left Out Details';
+        } else if (tableId === 'methods-table') {
+            tableData = safeData.methods?.assessments || [];
+            tableHeaders = ['Assessment Code', 'Assessment Title', 'Total Enrolled', 'Self-Enrolled', 'Lecturer-Enrolled', 'Self-Enrollment %', 'Effectiveness'];
+            reportTitle = 'Enrollment Method Analysis';
+        }
+
+        // If no table data but we have summary, extract from the visible table on page
+        if (tableData.length === 0) {
+            console.log('No stored table data, trying to extract from visible table...');
+            const visibleTable = document.getElementById(tableId);
+            if (visibleTable) {
+                const rows = visibleTable.querySelectorAll('tbody tr');
+                tableData = Array.from(rows).map(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    if (cells.length > 0 && !cells[0].textContent.includes('Loading') && !cells[0].textContent.includes('No data')) {
+                        const rowData = {};
+                        cells.forEach((cell, index) => {
+                            rowData[`col_${index}`] = cell.textContent.trim();
+                        });
+                        return rowData;
+                    }
+                    return null;
+                }).filter(row => row !== null);
+            }
+        }
+
+        // Simple HTML content
+        const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>${reportTitle}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
+        .header h1 { color: #333; margin: 0; }
+        .info { background: #f5f5f5; padding: 15px; margin: 20px 0; border-radius: 5px; }
+        .summary { margin: 20px 0; }
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+        .summary-item { padding: 15px; border: 1px solid #ddd; text-align: center; background: #f9f9f9; }
+        .summary-item h3 { margin: 0 0 10px 0; font-size: 14px; color: #666; }
+        .summary-item .value { font-size: 20px; font-weight: bold; margin: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #3b82f6; color: white; font-weight: bold; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Assessment Enrollment Analytics</h1>
+        <p><strong>${reportTitle}</strong></p>
+        <p>Generated: ${new Date().toLocaleString()}</p>
+    </div>
+    
+    <div class="info">
+        <p><strong>Filter:</strong> ${safeFilters.assessment === 'all' ? 'All Assessments' : safeFilters.assessment}</p>
+        <p><strong>Type:</strong> ${safeFilters.enrollment_type === 'all' ? 'All Methods' : safeFilters.enrollment_type}</p>
+    </div>
+    
+    <div class="summary">
+        <h2>Summary Statistics</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <h3>Total Assessments</h3>
+                <p class="value">${safeSummary.total_assessments}</p>
+            </div>
+            <div class="summary-item">
+                <h3>Coverage Rate</h3>
+                <p class="value">${safeSummary.average_coverage_rate}%</p>
+            </div>
+            <div class="summary-item">
+                <h3>Self-Enrollment</h3>
+                <p class="value">${safeSummary.self_enrollment_rate}%</p>
+            </div>
+            <div class="summary-item">
+                <h3>Students Left Out</h3>
+                <p class="value">${safeSummary.students_left_out}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="details">
+        <h2>${reportTitle}</h2>
+        <table>
+            <thead>
+                <tr>
+                    ${tableHeaders.map(h => `<th>${h}</th>`).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                ${tableData.length === 0 ? 
+                    `<tr><td colspan="${tableHeaders.length}" style="text-align: center; padding: 20px;">No detailed data available - Summary statistics shown above</td></tr>` :
+                    generateTableRows(tableData, tableId)
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="footer">
+        <p>Generated by Online Exam Platform - Assessment Enrollment Analytics</p>
+    </div>
+</body>
+</html>`;
+
+        // Helper function for table rows
+        function generateTableRows(data, tableType) {
+            if (tableType === 'coverage-table') {
+                return data.map(item => {
+                    if (item.col_0) {
+                        // From visible table
+                        return `<tr>
+                            <td>${item.col_0 || 'N/A'}</td>
+                            <td>${item.col_1 || 'N/A'}</td>
+                            <td>${item.col_2 || '0'}</td>
+                            <td>${item.col_3 || '0'}</td>
+                            <td>${item.col_4 || '0%'}</td>
+                            <td>${item.col_5 || '0'}</td>
+                            <td>${item.col_6 || '0'}</td>
+                            <td>${item.col_7 || '0'}</td>
+                        </tr>`;
+                    } else {
+                        // From API data
+                        const leftOut = Math.max(0, (item.course_students || 0) - (item.enrolled_students || 0));
+                        return `<tr>
+                            <td>${item.assessment_code || 'N/A'}</td>
+                            <td>${item.assessment_title || 'N/A'}</td>
+                            <td>${item.course_students || 0}</td>
+                            <td>${item.enrolled_students || 0}</td>
+                            <td>${item.coverage_rate || 0}%</td>
+                            <td>${item.self_enrolled || 0}</td>
+                            <td>${item.lecturer_enrolled || 0}</td>
+                            <td>${leftOut}</td>
+                        </tr>`;
+                    }
+                }).join('');
+            } else if (tableType === 'left-out-table') {
+                return data.map(item => {
+                    if (item.col_0) {
+                        return `<tr>
+                            <td>${item.col_0 || 'N/A'}</td>
+                            <td>${item.col_1 || 'N/A'}</td>
+                            <td>${item.col_2 || 'N/A'}</td>
+                            <td>${item.col_3 || 'N/A'}</td>
+                        </tr>`;
+                    } else {
+                        return `<tr>
+                            <td>${item.student_id || 'N/A'}</td>
+                            <td>${item.student_name || 'N/A'}</td>
+                            <td>${item.course_code || 'N/A'}</td>
+                            <td>${item.assessment_code || 'N/A'}</td>
+                        </tr>`;
+                    }
+                }).join('');
+            } else if (tableType === 'methods-table') {
+                return data.map(item => {
+                    if (item.col_0) {
+                        return `<tr>
+                            <td>${item.col_0 || 'N/A'}</td>
+                            <td>${item.col_1 || 'N/A'}</td>
+                            <td>${item.col_2 || '0'}</td>
+                            <td>${item.col_3 || '0'}</td>
+                            <td>${item.col_4 || '0'}</td>
+                            <td>${item.col_5 || '0%'}</td>
+                            <td>${item.col_6 || 'Low'}</td>
+                        </tr>`;
+                    } else {
+                        return `<tr>
+                            <td>${item.assessment_code || 'N/A'}</td>
+                            <td>${item.assessment_title || 'N/A'}</td>
+                            <td>${item.total_enrolled || 0}</td>
+                            <td>${item.self_enrolled || 0}</td>
+                            <td>${item.lecturer_enrolled || 0}</td>
+                            <td>${item.self_enrollment_rate || 0}%</td>
+                            <td>${item.effectiveness || 'Low'}</td>
+                        </tr>`;
+                    }
+                }).join('');
+            }
+            return '';
+        }
+
+        // Write content and set up print
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // Wait and then print
+        setTimeout(() => {
+            printWindow.print();
+        }, 1000);
+        
+        console.log('PDF generated successfully');
+        
+    } catch (error) {
+        console.error('PDF Export Error:', error);
+        Swal.fire('Error', 'Failed to generate PDF: ' + error.message, 'error');
+    }
+}
+
+// Remove the separate printAssessmentReport function since it's now integrated above
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initCharts();
+    loadAssessmentOptions(); // Load real assessment options first
+    updateReport(); // Then load initial data
+});
+
+// Load real assessment options for filter
+async function loadAssessmentOptions() {
+    try {
+        const response = await fetch('/api/assessments/list');
+        const result = await response.json();
+        
+        if (result.success) {
+            const select = document.getElementById('assessment-filter');
+            // Keep "All Assessments" option
+            const allOption = select.querySelector('option[value="all"]');
+            select.innerHTML = '';
+            select.appendChild(allOption);
+            
+            // Add real assessments
+            result.assessments.forEach(assessment => {
+                const option = document.createElement('option');
+                option.value = assessment.assessment_code;
+                option.textContent = `${assessment.assessment_code} - ${assessment.title}`;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading assessment options:', error);
+    }
+}
+</script>
+
+{% endblock %}

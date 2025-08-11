@@ -5,7 +5,13 @@
   <title>Exam in Progress</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/student_exam_interface.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- Your existing scripts -->
   <script src="{{ url_for('static', filename='js/exam-screenmonitoring.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/exam-shortcutdisable.js') }}"></script>
+  
+  <!-- Head Movement Detection -->
+  <script src="{{ url_for('static', filename='js/head-movement-detection.js') }}"></script>
 </head>
 <body>
 
@@ -27,23 +33,57 @@
       <p><strong>Assessment Code:</strong> {{ assessment.assessment_code }}</p>
       <hr style="display:block; height: 1px; border-top: 1px solid #ccc;">
 
-      <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-        📹 <strong>Screen Monitoring Active:</strong> Your screen activity is being monitored...
-      </div>
-
+      <!-- Enhanced Monitoring Warning -->
       <div class="exam-warning">
-        ⚠ Your webcam is active and your screen is being monitored. Do not leave this page or open other applications.
+        ⚠ Your webcam is active and your behavior is being monitored. Do not leave this page, open other applications, or look away from the screen for extended periods.
       </div>
+      
       <iframe src="{{ url_for('static', filename='uploads/assessments/' + assessment.pdf_filename) }}" width="100%" height="600px"></iframe>
     </div>
 
-    <!-- Right Panel: Timer + Submission -->
+    <!-- Right Panel: Enhanced Monitoring -->
     <div class="right-panel">
-      <div class="panel-box">
-        <h3>Webcam Monitor</h3>
-        <video id="webcam-video" style="width: 100%; height: 180px; background-color: #000; border-radius: 4px;" autoplay muted playsinline></video>
+      
+      <!-- ✅ ENHANCED AI Behavior Monitor Panel -->
+      <div id="ai-behavior-monitor" class="panel-box monitoring-panel">
+          <h3>Webcam Monitor</h3>
+        
+        <!-- Status Display with Better Styling -->
+        <div id="detection-status" class="status-display">Monitoring Active</div>
+        
+        <!-- Webcam Container with Proper Positioning for Overlay -->
+        <div class="webcam-container">
+          <video id="webcam-video" autoplay muted playsinline class="webcam-video"></video>
+          <!-- Overlay canvas will be added here automatically by JavaScript -->
+        </div>
+        
+        <!-- Pose Indicator with Better Styling -->
+        <div id="pose-indicator" class="pose-indicator" style="display: none;">
+          <div class="pose-row">
+            <span>Yaw:</span>
+            <span class="pose-value">--</span>
+          </div>
+          <div class="pose-row">
+            <span>Pitch:</span>
+            <span class="pose-value">--</span>
+          </div>
+          <div class="pose-row">
+            <span>Roll:</span>
+            <span class="pose-value">--</span>
+          </div>
+          <div class="pose-info">Visual Tracking</div>
+        </div>
+        
+        <!-- Session Summary - Status Only (Removed Violation Count) -->
+        <div id="session-summary" class="session-summary">
+          <h4>Monitoring Status:</h4>
+          <div class="status-info">
+            <span class="status-indicator">System Active</span>
+          </div>
+        </div>
       </div>
 
+      <!-- Exam Timer -->
       <div class="panel-box">
         <h3>Exam Timer</h3>
         <p style="text-align: center;">{{ timetable.exam_date }} {{ timetable.start_time }} - {{ timetable.end_time }}</p>
@@ -51,6 +91,7 @@
         <p style="text-align: center;">Time Remaining</p>
       </div>
 
+      <!-- Submission -->
       <div class="panel-box">
         <div class="upload-section">
           <h3>Submission</h3>
@@ -72,6 +113,155 @@
   </div>
 </form>
 
+<!-- ✅ ENHANCED CSS STYLING -->
+<style>
+/* AI Behavior Monitor Panel */
+.monitoring-panel {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    border: 2px solid #cbd5e0 !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Monitor Header */
+.monitor-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.monitor-header h3 {
+    margin: 0 !important;
+    color: #1e293b !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+/* Status Display */
+.status-display {
+    font-weight: 500;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 12px 0;
+    transition: all 0.3s ease;
+    font-size: 13px;
+    border: 1px solid transparent;
+    background: #f9fafb;
+    color: #6b7280;
+}
+
+/* Webcam Container */
+.webcam-container {
+    position: relative;
+    display: block;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+    margin: 12px 0;
+    width: 100%;
+}
+
+.webcam-video {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #000;
+    border-radius: 6px;
+}
+
+/* Pose Indicator */
+.pose-indicator {
+    background: #1f2937;
+    color: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    margin: 12px 0;
+    border: 1px solid #374151;
+}
+
+.pose-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 4px 0;
+}
+
+.pose-value {
+    font-weight: bold;
+    color: #60a5fa;
+}
+
+.pose-info {
+    text-align: center;
+    font-size: 10px;
+    color: #9ca3af;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #374151;
+}
+
+/* Session Summary */
+.session-summary {
+    background: #f0f9ff;
+    border: 1px solid #0ea5e9;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.session-summary h4 {
+    color: #0369a1;
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.status-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #ecfdf5;
+    color: #10b981;
+    border: 1px solid #6ee7b7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .monitoring-panel {
+        margin: 10px;
+        padding: 12px;
+    }
+    
+    .monitor-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+    }
+    
+    .monitor-controls {
+        justify-content: center;
+    }
+}
+</style>
+
+<!-- Timer Script -->
 <script>
   const endTime = new Date("{{ end_time }}").getTime();
   const timerEl = document.getElementById('timer');
@@ -83,6 +273,16 @@
     if (distance <= 0) {
       clearInterval(x);
       timerEl.innerHTML = "Time's up!";
+      
+      // 🔧 FIX: Set global flag for auto-submit too
+      window.examSubmitting = true;
+      console.log("⏰ AUTO-SUBMIT: Setting global flag to prevent false violations");
+      
+      // Stop monitoring before auto-submit
+      if (window.headDetector) {
+        window.headDetector.stopDetection();
+      }
+      
       document.getElementById("auto-submit-flag").value = "true";
       document.querySelector("form").submit();
     } else {
@@ -94,6 +294,7 @@
   }, 1000);
 </script>
 
+<!-- File Upload Script -->
 <script>
   const input = document.getElementById("submission-files");
   const fileList = document.getElementById("file-list");
@@ -122,6 +323,7 @@
   }
 </script>
 
+<!-- Form Submission Script -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
@@ -134,6 +336,10 @@
   });
 
   document.getElementById("examForm").addEventListener("submit", function (e) {
+    // 🔧 FIX: Set global flag IMMEDIATELY to prevent false violations
+    window.examSubmitting = true;
+    console.log("📤 EXAM SUBMISSION STARTED - Setting global flag");
+    
     const fileInput = document.getElementById("submission-files");
     const errorDiv = document.getElementById("format-error");
     const submitBtn = document.getElementById("submit-btn");
@@ -142,6 +348,8 @@
     errorDiv.innerText = "";
 
     if (!fileInput.files.length && !autoSubmit) {
+      // Reset flag if submission is cancelled
+      window.examSubmitting = false;
       e.preventDefault();
       fileInput.reportValidity();
       return;
@@ -153,6 +361,8 @@
       const fileExtension = fileName.split('.').pop().toLowerCase();
 
       if (!allowedExtensions.includes(fileExtension)) {
+        // Reset flag if submission is cancelled
+        window.examSubmitting = false;
         e.preventDefault();
         errorDiv.innerText = "Invalid file format. Please upload a TXT or DOC/DOCX file.";
         return;
@@ -162,14 +372,103 @@
     if (!autoSubmit) {
       const confirmed = confirm("Are you sure you want to submit your exam?");
       if (!confirmed) {
+        // Reset flag if submission is cancelled
+        window.examSubmitting = false;
         e.preventDefault();
         return;
       }
     }
 
+    // 🔧 ENHANCED Step 4: Stop ALL monitoring before submission
+    console.log("🛑 Stopping all monitoring systems for exam submission...");
+    
+    if (window.headDetector) {
+      window.headDetector.stopDetection();
+      console.log("✅ Head detection stopped");
+    }
+
+    if (window.screenMonitor) {
+      window.screenMonitor.stopMonitoring();
+      console.log("✅ Screen monitoring stopped");
+    }
+
     submitBtn.disabled = true;
     submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Submitting...`;
+    
+    // Small delay to ensure everything stops cleanly
+    setTimeout(() => {
+      console.log("📤 Proceeding with exam submission...");
+      // Form will submit naturally after this function completes
+    }, 500);
   });
+</script>
+
+<!-- ✅ Enhanced Head Detection with Timeline Support -->
+<script>
+// ✅ Auto-start detection when page loads with TIMELINE SUPPORT
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log("📱 Page loaded - starting head detection automatically...");
+    
+    // Wait a moment for page to fully load
+    setTimeout(async () => {
+        try {
+            const assessmentCode = document.getElementById('assessment-code').value;
+            const studentId = document.getElementById('student-id').value;
+            
+            // 🔧 ADD TIMELINE DATA - Get from Flask template
+            const examStartTime = '{{ exam_start_iso }}';
+            const examEndTime = '{{ exam_end_iso }}';
+            
+            // 🔧 DEBUG: Check if timeline data is provided
+            console.log("📅 DEBUG: Exam start ISO:", examStartTime);
+            console.log("📅 DEBUG: Exam end ISO:", examEndTime);
+            console.log("📅 DEBUG: Are times empty?", examStartTime === '', examEndTime === '');
+            
+            if (!assessmentCode || !studentId) {
+                console.error('❌ Missing assessment code or student ID');
+                return;
+            }
+            
+            console.log("🚀 Initializing head detection with timeline support...");
+            
+            // 🔧 FIXED: Initialize with timeline data
+            window.headDetector = new HeadMovementDetector(
+                assessmentCode, 
+                studentId,
+                examStartTime,  // Add exam start time
+                examEndTime     // Add exam end time
+            );
+            
+            await window.headDetector.startDetection();
+            
+            // Update status
+            const statusEl = document.getElementById('detection-status');
+            if (statusEl) {
+                statusEl.textContent = "🎥 Head Movement Detection Active";
+                statusEl.style.color = '#10b981';
+                statusEl.style.backgroundColor = '#ecfdf5';
+            }
+            
+            console.log("✅ Head detection started with timeline support");
+        } catch (error) {
+            console.error("❌ Failed to auto-start head detection:", error);
+            const statusEl = document.getElementById('detection-status');
+            if (statusEl) {
+                statusEl.textContent = "❌ Detection Failed";
+                statusEl.style.color = '#dc2626';
+                statusEl.style.backgroundColor = '#fee2e2';
+            }
+        }
+    }, 2000); // Wait 2 seconds for full page load
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (window.headDetector) {
+        console.log("🧹 Cleaning up head detection...");
+        window.headDetector.stopDetection();
+    }
+});
 </script>
 
 </body>

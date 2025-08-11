@@ -4,32 +4,54 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_student.css') }}">
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+      document.querySelectorAll(".error").forEach(el => {
+        el.style.transition = "opacity 0.5s ease-out";
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);
+      });
+    }, 5000);
+  });
+</script>
 <h2 style="margin-left: 20px;">Edit Leturer</h2>
 <hr style="width: 100%;">
 
 <form method="POST" class="edit-form">
-<div class="form-group">
-  <label>Full Name:</label>
-  <input type="text" name="name" value="{{ lecturer.name }}" required>
-</div>
-<div class="form-group">
-  <label>Email:</label>
-  <input type="email" name="email" value="{{ lecturer.email }}" required>
-</div>
-<div class="form-group">
-  <label>Phone:</label>
-  <input type="text" name="phone" value="{{ lecturer.phone }}" required>
-</div>
   <div class="form-group">
-  <label>Gender:</label>
-  <select name="gender" required>
-    <option value="Male" {% if lecturer.gender == 'Male' %}selected{% endif %}>Male</option>
-    <option value="Female" {% if lecturer.gender == 'Female' %}selected{% endif %}>Female</option>
-  </select>
-</div>
-<div class="form-actions">
+    <label>Lecturer ID:</label>
+    <input type="text" name="user_id" value="{{ lecturer.user_id }}" required pattern="[0-9]{7}" maxlength="7" title="Lecturer ID must be 7 digits.">
+    {% if errors and errors.user_id %}
+      <div class="error">{{ errors.user_id }}</div>
+    {% endif %}
+  </div>
+  <div class="form-group">
+    <label>Full Name:</label>
+    <input type="text" name="name" value="{{ lecturer.name }}" required>
+  </div>
+  <div class="form-group">
+    <label>Email:</label>
+    <input type="email" name="email" value="{{ lecturer.email }}" required>
+    {% if errors and errors.email %}
+      <div class="error">{{ errors.email }}</div>
+    {% endif %}
+  </div>
+  <div class="form-group">
+    <label>Phone:</label>
+    <input type="text" name="phone" value="{{ lecturer.phone }}" placeholder="e.g. 012-3456789" pattern="01[0-9]-[0-9]{7,8}" maxlength="12" title="Phone number must be in the format 01x-xxxxxxxx." required>
+  </div>
+  <div class="form-group">
+    <label>Gender:</label>
+    <select name="gender" required>
+      <option value="Male" {% if lecturer.gender == 'Male' %}selected{% endif %}>Male</option>
+      <option value="Female" {% if lecturer.gender == 'Female' %}selected{% endif %}>Female</option>
+    </select>
+  </div>
+  <div class="form-actions">
     <a href="{{ url_for('lec_list') }}" class="btn-reset">Cancel</a>
-  <button type="submit" class="btn-save">Save</button>
+    <button type="submit" class="btn-save">Save</button>
   </div>
 </form>
+
 {% endblock %}

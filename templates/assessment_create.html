@@ -22,7 +22,7 @@
   <div style="margin: 20px;">
     <div class="detail-group">
     <label>Assessment Code:</label>
-    <input type="text" name="assessment_code" required />
+    <input type="text" name="assessment_code" placeholder="e.g., ABCD1234" pattern="[A-Z]{4}[0-9]{4}" title="4 uppercase letters followed by 4 digits (e.g., ABCD1234)" required />
     {% if errors.assessment_code %}
         <div class="error">{{ errors.assessment_code }}</div>
     {% endif %}

@@ -1,0 +1,350 @@
+{% extends 'base_lecdashboard.html' %}
+
+{% block title %}Announcements Management{% endblock %}
+{% block breadcrumb %}Announcements > Announcement Management{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
+
+<!-- CHANGED: Simple header like course management -->
+<div class="profile-header">
+  <h2 style="margin-left: 20px;">Announcement Management</h2>
+</div>
+
+<hr style="width: 100%;">
+
+<!-- CHANGED: Simple create button like course management -->
+<form method="GET" action="{{ url_for('lec_announcement_create') }}">
+  <button type="submit" class="btnCreate" style="margin-left: 90%;">Create</button>
+</form>
+
+<style>
+/* Keep all your existing announcement styles... */
+.announcements-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.announcement-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.announcement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.announcement-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.announcement-date {
+    color: #004080;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.announcement-author {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.priority-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.priority-high {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.priority-normal {
+    background: rgba(0, 64, 128, 0.1);
+    color: #004080;
+    border: 1px solid rgba(0, 64, 128, 0.2);
+}
+
+.priority-low {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-active {
+    background: rgba(34, 197, 94, 0.1);
+    color: #059669;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-inactive {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.announcement-title {
+    color: #1f2937;
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.announcement-content {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.announcement-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background: #004080;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #003060;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-toggle {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.btn-toggle:hover {
+    background: #d97706;
+    color: white;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #6b7280;
+}
+
+.empty-state p {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+</style>
+
+<div class="announcements-container">
+    <!-- Keep your existing announcements content -->
+    <div class="announcements-grid">
+        {% if announcements %}
+            {% for announcement in announcements %}
+            <div class="announcement-card">
+                <div class="announcement-header">
+                    <div class="announcement-meta">
+                        <span class="announcement-date">{{ announcement.formatted_date }}</span>
+                        <span class="announcement-author">by {{ announcement.creator_name }}</span>
+                        <span class="priority-badge priority-{{ announcement.priority }}">
+                            {{ announcement.priority }}
+                        </span>
+                    </div>
+                    <div class="status-badge {% if announcement.is_active %}status-active{% else %}status-inactive{% endif %}">
+                        {% if announcement.is_active %}Active{% else %}Inactive{% endif %}
+                    </div>
+                </div>
+                
+                <h3 class="announcement-title">{{ announcement.title }}</h3>
+                
+                <div class="announcement-content">
+                    {{ announcement.content[:200] }}
+                    {% if announcement.content|length > 200 %}...{% endif %}
+                </div>
+                
+                <div class="announcement-actions">
+                    <a href="{{ url_for('lec_announcement_edit', announcement_id=announcement._id) }}" class="btn-action btn-edit">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    
+                    <form method="POST" action="{{ url_for('lec_announcement_toggle', announcement_id=announcement._id) }}" style="display: inline;">
+                        <button type="submit" class="btn-action btn-toggle">
+                            <i class="fas fa-{% if announcement.is_active %}pause{% else %}play{% endif %}"></i>
+                            {% if announcement.is_active %}Deactivate{% else %}Activate{% endif %}
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{{ url_for('lec_announcement_delete', announcement_id=announcement._id) }}" 
+                        onsubmit="return confirm('Are you sure you want to delete this announcement?')" style="display: inline;">
+                        <button type="submit" class="btn-action btn-delete delete-announcement-btn"
+                                data-announcement-id="{{ announcement._id }}"
+                                data-title="{{ announcement.title }}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="announcement-card">
+                <div class="empty-state">
+                    <i class="fas fa-bullhorn"></i>
+                    <h3>No Announcements Yet</h3>
+                    <p>Create your first announcement to communicate with students.</p>
+                    <a href="{{ url_for('lec_announcement_create') }}" class="btnCreate">
+                        <i class="fas fa-plus"></i> Create First Announcement
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Keep your existing JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.announcement-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+
+<script>
+// Keep your existing animation script
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.announcement-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+
+// Add delete confirmation with SweetAlert2
+$(document).on('click', '.delete-announcement-btn', function (e) {
+    e.preventDefault();
+    e.stopPropagation(); // Prevent form submission
+
+    const announcementId = $(this).data('announcement-id');
+    const title = $(this).data('title');
+
+    Swal.fire({
+        title: 'Delete This Announcement?',
+        html: `
+        <span style="color: #dc2626;">This action cannot be undone.</span>
+            <div style="font-size: 16px; text-align: left; line-height: 1.8; padding: 20px;">
+                <strong>Title:</strong> ${title}<br>
+                <br>
+            </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Submit the form programmatically
+            $.ajax({
+                url: '/lec/announcements/delete/' + announcementId,
+                type: 'POST',
+                success: function (res) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Announcement has been deleted successfully.',
+                        icon: 'success'
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: xhr.responseJSON?.message || 'Failed to delete announcement.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

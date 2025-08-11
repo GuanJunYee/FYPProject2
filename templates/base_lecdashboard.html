@@ -52,6 +52,11 @@
     <ul class="side-menu">
       <li class="menu-item"><a href="{{ url_for('lec_dashboard') }}"><i class="fas fa-tachometer-alt" style="padding-right: 12px;"></i>Dashboard</a></li>
       <li class="menu-item">
+          <a href="{{ url_for('lec_announcements') }}">
+              <i class="fas fa-bullhorn" style="padding-right: 12px;"></i>Announcements
+          </a>
+      </li>
+      <li class="menu-item">
         <a href="javascript:void(0)"><i class="fas fa-user-cog" style="padding-right: 12px;"></i>User Management
           <i class="fa fa-caret-down" style="margin-left: 10px;"></i></a>
         <ul class="submenu">
@@ -73,19 +78,21 @@
           <i class="fa fa-caret-down" style="margin-left: 47.5px;"></i></a>
         <ul class="submenu">
           <li><a href="{{ url_for('exam_timetable') }}">Exam Timetable</a></li>
-          <li><a href="#">Exam Environment</a></li>
+          <li><a href="{{ url_for('global_exam_environment') }}">Exam Environment</a></li>
           <li><a href="{{ url_for('lecturer_submission_overview') }}">Exam Submissions</a></li>
-          <li><a href="{{ url_for('lecturer_exam_violations') }}">Exam Violation</a></li>
+          <li><a href="{{ url_for('lecturer_violation_assessments') }}">Exam Violation</a></li>
         </ul>
       </li>
       <li class="menu-item">
         <a href="javascript:void(0)"><i class="fa fa-file-alt" style="padding-right: 20px;"></i>Report
           <i class="fa fa-caret-down" style="margin-left: 93.5px;"></i></a>
         <ul class="submenu">
-          <li><a href="#">Exam Setup</a></li>
-          <li><a href="#">Exam Timetable</a></li>
-          <li><a href="#">Exam Environment</a></li>
-          <li><a href="#">Exam Submissions</a></li>
+          <li><a href="{{ url_for('user_registration_report') }}">User Registration Trends</a></li>
+          <li><a href="{{ url_for('assessment_enrollment_report') }}">Assessment Enrollment</a></li>
+          <li><a href="{{ url_for('plagiarism_overview_report') }}">Plagiarism Overview</a></li>
+          <li><a href="{{ url_for('violation_analysis_report') }}">Violation Analysis</a></li>
+          <li><a href="{{ url_for('exam_evidence_report') }}">Exam Video & Screenshot Evidence</a></li>
+          <li><a href="{{ url_for('individual_student_behavior_report') }}">Individual Student Behavior</a></li>
         </ul>
       </li>
     </ul>

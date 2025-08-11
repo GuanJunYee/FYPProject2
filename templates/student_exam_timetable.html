@@ -4,55 +4,18 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/useredit.css') }}">
-<style>
-  .exam-cards {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding: 20px;
-  }
-  .exam-card {
-    display: flex;
-    border-left: 6px solid #004080;
-    border-radius: 8px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    padding: 12px;
-    background: #fff;
-    align-items: center;
-  }
-  .exam-date {
-    width: 80px;
-    text-align: center;
-    font-weight: bold;
-    margin-right: 16px;
-  }
-  .exam-date .day {
-    font-size: 18px;
-    color: #004080;
-  }
-  .exam-date .date {
-    font-size: 14px;
-    color: #666;
-  }
-  .exam-details {
-    flex: 1;
-  }
-  .exam-details .time {
-    color:#004080;
-    font-weight: 600;
-  }
-  .exam-details .title {
-    font-size: 16px;
-    font-weight: bold;
-  }
-  .exam-details .code {
-    font-size: 13px;
-  }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/student_exam_timetable.css') }}">
 
 <h2 style="margin-left: 20px;">Exam Timetable</h2>
 <hr>
-<div class="exam-cards">
+
+<div class="view-toggle">
+  <button class="toggle-btn active" onclick="showListView()"><i class="fa fa-list" aria-hidden="true"></i> &nbsp;List View</button>
+  <button class="toggle-btn" onclick="showCalendarView()"><i class="fa fa-calendar" aria-hidden="true"></i> &nbsp;Calendar View</button>
+</div>
+
+<!-- List View -->
+<div id="listView" class="exam-cards">
   {% for t in exam_timetables %}
   <div class="exam-card">
     <div class="exam-date">
@@ -69,4 +32,228 @@
     <p style="margin-left: 20px;">No upcoming exams found.</p>
   {% endfor %}
 </div>
+
+<!-- Calendar View -->
+<div id="calendarView" class="calendar-container" style="display: none;">
+  <div class="calendar-header">
+    <button class="calendar-nav" onclick="previousMonth()">‹</button>
+    <div class="calendar-title" id="calendarTitle"></div>
+    <button class="calendar-nav" onclick="nextMonth()">›</button>
+  </div>
+  <div class="calendar-grid">
+    <div class="calendar-day-header">Sunday</div>
+    <div class="calendar-day-header">Monday</div>
+    <div class="calendar-day-header">Tuesday</div>
+    <div class="calendar-day-header">Wednesday</div>
+    <div class="calendar-day-header">Thursday</div>
+    <div class="calendar-day-header">Friday</div>
+    <div class="calendar-day-header">Saturday</div>
+    <div id="calendarDays"></div>
+  </div>
+</div>
+
+<!-- Exam Details Modal -->
+<div id="examModal" class="exam-modal">
+  <div class="exam-modal-content">
+    <div class="modal-header">
+      <span class="modal-close" onclick="closeExamModal()">&times;</span>
+      <h3 id="modalTitle">Exam Details</h3>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Dynamic content will be inserted here -->
+    </div>
+  </div>
+</div>
+
+<script>
+// Exam data for JavaScript
+const examData = [
+  {% for t in exam_timetables %}
+  {
+    date: '{{ t.date_string }}',
+    time: '{{ t.start_time }} - {{ t.end_time }}',
+    title: '{{ assessment_map[t.assessment_code] }}',
+    code: '{{ t.assessment_code }}',
+    startTime: '{{ t.start_time }}',
+    endTime: '{{ t.end_time }}'
+  }{% if not loop.last %},{% endif %}
+  {% endfor %}
+];
+
+let currentDate = new Date();
+let currentMonth = currentDate.getMonth();
+let currentYear = currentDate.getFullYear();
+
+function showListView() {
+  document.getElementById('listView').style.display = 'flex';
+  document.getElementById('calendarView').style.display = 'none';
+  document.querySelectorAll('.toggle-btn')[0].classList.add('active');
+  document.querySelectorAll('.toggle-btn')[1].classList.remove('active');
+}
+
+function showCalendarView() {
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('calendarView').style.display = 'block';
+  document.querySelectorAll('.toggle-btn')[0].classList.remove('active');
+  document.querySelectorAll('.toggle-btn')[1].classList.add('active');
+  generateCalendar(currentMonth, currentYear);
+}
+
+function generateCalendar(month, year) {
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"];
+  
+  document.getElementById('calendarTitle').textContent = monthNames[month] + ' ' + year;
+  
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+  
+  let calendarHTML = '';
+  
+  // Total cells needed (6 weeks × 7 days = 42 cells)
+  const totalCells = 42;
+  
+  for (let i = 0; i < totalCells; i++) {
+    let dayNumber;
+    let dayClass = 'calendar-day';
+    let isCurrentMonth = false;
+    let currentDateStr = '';
+    
+    if (i < firstDay) {
+      // Previous month days
+      dayNumber = daysInPrevMonth - firstDay + i + 1;
+      dayClass += ' other-month';
+      const prevMonth = month === 0 ? 11 : month - 1;
+      const prevYear = month === 0 ? year - 1 : year;
+      currentDateStr = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+    } else if (i >= firstDay + daysInMonth) {
+      // Next month days
+      dayNumber = i - firstDay - daysInMonth + 1;
+      dayClass += ' other-month';
+      const nextMonth = month === 11 ? 0 : month + 1;
+      const nextYear = month === 11 ? year + 1 : year;
+      currentDateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+    } else {
+      // Current month days
+      dayNumber = i - firstDay + 1;
+      isCurrentMonth = true;
+      currentDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+      
+      // Check if today
+      if (isDateToday(year, month, dayNumber)) {
+        dayClass += ' today';
+      }
+    }
+    
+    // Check for exams on this date
+    const dayExams = examData.filter(exam => exam.date === currentDateStr);
+    if (dayExams.length > 0 && isCurrentMonth) {
+      dayClass += ' has-exam';
+    }
+    
+    // Generate exam HTML
+    let examHTML = '';
+    if (isCurrentMonth && dayExams.length > 0) {
+      dayExams.forEach((exam, index) => {
+        const eventClass = dayExams.length > 1 ? 'exam-event multiple' : 'exam-event';
+        examHTML += `<div class="${eventClass}" onclick="showExamDetails('${exam.date}', ${index})" title="${exam.title} (${exam.code}) - ${exam.time}">
+          <span class="exam-time">${exam.startTime}</span>
+          <span class="exam-title">${exam.code}</span>
+        </div>`;
+      });
+    }
+    
+    // Create day cell
+    calendarHTML += `<div class="${dayClass}">
+      <div class="calendar-day-number">${dayNumber}</div>
+      ${examHTML}
+    </div>`;
+    
+    // Stop after 6 weeks if we've shown all days of current month
+    if (i >= firstDay + daysInMonth - 1 && (i + 1) % 7 === 0) {
+      break;
+    }
+  }
+  
+  document.getElementById('calendarDays').innerHTML = calendarHTML;
+}
+
+function showExamDetails(date, examIndex) {
+  const dayExams = examData.filter(exam => exam.date === date);
+  const exam = dayExams[examIndex];
+  
+  if (!exam) return;
+  
+  document.getElementById('modalTitle').textContent = 'Exam Details';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Exam Title</div>
+      <div class="exam-detail-value">${exam.title}</div>
+    </div>
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Course Code</div>
+      <div class="exam-detail-value">${exam.code}</div>
+    </div>
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Date</div>
+      <div class="exam-detail-value">${new Date(exam.date).toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })}</div>
+    </div>
+    <div class="exam-detail-item">
+      <div class="exam-detail-label">Time</div>
+      <div class="exam-detail-value">${exam.time}</div>
+    </div>
+  `;
+  
+  document.getElementById('examModal').style.display = 'block';
+}
+
+function closeExamModal() {
+  document.getElementById('examModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+  const modal = document.getElementById('examModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function isDateToday(year, month, date) {
+  const today = new Date();
+  return year === today.getFullYear() && 
+         month === today.getMonth() && 
+         date === today.getDate();
+}
+
+function previousMonth() {
+  currentMonth--;
+  if (currentMonth < 0) {
+    currentMonth = 11;
+    currentYear--;
+  }
+  generateCalendar(currentMonth, currentYear);
+}
+
+function nextMonth() {
+  currentMonth++;
+  if (currentMonth > 11) {
+    currentMonth = 0;
+    currentYear++;
+  }
+  generateCalendar(currentMonth, currentYear);
+}
+
+// Initialize calendar when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  generateCalendar(currentMonth, currentYear);
+});
+</script>
+
 {% endblock %}

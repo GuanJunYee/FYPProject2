@@ -36,6 +36,40 @@
   .btn-download:hover {
     background-color: #0056b3;
   }
+
+  .btn-not-available {
+    background-color: #e9ecef;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: not-allowed;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+    transition: none;
+    opacity: 0.7;
+  }
+
+  .btn-not-available:hover {
+      background-color: #e9ecef;
+      color: #6c757d;
+      border-color: #dee2e6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+  }
+
+  .btn-not-available:focus,
+  .btn-not-available:active {
+      background-color: #e9ecef;
+      color: #6c757d;
+      border-color: #dee2e6;
+      outline: none;
+      box-shadow: none;
+  }
   
 </style>
 
@@ -83,7 +117,7 @@
   {% elif s.can_request_resubmission %}
     <a href="{{ url_for('student_request_resubmission', submission_id=s._id) }}" class="btn-request">Request</a>
   {% else %}
-    <button class="btn-reset" disabled style="padding: 5px 12px;">Not Available</button>
+    <button class="btn-not-available" disabled style="padding: 5px 12px;">Not Available</button>
   {% endif %}
 </td>
 

@@ -8,7 +8,7 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const today = new Date();
-    today.setDate(today.getDate() + 2);  // ⬅️ adds 1 day
+    today.setDate(today.getDate() + 2);  // adds 2 days
     const minDate = today.toISOString().split("T")[0];
     document.getElementById("exam_date").setAttribute("min", minDate);
   });
@@ -46,6 +46,10 @@
 
   <label>Start Time:</label>
   <input type="time" name="start_time" required>
+    {% if errors.start_time %}
+        <div class="error">{{ errors.start_time }}</div>
+    {% endif %}
+
 
   <label>End Time:</label>
   <input type="time" name="end_time" required>

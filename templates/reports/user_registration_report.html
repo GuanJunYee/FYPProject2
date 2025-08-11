@@ -1,0 +1,607 @@
+{% extends 'base_lecdashboard.html' %}
+{% block title %}User Registration Report{% endblock %}
+{% block breadcrumb %}Reports > User Registration Trends{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/user_registration_report.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<div class="profile-header">
+    <h2 style="margin-left: 20px;">User Registration Report</h2>
+</div>
+
+<hr style="width: 100%;">
+
+<div class="report-container">
+    <!-- Controls Section -->
+    <div class="controls-section">
+        <div class="controls-grid">
+            <div class="control-group">
+                <label for="report-type">Report Type</label>
+                <select id="report-type" onchange="updateReport()">
+                    <option value="monthly">Monthly Trends</option>
+                    <option value="yearly">Yearly Overview</option>
+                    <option value="custom">Custom Date Range</option>
+                </select>
+            </div>
+            <div class="control-group" id="date-from-group" style="display: none;">
+                <label for="date-from">From Date</label>
+                <input type="date" id="date-from" value="2024-01-01" onchange="updateReport()">
+            </div>
+            <div class="control-group" id="date-to-group" style="display: none;">
+                <label for="date-to">To Date</label>
+                <input type="date" id="date-to" value="2025-12-31" onchange="updateReport()">
+            </div>
+            <div class="control-group">
+                <label for="user-filter">User Type</label>
+                <select id="user-filter" onchange="updateReport()">
+                    <option value="all">All Users</option>
+                    <option value="student">Students Only</option>
+                    <option value="lecturer">Lecturers Only</option>
+                </select>
+            </div>
+        </div>
+        <div class="control-actions">
+            <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
+            <button class="btn btn-primary" id="refresh-btn" onclick="updateReport()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card total-users">
+                <div class="stat-number" id="total-users">Loading...</div>
+                <div class="stat-label">Total Registered Users</div>
+                <div class="stat-change positive" id="total-change">Loading...</div>
+            </div>
+            <div class="stat-card students">
+                <div class="stat-number" id="total-students">Loading...</div>
+                <div class="stat-label">Student Registrations</div>
+                <div class="stat-change positive" id="student-change">Loading...</div>
+            </div>
+            <div class="stat-card lecturers">
+                <div class="stat-number" id="total-lecturers">Loading...</div>
+                <div class="stat-label">Lecturer Registrations</div>
+                <div class="stat-change positive" id="lecturer-change">Loading...</div>
+            </div>
+            <div class="stat-card growth-rate">
+                <div class="stat-number" id="growth-rate">Loading...</div>
+                <div class="stat-label">Growth Rate</div>
+                <div class="stat-change positive" id="growth-change">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <div class="chart-title">Registration Trends Over Time</div>
+                <canvas id="trendsChart" class="chart-canvas"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="chart-title">Total User Type Distribution</div>
+                <canvas id="distributionChart" class="chart-canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Data Table Section -->
+        <div class="data-table-section">
+            <div class="table-header">
+                <div class="table-title">Registration Details</div>
+                <div class="table-actions">
+                    <button class="btn btn-success" onclick="exportData()"><i class="fas fa-download"></i> Export Data</button>
+                    <button class="btn btn-secondary" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Total Registrations</th>
+                        <th>Students</th>
+                        <th>Lecturers</th>
+                        <th>Growth Rate</th>
+                        <th>Trend</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px;">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Export Section -->
+    <div class="export-section">
+        <div class="export-info">
+            Last updated: <strong id="last-updated">Loading...</strong>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Additional CSS for table actions */
+.table-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.table-actions .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+</style>
+
+<script>
+let trendsChart, distributionChart;
+
+// Initialize charts
+function initCharts() {
+    // Trends Chart
+    const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+    trendsChart = new Chart(trendsCtx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Students',
+                    data: [],
+                    backgroundColor: '#22c55e',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Lecturers',
+                    data: [],
+                    backgroundColor: '#f59e0b',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Distribution Chart (Pie Chart)
+    const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+    distributionChart = new Chart(distributionCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Students', 'Lecturers'],
+            datasets: [{
+                data: [0, 0],
+                backgroundColor: ['#22c55e', '#f59e0b'],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update report based on filters
+async function updateReport() {
+    const reportType = document.getElementById('report-type').value;
+    const userFilter = document.getElementById('user-filter').value;
+    const dateFrom = document.getElementById('date-from').value;
+    const dateTo = document.getElementById('date-to').value;
+    
+    // Show/hide date inputs for custom range
+    const dateFromGroup = document.getElementById('date-from-group');
+    const dateToGroup = document.getElementById('date-to-group');
+    
+    if (reportType === 'custom') {
+        dateFromGroup.style.display = 'flex';
+        dateToGroup.style.display = 'flex';
+    } else {
+        dateFromGroup.style.display = 'none';
+        dateToGroup.style.display = 'none';
+    }
+
+    // Show loading state
+    const refreshBtn = document.getElementById('refresh-btn');
+    refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    refreshBtn.disabled = true;
+    document.querySelector('.stats-section').classList.add('loading');
+
+    try {
+        // Build API URL with corrected parameter names
+        let apiUrl = `/api/reports/user-registration?type=${reportType}&user_type=${userFilter}`;
+        
+        if (reportType === 'custom' && dateFrom && dateTo) {
+            apiUrl += `&from_date=${dateFrom}&to_date=${dateTo}`;
+        }
+
+        console.log('API URL:', apiUrl); // Debug log
+
+        // Fetch data from backend
+        const response = await fetch(apiUrl);
+        const result = await response.json();
+
+        console.log('API Response:', result); // Debug log
+
+        if (result.success) {
+            // Update charts with real data
+            updateChartsWithData(result.data);
+            
+            // Update summary statistics
+            updateSummaryStats(result.summary);
+            
+            // Update data table
+            updateDataTable(result.data.table_data);
+            
+            // Update last updated time
+            document.getElementById('last-updated').textContent = new Date().toLocaleString();
+            
+            // Store data for export functions
+            storeReportData(result);
+            
+            console.log('Report updated successfully');
+        } else {
+            console.error('API Error:', result.error);
+            Swal.fire('Error', 'Error loading report data: ' + result.error, 'error');
+        }
+
+    } catch (error) {
+        console.error('Network Error:', error);
+        Swal.fire('Error', 'Error connecting to server. Please try again.', 'error');
+    } finally {
+        // Reset loading state
+        refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+        refreshBtn.disabled = false;
+        document.querySelector('.stats-section').classList.remove('loading');
+    }
+}
+
+// Update charts with real data from API
+function updateChartsWithData(data) {
+    // Prepare data for charts
+    const labels = data.labels;
+    const studentsData = data.students_data;
+    const lecturersData = data.lecturers_data;
+
+    console.log('Chart Data:', { labels, studentsData, lecturersData }); // Debug log
+
+    // Update trends chart
+    trendsChart.data.labels = labels;
+    trendsChart.data.datasets[0].data = studentsData;
+    trendsChart.data.datasets[1].data = lecturersData;
+    trendsChart.update();
+
+    // Update distribution chart (use totals across all periods)
+    const totalStudents = studentsData.reduce((sum, val) => sum + val, 0);
+    const totalLecturers = lecturersData.reduce((sum, val) => sum + val, 0);
+    
+    distributionChart.data.datasets[0].data = [totalStudents, totalLecturers];
+    distributionChart.update();
+}
+
+// Update summary statistics cards
+function updateSummaryStats(summary) {
+    console.log('Summary Stats:', summary); // Debug log
+    
+    document.getElementById('total-users').textContent = summary.total_users.toLocaleString();
+    document.getElementById('total-students').textContent = summary.students.toLocaleString();
+    document.getElementById('total-lecturers').textContent = summary.lecturers.toLocaleString();
+    document.getElementById('growth-rate').textContent = summary.total_growth + '%';
+
+    // Update growth indicators with dynamic period text
+    let changeText, changeClass;
+    
+    if (!summary.has_previous_data) {
+        // No previous data available
+        changeText = `No ${summary.growth_period_text} data`;
+        changeClass = "neutral";
+    } else if (summary.total_growth === 0) {
+        changeText = `No change from ${summary.growth_period_text}`;
+        changeClass = "neutral";
+    } else {
+        changeText = `${summary.total_growth >= 0 ? '+' : ''}${summary.total_growth}% from ${summary.growth_period_text}`;
+        changeClass = summary.total_growth >= 0 ? 'positive' : 'negative';
+    }
+    
+    // Update all growth indicators
+    const changeElements = [
+        'total-change',
+        'student-change', 
+        'lecturer-change',
+        'growth-change'
+    ];
+    
+    changeElements.forEach(elementId => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = changeText;
+            element.className = 'stat-change ' + changeClass;
+        }
+    });
+}
+
+// Update data table with real data
+function updateDataTable(tableData) {
+    const tbody = document.getElementById('data-table-body');
+    tbody.innerHTML = '';
+
+    console.log('Table Data:', tableData); // Debug log
+
+    if (!tableData || tableData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No data available for selected period</td></tr>';
+        return;
+    }
+
+    // Show last 12 periods (months), most recent first
+    tableData.slice(-12).reverse().forEach(item => {
+        const row = document.createElement('tr');
+        
+        const trendDirection = item.growth_rate >= 0 ? 'trend-up' : 'trend-down';
+        const trendIcon = item.growth_rate >= 0 ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+        const periodClass = item.period.includes('-') ? 'period-month' : 'period-year';
+        
+        row.innerHTML = `
+            <td><span class="period-indicator ${periodClass}">${item.period_label}</span></td>
+            <td>${item.total}</td>
+            <td>${item.students}</td>
+            <td>${item.lecturers}</td>
+            <td>${item.growth_rate >= 0 ? '+' : ''}${item.growth_rate}%</td>
+            <td>
+                <div class="trend-indicator ${trendDirection}">
+                    ${trendIcon} ${Math.abs(item.growth_rate)}%
+                </div>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+// Reset all filters
+function resetFilters() {
+    document.getElementById('report-type').value = 'monthly';
+    document.getElementById('user-filter').value = 'all';
+    document.getElementById('date-from').value = '2024-01-01';
+    document.getElementById('date-to').value = '2025-12-31';
+    updateReport();
+}
+
+// Export functions
+// Global variable to store current report data
+let currentReportData = null;
+
+// Update this in your updateReport function - add this after successful data fetch
+// Add this line after: if (result.success) {
+// Store current data globally for export functions
+function storeReportData(result) {
+    currentReportData = {
+        data: result.data,
+        summary: result.summary,
+        reportType: result.report_type,
+        dateRange: result.date_range,
+        filters: {
+            reportType: document.getElementById('report-type').value,
+            userFilter: document.getElementById('user-filter').value,
+            dateFrom: document.getElementById('date-from').value,
+            dateTo: document.getElementById('date-to').value
+        }
+    };
+}
+
+// Export to CSV
+function exportData() {
+    if (!currentReportData) {
+        Swal.fire('Warning', 'No data available to export. Please refresh the report first.', 'warning');
+        return;
+    }
+
+    try {
+        const { data, summary, reportType, dateRange, filters } = currentReportData;
+        
+        // Prepare CSV content
+        let csvContent = '';
+        
+        // Add header information
+        csvContent += `User Registration Report\n`;
+        csvContent += `Generated on: ${new Date().toLocaleString()}\n`;
+        csvContent += `Report Type: ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}\n`;
+        csvContent += `Date Range: ${dateRange.display}\n`;
+        csvContent += `User Filter: ${filters.userFilter === 'all' ? 'All Users' : filters.userFilter.charAt(0).toUpperCase() + filters.userFilter.slice(1)}\n`;
+        csvContent += `\n`;
+        
+        // Add summary statistics
+        csvContent += `Summary Statistics\n`;
+        csvContent += `Total Users,${summary.total_users}\n`;
+        csvContent += `Students,${summary.students}\n`;
+        csvContent += `Lecturers,${summary.lecturers}\n`;
+        csvContent += `Growth Rate,${summary.total_growth}%\n`;
+        csvContent += `\n`;
+        
+        // Add detailed data table
+        csvContent += `Period,Total Registrations,Students,Lecturers,Growth Rate\n`;
+        
+        data.table_data.forEach(item => {
+            csvContent += `"${item.period_label}",${item.total},${item.students},${item.lecturers},"${item.growth_rate >= 0 ? '+' : ''}${item.growth_rate}%"\n`;
+        });
+        
+        // Create and download file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `user_registration_report_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        Swal.fire('Success', 'Report exported successfully as CSV!', 'success');
+        
+    } catch (error) {
+        console.error('Export error:', error);
+        Swal.fire('Error', 'Failed to export data. Please try again.', 'error');
+    }
+}
+
+// Export to PDF (simple version) - KEEPING YOUR ORIGINAL FUNCTION
+function exportPDF() {
+    if (!currentReportData) {
+        Swal.fire('Warning', 'No data available to export. Please refresh the report first.', 'warning');
+        return;
+    }
+
+    // For now, create a print-friendly version
+    printReport();
+}
+
+// Print function - KEEPING YOUR ORIGINAL FUNCTION  
+function printReport() {
+    if (!currentReportData) {
+        Swal.fire('Warning', 'No data available to print. Please refresh the report first.', 'warning');
+        return;
+    }
+
+    // Create print-friendly version
+    const printWindow = window.open('', '_blank');
+    const { data, summary, reportType, dateRange } = currentReportData;
+    
+    const printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>User Registration Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { text-align: center; margin-bottom: 30px; }
+                .info { margin-bottom: 20px; }
+                .summary { margin-bottom: 30px; }
+                .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+                .summary-item { padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                th { background-color: #f5f5f5; font-weight: bold; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                .positive { color: green; }
+                .negative { color: red; }
+                @media print { body { margin: 0; } }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>User Registration Report</h1>
+                <p>Generated on: ${new Date().toLocaleString()}</p>
+            </div>
+            
+            <div class="info">
+                <p><strong>Report Type:</strong> ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}</p>
+                <p><strong>Date Range:</strong> ${dateRange.display}</p>
+            </div>
+            
+            <div class="summary">
+                <h2>Summary Statistics</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <h3>Total Users</h3>
+                        <p style="font-size: 24px; margin: 0;">${summary.total_users}</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Students</h3>
+                        <p style="font-size: 24px; margin: 0;">${summary.students}</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Lecturers</h3>
+                        <p style="font-size: 24px; margin: 0;">${summary.lecturers}</p>
+                    </div>
+                    <div class="summary-item">
+                        <h3>Growth Rate</h3>
+                        <p style="font-size: 24px; margin: 0;" class="${summary.total_growth >= 0 ? 'positive' : 'negative'}">${summary.total_growth}%</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="details">
+                <h2>Registration Details</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Total Registrations</th>
+                            <th>Students</th>
+                            <th>Lecturers</th>
+                            <th>Growth Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.table_data.slice(-12).reverse().map(item => `
+                            <tr>
+                                <td>${item.period_label}</td>
+                                <td>${item.total}</td>
+                                <td>${item.students}</td>
+                                <td>${item.lecturers}</td>
+                                <td class="${item.growth_rate >= 0 ? 'positive' : 'negative'}">
+                                    ${item.growth_rate >= 0 ? '+' : ''}${item.growth_rate}%
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    
+    // Wait for content to load, then print
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 250);
+    };
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initCharts();
+    updateReport(); // Load initial data
+});
+</script>
+
+{% endblock %}

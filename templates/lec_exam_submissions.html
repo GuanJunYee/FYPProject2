@@ -60,7 +60,7 @@
     <td>
       {% if s.plagiarism_score is defined  %}
         {% set bg_color = (
-          'red' if s.plagiarism_score > 50 else
+          'red' if s.plagiarism_score > 30 else
           'green'
         ) %}
         <a href="{{ url_for('lecturer_view_plagiarism_report', submission_id=s._id) }}"

@@ -72,14 +72,20 @@
       <td>{{ a.title }}</td>
       <td>{{ a.course_codes | join(', ') }}</td>
       <td>
-        <form method="POST" action="{{ url_for('enroll_assessment', code=a.assessment_code) }}">
-          <button type="submit" class="btn-save" style="padding: 5px 12px;">Enroll</button>
-        </form>
+        {% if a.time_clash %}
+          <span style="color: red; font-weight: bold;">Time Clash</span>
+        {% else %}
+          <form method="POST" action="{{ url_for('enroll_assessment', code=a.assessment_code) }}">
+            <button type="submit" class="btn-save" style="padding: 5px 12px;">Enroll</button>
+          </form>
+        {% endif %}
       </td>
+
     </tr>
     {% else %}
     <tr><td colspan="5" style="text-align:center;">No assessments available for enrollment.</td></tr>
     {% endfor %}
   </tbody>
 </table>
+
 {% endblock %}

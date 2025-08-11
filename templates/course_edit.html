@@ -25,7 +25,7 @@
 <div class="form-group">
   
   <label>Course Code:</label>
-  <input type="text" name="course_code" value="{{ course.course_code }}" required />
+  <input type="text" name="course_code" value="{{ course.course_code }}" required placeholder="e.g., ABCD1234" pattern="[A-Z]{4}[0-9]{4}" title="4 uppercase letters followed by 4 digits (e.g., ABCD1234)"/>
   {% if errors.course_code %}
     <div class="error">{{ errors.course_code }}</div>
   {% endif %}

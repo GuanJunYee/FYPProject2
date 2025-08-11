@@ -4,27 +4,585 @@
 {% block breadcrumb %}Dashboard{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+/* Dashboard specific styles - using your color scheme */
+.welcome-header {
+    background: #004080;
+    color: white;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
 
-<div class="card">
-    <div class="card-header">
-        <h2>Welcome, {{ session.name }}!</h2>
-        <p>You are logged in as a <strong>{{ session.role|capitalize }}</strong>.</p>
+.welcome-header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.welcome-header p {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+/* Announcements card spans 2 columns */
+.announcements-card {
+    grid-column: span 2;
+}
+
+/* On smaller screens, announcements take full width */
+@media (max-width: 900px) {
+    .announcements-card {
+        grid-column: span 1;
+    }
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: #004080;
+    margin-bottom: 6px;
+}
+
+.stat-label {
+    color: #374151;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Card Styles - matching your existing table styles */
+.dashboard-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f9f9f9;
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    background: #004080;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 12px;
+    background: white;
+    border: 2px solid #004080;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #004080;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 13px;
+}
+
+.action-btn:hover {
+    background: #004080;
+    color: white;
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.action-btn i {
+    font-size: 20px;
+    margin-bottom: 6px;
+}
+
+/* Exam Items */
+.exam-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.exam-item:last-child {
+    border-bottom: none;
+}
+
+.exam-date {
+    background: #004080;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 11px;
+    margin-right: 12px;
+    min-width: 70px;
+    text-align: center;
+}
+
+.exam-details h4 {
+    color: #000;
+    font-weight: 600;
+    margin-bottom: 3px;
+    font-size: 14px;
+}
+
+.exam-details p {
+    color: #374151;
+    font-size: 12px;
+}
+
+/* Course Items */
+.course-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.course-item:last-child {
+    border-bottom: none;
+}
+
+.course-code {
+    background: #004080;
+    color: white;
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 11px;
+    margin-right: 10px;
+    min-width: 50px;
+    text-align: center;
+    display: inline-block;
+}
+
+.course-name {
+    color: #000;
+    font-weight: 600;
+    flex: 1;
+    font-size: 14px;
+}
+
+/* Submission Items */
+.submission-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.submission-item:last-child {
+    border-bottom: none;
+}
+
+.submission-details h4 {
+    color: #000;
+    font-weight: 600;
+    margin-bottom: 3px;
+    font-size: 14px;
+}
+
+.submission-details p {
+    color: #374151;
+    font-size: 12px;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Announcement Items */
+.announcement-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.announcement-item:last-child {
+    border-bottom: none;
+}
+
+.announcement-date {
+    color: #004080;
+    font-weight: 600;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+.announcement-content {
+    color: #000;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-left: 5px;
+}
+
+.status-submitted {
+    background: rgba(34, 197, 94, 0.1);
+    color: #059669;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-pending {
+    background: rgba(251, 191, 36, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.status-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .quick-actions {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .welcome-header {
+        padding: 20px;
+    }
+
+    .welcome-header h1 {
+        font-size: 24px;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dashboard-card {
+    animation: fadeInUp 0.6s ease;
+}
+</style>
+
+<div class="dashboard-container">
+    <!-- Welcome Header -->
+    <div class="welcome-header">
+        <h1>Welcome back, {{ user.name }}!</h1>
+        <p>You are logged in as a <strong>{{ user.role|capitalize }}</strong></p>
     </div>
-    <div class="card-body">
-        <h3>Quick Actions</h3>
-        <ul style="list-style-type: disc; padding-left: 20px;">
-            <li><a href="#">View Timetable</a></li>
-            <li><a href="#">Check Attendance</a></li>
-            <li><a href="#">Billing History</a></li>
-            <li><a href="#">Submit Feedback</a></li>
-        </ul>
-        <br />
-        <h3>Latest Announcements</h3>
-        <ul>
-            <li>📢 Orientation Briefing: 20 June 2025</li>
-            <li>📝 Midterm Schedule Released</li>
-            <li>📌 Lab Rules & Safety Guidelines</li>
-        </ul>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.courses_count }}</div>
+            <div class="stat-label">Enrolled Courses</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.upcoming_exams_count }}</div>
+            <div class="stat-label">Upcoming Exams</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.submissions_count }}</div>
+            <div class="stat-label">Total Submissions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.pending_requests }}</div>
+            <div class="stat-label">Pending Requests</div>
+        </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+        <!-- Quick Actions Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="card-title">Quick Actions</h3>
+            </div>
+            <div class="quick-actions">
+                <a href="{{ url_for('student_course') }}" class="action-btn">
+                    <i class="fas fa-book"></i>
+                    <span>My Courses</span>
+                </a>
+                <a href="{{ url_for('student_assessment') }}" class="action-btn">
+                    <i class="fas fa-tasks"></i>
+                    <span>My Assessments</span>
+                </a>
+                <a href="{{ url_for('student_exam_timetable') }}" class="action-btn">
+                    <i class="fas fa-calendar"></i>
+                    <span>Exam Timetable</span>
+                </a>
+                <a href="{{ url_for('join_exam') }}" class="action-btn">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Join Exam</span>
+                </a>
+                <a href="{{ url_for('student_submissions') }}" class="action-btn">
+                    <i class="fas fa-file-alt"></i>
+                    <span>My Submissions</span>
+                </a>
+                <a href="{{ url_for('profile') }}" class="action-btn">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </div>
+        </div>
+
+<!-- Announcements Card (spans 2 columns) -->
+        <div class="dashboard-card announcements-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h3 class="card-title">Latest Announcements</h3>
+                <a href="{{ url_for('student_announcements') }}" style="margin-left: auto; color: #004080; font-size: 12px; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-external-link-alt"></i> View All
+                </a>
+            </div>
+            
+            {% if announcements %}
+                {% for announcement in announcements %}
+                <div class="announcement-item">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                        <div class="announcement-date">{{ announcement.formatted_date }}</div>
+                        <div style="
+                            padding: 2px 6px; 
+                            border-radius: 8px; 
+                            font-size: 9px; 
+                            font-weight: bold;
+                            {% if announcement.priority == 'high' %}
+                                background: rgba(239, 68, 68, 0.1); color: #dc2626;
+                            {% elif announcement.priority == 'normal' %}
+                                background: rgba(0, 64, 128, 0.1); color: #004080;
+                            {% else %}
+                                background: rgba(107, 114, 128, 0.1); color: #6b7280;
+                            {% endif %}
+                        ">
+                            {{ announcement.priority|upper }}
+                        </div>
+                    </div>
+                    <div style="font-weight: 600; color: #000; margin-bottom: 4px; font-size: 14px;">
+                        {{ announcement.title }}
+                    </div>
+                    <div class="announcement-content">
+                        {{ announcement.content[:100] }}{% if announcement.content|length > 100 %}...{% endif %}
+                    </div>
+                    <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">
+                        by {{ announcement.creator_name }}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- No announcements message -->
+                <div class="empty-state" style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                    <i class="fas fa-bullhorn" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5; color: #004080;"></i>
+                    <h4 style="font-size: 16px; margin-bottom: 8px; color: #6b7280; font-weight: 600;">No Announcements</h4>
+                    <p style="font-size: 14px; margin: 0; color: #9ca3af;">There are currently no announcements available. Check back later for important updates from your instructors.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- My Courses Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="card-title">My Courses</h3>
+            </div>
+            {% if enrolled_courses %}
+                {% for course in enrolled_courses %}
+                <div class="course-item">
+                    <div class="course-code">{{ course.course_code }}</div>
+                    <div class="course-name">{{ course.course_name }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <p>No courses enrolled yet.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Upcoming Exams Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="card-title">Upcoming Exams</h3>
+            </div>
+            {% if upcoming_exams %}
+                {% for exam in upcoming_exams %}
+                <div class="exam-item">
+                    <div class="exam-date">{{ exam.date_formatted }}</div>
+                    <div class="exam-details">
+                        <h4>{{ exam.title }}</h4>
+                        <p>{{ exam.time_info }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-check"></i>
+                    <p>No upcoming exams scheduled.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Submissions Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <h3 class="card-title">Recent Submissions</h3>
+            </div>
+            {% if recent_submissions %}
+                {% for submission in recent_submissions %}
+                <div class="submission-item">
+                    <div class="submission-details">
+                        <h4>{{ submission.title }}</h4>
+                        <p>Submitted on {{ submission.submission_date.strftime('%b %d, %Y') }}</p>
+                    </div>
+                    {% if submission.has_resubmission_request %}
+                        {% if submission.resubmission_status == 'Approved' %}
+                            <div class="status-badge status-submitted">Resubmitted</div>
+                        {% elif submission.resubmission_status == 'Rejected' %}
+                            <div class="status-badge status-danger">Rejected</div>
+                        {% else %}
+                            <div class="status-badge status-pending">Pending</div>
+                        {% endif %}
+                    {% else %}
+                        <div class="status-badge status-submitted">Submitted</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-file-alt"></i>
+                    <p>No submissions yet.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<script>
+// Add smooth animations when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.dashboard-card, .stat-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+});
+
+// Add click animations to action buttons
+document.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            this.style.transform = '';
+        }, 150);
+    });
+});
+</script>
+
 {% endblock %}

@@ -19,10 +19,17 @@ class ExamScreenMonitor {
         this.violationCount = 0;
         this.isCapturingEvidence = false;
         
+        // 🔧 NEW: File dialog detection
+        this.fileDialogActive = false;
+        this.fileDialogTimer = null;
+        
         // captures the switch
         this.transitionRecorder = null;
         this.transitionChunks = [];
         this.isRecordingTransition = false;
+
+        this.lastViolationId = null; // Store latest violation ID
+
         
         console.log(`🔍 Initializing BEFORE+TRANSITION monitor for ${assessmentCode}`);
         this.init();
@@ -177,9 +184,18 @@ class ExamScreenMonitor {
     setupEventListeners() {
         console.log('👂 Setting up tab switch detection...');
         
+        // 🔧 ENHANCED: File dialog detection to prevent false violations
+        this.setupFileDialogDetection();
+        
         // ✅ CRITICAL: Start TRANSITION recording BEFORE tab switch
         window.addEventListener('blur', () => {
             if (this.isMonitoring && !this.isRecordingTransition) {
+                // 🔧 NEW: Check if this is a file dialog before starting transition recording
+                if (this.isFileDialogLikelyActive()) {
+                    console.log('📁 File dialog detected during blur - skipping transition recording');
+                    return;
+                }
+                
                 console.log('🚨 Window losing focus - START TRANSITION recording NOW');
                 this.startTransitionRecording();
             }
@@ -187,6 +203,12 @@ class ExamScreenMonitor {
         
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && this.isMonitoring && !this.isCapturingEvidence) {
+                // 🔧 NEW: Check if this is a file dialog before recording violation
+                if (this.isFileDialogLikelyActive()) {
+                    console.log('📁 File dialog detected - skipping tab switch violation');
+                    return;
+                }
+                
                 this.tabSwitchCount++;
                 console.log(`🚨 TAB SWITCH #${this.tabSwitchCount} - Student LEFT exam`);
                 this.handleTabSwitchLeaving();
@@ -195,6 +217,116 @@ class ExamScreenMonitor {
                 this.stopTransitionRecording();
             }
         });
+    }
+
+    // 🔧 NEW: Setup file dialog detection
+    setupFileDialogDetection() {
+        this.fileDialogActive = false;
+        this.fileDialogTimer = null;
+        
+        // Listen for file input clicks
+        document.addEventListener('click', (event) => {
+            if (event.target && event.target.type === 'file') {
+                console.log('📁 File input clicked - activating file dialog detection');
+                this.markFileDialogActive();
+            }
+        });
+        
+        // 🔧 ENHANCED: Listen for any file input interactions (including programmatic)
+        document.addEventListener('change', (event) => {
+            if (event.target && event.target.type === 'file') {
+                console.log('📁 File input changed - activating file dialog detection');
+                this.markFileDialogActive();
+            }
+        });
+        
+        // 🔧 ENHANCED: Listen for form interactions that might trigger file dialogs
+        document.addEventListener('focus', (event) => {
+            if (event.target && event.target.type === 'file') {
+                console.log('📁 File input focused - activating file dialog detection');
+                this.markFileDialogActive();
+            }
+        });
+        
+        // Listen for form submissions that might involve file uploads
+        document.addEventListener('submit', (event) => {
+            const form = event.target;
+            if (form && form.querySelector('input[type="file"]')) {
+                console.log('📁 Form with file input submitted - activating file dialog detection');
+                this.markFileDialogActive();
+            }
+        });
+        
+        // 🔧 ENHANCED: Listen for any button clicks that might trigger file operations
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target) {
+                // Check if clicked element or its parents contain file-related terms
+                const elementText = target.textContent || target.value || target.innerText || '';
+                const isFileRelated = /submit|upload|file|attach|browse|choose|send/i.test(elementText);
+                
+                if (isFileRelated) {
+                    console.log(`📁 File-related button clicked: "${elementText}" - activating file dialog detection`);
+                    this.markFileDialogActive();
+                }
+                
+                // Check for buttons that might trigger file dialogs
+                if (target.tagName === 'BUTTON' || (target.tagName === 'INPUT' && (target.type === 'submit' || target.type === 'button'))) {
+                    const form = target.closest('form');
+                    if (form && form.querySelector('input[type="file"]')) {
+                        console.log('📁 Submit button in form with file input - activating file dialog detection');
+                        this.markFileDialogActive();
+                    }
+                }
+                
+                // 🔧 ENHANCED: Check for any submit button click
+                if (target.type === 'submit' || target.tagName === 'BUTTON' && /submit/i.test(target.textContent || target.value || '')) {
+                    console.log('📁 Submit button clicked - activating extended file dialog protection');
+                    this.markFileDialogActive();
+                }
+            }
+        });
+        
+        // Listen for focus events that might indicate file dialog
+        window.addEventListener('focus', () => {
+            if (this.fileDialogActive) {
+                console.log('📁 Window regained focus - file dialog likely closed');
+                // Don't clear immediately, give it a delay in case of multiple focus events
+                setTimeout(() => {
+                    this.clearFileDialogActive();
+                }, 1000);
+            }
+        });
+    }
+
+    // 🔧 NEW: Mark file dialog as active
+    markFileDialogActive() {
+        this.fileDialogActive = true;
+        
+        // Clear any existing timer
+        if (this.fileDialogTimer) {
+            clearTimeout(this.fileDialogTimer);
+        }
+        
+        // Auto-clear after 60 seconds (increased timeout for file operations)
+        this.fileDialogTimer = setTimeout(() => {
+            console.log('📁 File dialog auto-timeout - clearing detection');
+            this.clearFileDialogActive();
+        }, 60000);
+    }
+
+    // 🔧 NEW: Clear file dialog active state
+    clearFileDialogActive() {
+        this.fileDialogActive = false;
+        if (this.fileDialogTimer) {
+            clearTimeout(this.fileDialogTimer);
+            this.fileDialogTimer = null;
+        }
+    }
+
+    // 🔧 NEW: Check if file dialog is likely active
+    isFileDialogLikelyActive() {
+        return this.fileDialogActive;
     }
 
     startMonitoring() {
@@ -294,6 +426,12 @@ class ExamScreenMonitor {
             return;
         }
 
+        // 🔧 ENHANCED: Double-check file dialog protection
+        if (this.isFileDialogLikelyActive()) {
+            console.log('📁 File dialog still active during tab switch handling - skipping all violation recording');
+            return;
+        }
+
         this.isCapturingEvidence = true;
         
         console.log(`🚨 CAPTURING: Student switched AWAY from exam`);
@@ -312,8 +450,8 @@ class ExamScreenMonitor {
         // Capture screenshot immediately
         await this.captureScreenshot('tab_switch');
 
-        // Create BEFORE video (TRANSITION is already recording)
-        await this.createBeforeVideo('tab_switch');
+        // Skip BEFORE video creation - only TRANSITION video needed for tab switch violations
+        // await this.createBeforeVideo('tab_switch');
 
         // Reset flag after a delay
         setTimeout(() => {
@@ -482,6 +620,7 @@ class ExamScreenMonitor {
             formData.append('evidence_type', evidenceType);
             formData.append('expected_duration', expectedDuration.toString());
             formData.append('timestamp', new Date().toISOString());
+            formData.append('violation_id', this.lastViolationId); 
 
             const filename = `video_${evidenceType}_${this.assessmentCode}_${this.studentId}_${Date.now()}_${expectedDuration}s${extension}`;
             formData.append('video', videoBlob, filename);
@@ -508,6 +647,7 @@ class ExamScreenMonitor {
             formData.append('student_id', this.studentId);
             formData.append('violation_type', violationType);
             formData.append('timestamp', new Date().toISOString());
+            formData.append('violation_id', this.lastViolationId);
 
             const filename = `screenshot_${this.assessmentCode}_${this.studentId}_${Date.now()}.png`;
             formData.append('screenshot', screenshotBlob, filename);
@@ -540,7 +680,7 @@ class ExamScreenMonitor {
         console.log(`⚠️ Violation #${this.violationCount}:`, violation);
 
         // Send important violations to server
-        const importantViolations = ['TAB_SWITCH', 'SCREEN_SHARE_STOPPED', 'WEBCAM_DENIED'];
+        const importantViolations = ['TAB_SWITCH', 'SCREEN_SHARE_STOPPED', 'WEBCAM_DENIED', 'FORBIDDEN_SHORTCUT'];
         if (importantViolations.includes(type)) {
             this.sendViolationToServer(violation);
         }
@@ -554,13 +694,17 @@ class ExamScreenMonitor {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    assessment_code: this.assessmentCode,
-                    student_id: this.studentId,
-                    ...violation
-                })
+                assessment_code: this.assessmentCode,
+                student_id: this.studentId,
+                violation_type: violation.type,  
+                description: violation.description,
+                timestamp: violation.timestamp
+            })
             });
 
             if (response.ok) {
+                const result = await response.json();
+                this.lastViolationId = result.violation_id || null; // ✅ Store violation_id
                 console.log('✅ Violation recorded on server');
             }
         } catch (error) {
@@ -630,7 +774,7 @@ class ExamScreenMonitor {
 }
 
 // Initialize when page loads
-let screenMonitor = null;
+window.screenMonitor = null; // 🔥 MAKE IT GLOBAL
 
 document.addEventListener('DOMContentLoaded', () => {
     const assessmentCodeElement = document.getElementById('assessment-code');
@@ -641,47 +785,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const studentId = studentIdElement.value;
         
         console.log(`🚀 Starting BEFORE+TRANSITION monitor for ${assessmentCode}`);
-        screenMonitor = new ExamScreenMonitor(assessmentCode, studentId);
+        window.screenMonitor = new ExamScreenMonitor(assessmentCode, studentId); // 🔥 EXPOSE GLOBALLY
     }
 });
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {
-    if (screenMonitor) {
-        screenMonitor.stopMonitoring();
-    }
-});
-
-// Prevent right-click
-document.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    if (screenMonitor) {
-        screenMonitor.recordViolation('RIGHT_CLICK', 'Right-click attempted');
-        screenMonitor.showViolationWarning('⚠️ Right-click disabled!');
-    }
-});
-
-// Prevent shortcuts
-document.addEventListener('keydown', (e) => {
-    const forbidden = [
-        { key: 'F12', desc: 'Developer Tools' },
-        { ctrlKey: true, shiftKey: true, key: 'I', desc: 'Developer Tools' },
-        { ctrlKey: true, key: 'u', desc: 'View Source' },
-        { key: 'F5', desc: 'Refresh' }
-    ];
-
-    for (let item of forbidden) {
-        const matches = (!item.ctrlKey || e.ctrlKey) &&
-                       (!item.shiftKey || e.shiftKey) &&
-                       (e.key === item.key);
-
-        if (matches) {
-            e.preventDefault();
-            if (screenMonitor) {
-                screenMonitor.recordViolation('FORBIDDEN_SHORTCUT', `${item.desc} blocked`);
-                screenMonitor.showViolationWarning(`⚠️ ${item.desc} disabled!`);
-            }
-            return false;
-        }
+    if (window.screenMonitor) {
+        window.screenMonitor.stopMonitoring();
     }
 });

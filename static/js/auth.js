@@ -16,7 +16,7 @@ function showTab(tabId) {
 // =====================
 // ➡️ Go to Next Step
 // =====================
-function nextStep(step) {
+async function nextStep(step) {
   const current = document.querySelector(`#step-${step}`);
   const next = document.querySelector(`#step-${step + 1}`);
 
@@ -29,13 +29,26 @@ function nextStep(step) {
     }
   }
 
-  // Step 1: Validate password confirmation
+  // Step 1: Check duplicates AND validate password confirmation
   if (step === 1) {
+    // Check password confirmation
     const pw = document.getElementById('register-password').value;
     const confirm = document.getElementById('confirm-password').value;
     if (pw !== confirm) {
       showError("password-error", "Password and confirm password do not match.");
       return;
+    }
+
+    // Check for duplicate user ID
+    const userIdValid = await checkUserIdDuplicate();
+    if (!userIdValid) {
+      return; // Stop if user ID already exists
+    }
+
+    // Check for duplicate email
+    const emailValid = await checkEmailDuplicate();
+    if (!emailValid) {
+      return; // Stop if email already exists
     }
   }
 
@@ -203,3 +216,71 @@ setTimeout(() => {
     setTimeout(() => msg.remove(), 500);
   });
 }, 5000);   
+
+// =====================
+// 🔍 Check User ID Duplicate
+// =====================
+async function checkUserIdDuplicate() {
+  const userIdInput = document.querySelector('input[name="user_id"]');
+  const userId = userIdInput.value.trim();
+  
+  if (!userId || userId.length !== 7) {
+    return true; // Let HTML5 validation handle this
+  }
+  
+  try {
+    const response = await fetch('/check-user-id', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user_id: userId })
+    });
+    
+    const data = await response.json();
+    
+    if (data.exists) {
+      showError("password-error", "User ID already exists. Please choose a different ID.");
+      return false;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.error('Error checking user ID:', error);
+    return true; // Allow to proceed if check fails
+  }
+}
+
+// =====================
+// 📧 Check Email Duplicate
+// =====================
+async function checkEmailDuplicate() {
+  const emailInput = document.querySelector('input[name="email"]');
+  const email = emailInput.value.trim();
+  
+  if (!email) {
+    return true; // Let HTML5 validation handle this
+  }
+  
+  try {
+    const response = await fetch('/check-email-duplicate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: email })
+    });
+    
+    const data = await response.json();
+    
+    if (data.exists) {
+      showError("password-error", "Email already exists. Please use a different email.");
+      return false;
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.error('Error checking email:', error);
+    return true; // Allow to proceed if check fails
+  }
+}

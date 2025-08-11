@@ -9,11 +9,16 @@ form {
 }
 
 /* Labels */
-form label {
+.form-group label {
     display: block;
     font-weight: bold;
     margin-bottom: 6px;
-    color: #333;
+    color: black;
+}
+
+.student-check {
+    display: block;
+    margin: 5px 0;
 }
 
 /* Input fields */

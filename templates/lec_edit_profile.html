@@ -6,6 +6,18 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script>
+  // Auto-hide error messages after 5 seconds
+  document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+      document.querySelectorAll(".error").forEach(el => {
+        el.style.transition = "opacity 0.5s ease-out";
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 500);  // remove from DOM
+      });
+    }, 5000);
+  });
+</script>
 
 <div class="profile-header">
   <h1 style="padding-left:20px;">Edit Profile</h1>
@@ -37,10 +49,13 @@
       <div class="detail-group">
         <label>Email:</label>
         <input type="email" name="email" value="{{ user.email }}" class="form-control" required />
+        {% if errors.email %}
+          <div class="error">{{ errors.email }}</div>
+        {% endif %}
       </div>
       <div class="detail-group">
         <label>Phone:</label>
-        <input type="tel" name="phone" value="{{ user.phone }}" pattern="^(\+?6?01)[0-46-9]-*[0-9]{7,8}$" class="form-control" required />
+        <input type="tel" name="phone" value="{{ user.phone }}" placeholder="012-3456789"  class="form-control" pattern="01[0-9]-[0-9]{7,8}" maxlength="12" title="Phone number must be in the format 01x-xxxxxxxx." required />
       </div>
       <div class="detail-group">
         <label>Gender:</label>

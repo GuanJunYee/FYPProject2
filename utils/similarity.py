@@ -1,5 +1,5 @@
 from difflib import SequenceMatcher
-# using SequenceMatcher it is a character-based sequence alignment algorith, to check the similarity score.
+# using SequenceMatcher it is a character-based sequence alignment algorithm, to check the similarity score.
 
 ################################################################################################
 from sklearn.feature_extraction.text import TfidfVectorizer

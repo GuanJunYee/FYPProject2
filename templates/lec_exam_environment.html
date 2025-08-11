@@ -1,0 +1,833 @@
+<!-- Enhanced HTML with Inline Error Messages -->
+{% extends 'base_lecdashboard.html' %}
+{% block title %}Exam Environment Settings{% endblock %}
+{% block breadcrumb %}Examinations > Environment Settings{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/environment.css') }}">
+<h2 style="margin-left: 20px;">Exam Environment Settings</h2>
+<hr>
+
+<div class="env-container">
+  
+  <form method="POST" class="env-form">
+    <div class="form-header">
+      <h3>Security Configuration</h3>
+      <p>Configure exam security settings to prevent cheating and maintain academic integrity</p>
+    </div>
+    
+    <div class="form-body">
+      <!-- EXISTING: Browser Controls Section -->
+      <div class="section-title">Browser Controls</div>
+      
+      <div class="settings-grid">
+        <div class="setting-card">
+          <div class="status-indicator"></div>
+          <div class="setting-header">
+            <div>
+              <div class="setting-title"> <i class="fas fa-tools"></i> Block Developer Tools (F12)</div>
+              <div class="setting-description">Prevents students from opening browser developer tools</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="block_f12" {% if rule and rule.block_f12 %}checked{% endif %}>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-card">
+          <div class="status-indicator"></div>
+          <div class="setting-header">
+            <div>
+              <div class="setting-title">	<i class="fas fa-keyboard"></i> Block Inspect Element (Ctrl+Shift+I)</div>
+              <div class="setting-description">Disables the inspect element shortcut key combination</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="block_ctrl_shift_i" {% if rule and rule.block_ctrl_shift_i %}checked{% endif %}>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-card">
+          <div class="status-indicator"></div>
+          <div class="setting-header">
+            <div>
+              <div class="setting-title"><i class="fas fa-file-alt"></i> Block View Source (Ctrl+U)</div>
+              <div class="setting-description">Prevents viewing the page source code</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="block_ctrl_u" {% if rule and rule.block_ctrl_u %}checked{% endif %}>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-card">
+          <div class="status-indicator"></div>
+          <div class="setting-header">
+            <div>
+              <div class="setting-title">	<i class="fas fa-mouse-pointer"></i> Block Right Click Menu</div>
+              <div class="setting-description">Disables the context menu to prevent copying and inspecting</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="block_right_click" {% if rule and rule.block_right_click %}checked{% endif %}>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-card">
+          <div class="status-indicator"></div>
+          <div class="setting-header">
+            <div>
+              <div class="setting-title">	<i class="fas fa-copy"></i> Block Copy (Ctrl+C)</div>
+              <div class="setting-description">Prevents copying text from the exam interface</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="block_copy" {% if rule and rule.block_copy %}checked{% endif %}>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-card">
+          <div class="status-indicator"></div>
+          <div class="setting-header">
+            <div>
+              <div class="setting-title">	<i class="fas fa-paste"></i> Block Paste (Ctrl+V)</div>
+              <div class="setting-description">Prevents pasting content into exam fields</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" name="block_paste" {% if rule and rule.block_paste %}checked{% endif %}>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW SECTION: Head Movement Monitoring -->
+      <div class="section-title">Head Movement Monitoring</div>
+    
+      <div class="monitoring-controls">
+        <!-- Violation Duration Control with Manual Input -->
+        <div class="control-group">
+          <label for="violation-duration" class="control-label">
+            <span class="control-icon"><i class="fas fa-stopwatch"></i></span>
+            <div class="control-info">
+              <div class="control-title">Violation Duration Threshold</div>
+              <div class="control-description">How long students can look away before detection triggers</div>
+            </div>
+          </label>
+          
+          <!-- Error Message for Duration -->
+          <div id="duration-error" class="inline-error-message" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span class="error-text"></span>
+          </div>
+          
+          <!-- Slider Control -->
+          <div class="slider-container">
+            <input type="range" 
+                   id="violation-duration-slider" 
+                   min="1" 
+                   max="10" 
+                   step="0.5" 
+                   value="{{ rule.head_movement_settings.violation_duration/1000 if rule and rule.head_movement_settings else 2 }}">
+            <div class="slider-labels">
+              <span>1s<br><small>Strict</small></span>
+              <span>5.5s<br><small>Balanced</small></span>
+              <span>10s<br><small>Lenient</small></span>
+            </div>
+          </div>
+          
+          <!-- Manual Input Section -->
+          <div class="manual-input-section">
+            <div class="input-group">
+              <label for="violation-duration-input" class="input-label">Or enter exact duration:</label>
+              <div class="input-with-unit">
+                <input type="number" 
+                       id="violation-duration-input" 
+                       name="violation_duration"
+                       min="0.1" 
+                       max="60" 
+                       step="0.1" 
+                       value="{{ rule.head_movement_settings.violation_duration/1000 if rule and rule.head_movement_settings else 2 }}"
+                       placeholder="2.0"
+                       class="{% if error_field == 'violation_duration' %}error-input{% endif %}">
+                <span class="input-unit">seconds</span>
+              </div>
+              <div class="input-help">Supports decimals (e.g., 1.5, 2.7, 3.2)</div>
+              <div class="input-help">Enter duration 0.1 - 60 seconds</div>
+            </div>
+          </div>
+          
+          <div class="current-value">
+            <span id="duration-display">2.0 seconds</span>
+          </div>
+        </div>
+
+        <!-- Warning Count Control -->
+        <div class="control-group">
+          <label for="warning-count" class="control-label">
+            <span class="control-icon">	<i class="fas fa-exclamation-triangle"></i></span>
+            <div class="control-info">
+              <div class="control-title">Warning Count Before Flagging</div>
+              <div class="control-description">Number of warnings before recording actual violation</div>
+            </div>
+          </label>
+          
+          <!-- Error Message for Warning Count -->
+          <div id="warning-error" class="inline-error-message" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span class="error-text"></span>
+          </div>
+          
+          <div class="warning-selector">
+            <select id="warning-count" name="warning_count" class="warning-dropdown {% if error_field == 'warning_count' %}error-input{% endif %}">
+              <option value="0" {% if rule and rule.head_movement_settings and rule.head_movement_settings.warning_count == 0 %}selected{% endif %}>
+                0 warnings (Immediate flagging)
+              </option>
+              <option value="1" {% if rule and rule.head_movement_settings and rule.head_movement_settings.warning_count == 1 %}selected{% endif %}>
+                1 warning before flagging
+              </option>
+              <option value="2" {% if rule and rule.head_movement_settings and rule.head_movement_settings.warning_count == 2 %}selected{% endif %}>
+                2 warnings before flagging
+              </option>
+              <option value="3" {% if not rule or not rule.head_movement_settings or rule.head_movement_settings.warning_count == 3 %}selected{% endif %}>
+                3 warnings before flagging (Recommended)
+              </option>
+              <option value="4" {% if rule and rule.head_movement_settings and rule.head_movement_settings.warning_count == 4 %}selected{% endif %}>
+                4 warnings before flagging
+              </option>
+              <option value="5" {% if rule and rule.head_movement_settings and rule.head_movement_settings.warning_count == 5 %}selected{% endif %}>
+                5 warnings before flagging
+              </option>
+              <option value="10" {% if rule and rule.head_movement_settings and rule.head_movement_settings.warning_count == 10 %}selected{% endif %}>
+                10 warnings before flagging
+              </option>
+            </select>
+          </div>
+          
+          <div class="warning-explanation">
+            <div class="warning-flow">
+              <div class="warning-step">
+                <span class="step-number">1-<span id="max-warnings">3</span></span>
+                <span class="step-text">Student sees warning message</span>
+              </div>
+              <div class="warning-arrow">→</div>
+              <div class="warning-step flagging">
+                <span class="step-number"><span id="flagging-occurrence">4</span></span>
+                <span class="step-text">Violation recorded with evidence</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Head Turn Angle Control -->
+        <div class="control-group">
+          <label for="max-yaw" class="control-label">
+            <span class="control-icon"><i class="fas fa-arrows-alt-h"></i></span>
+            <div class="control-info">
+              <div class="control-title">Maximum Head Turn (Left/Right)</div>
+              <div class="control-description">How far students can turn their head horizontally before violation</div>
+              <div class="control-description">* Recommended Angle: 25°</div>
+
+            </div>
+          </label>
+          
+          <!-- Error Message for Yaw -->
+          <div id="yaw-error" class="inline-error-message" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span class="error-text"></span>
+          </div>
+          
+          <div class="slider-container">
+            <input type="range" 
+                   id="max-yaw" 
+                   name="max_yaw"
+                   min="10" 
+                   max="45" 
+                   step="5" 
+                   value="{{ rule.head_movement_settings.max_yaw if rule and rule.head_movement_settings else 20 }}"
+                   class="{% if error_field == 'max_yaw' %}error-input{% endif %}">
+            <div class="slider-labels">
+              <span>10°<br><small>Strict</small></span>
+              <span>27.5°<br><small>Balanced</small></span>
+              <span>45°<br><small>Lenient</small></span>
+            </div>
+            <div class="current-value">
+              <span id="yaw-display">20°</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Head Tilt Angle Control -->
+        <div class="control-group">
+          <label for="max-pitch" class="control-label">
+            <span class="control-icon"><i class="fas fa-arrows-alt-v"></i></span>
+            <div class="control-info">
+              <div class="control-title">Maximum Head Tilt (Up/Down)</div>
+              <div class="control-description">How far students can tilt their head vertically before violation</div>
+              <div class="control-description">* Recommended Angle: 15°</div>
+            </div>
+          </label>
+          
+          <!-- Error Message for Pitch -->
+          <div id="pitch-error" class="inline-error-message" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span class="error-text"></span>
+          </div>
+          
+          <div class="slider-container">
+            <input type="range" 
+                   id="max-pitch" 
+                   name="max_pitch"
+                   min="5" 
+                   max="30" 
+                   step="5" 
+                   value="{{ rule.head_movement_settings.max_pitch if rule and rule.head_movement_settings else 10 }}"
+                   class="{% if error_field == 'max_pitch' %}error-input{% endif %}">
+            <div class="slider-labels">
+              <span>5°<br><small>Strict</small></span>
+              <span>17.5°<br><small>Balanced</small></span>
+              <span>30°<br><small>Lenient</small></span>
+            </div>
+            <div class="current-value">
+              <span id="pitch-display">10°</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Save Configuration</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Enhanced CSS with Inline Error Message Styles -->
+<style>
+/* Inline Error Message Styles */
+.inline-error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 4px solid #ef4444;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: fadeInError 0.3s ease-in-out;
+}
+
+.inline-error-message i {
+    color: #ef4444;
+    font-size: 16px;
+}
+
+.inline-error-message .error-text {
+    flex: 1;
+    font-weight: 500;
+}
+
+/* Error input styling */
+.error-input {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.error-input:focus {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Animation for error messages */
+@keyframes fadeInError {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Success message for individual sections */
+.inline-success-message {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #10b981;
+    color: #047857;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: fadeInSuccess 0.3s ease-in-out;
+}
+
+.inline-success-message i {
+    color: #10b981;
+    font-size: 16px;
+}
+
+@keyframes fadeInSuccess {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Core control group styling */
+.control-group {
+  margin-bottom: 32px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  border-left: 4px solid #004080;
+}
+
+.control-group.has-error {
+  border-left-color: #ef4444;
+  background: #fefefe;
+}
+
+.control-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  cursor: default;
+}
+
+.control-icon {
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.control-info {
+  flex: 1;
+}
+
+.control-title {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.control-description {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Slider styles */
+.slider-container {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.slider-container input[type="range"] {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  outline: none;
+  -webkit-appearance: none;
+  margin: 16px 0;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.slider-container input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+.slider-labels small {
+  display: block;
+  font-size: 9px;
+  color: #9ca3af;
+}
+
+/* Manual input styles */
+.manual-input-section {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.input-with-unit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-with-unit input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 14px;
+  max-width: 120px;
+}
+
+.input-unit {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.input-help {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Warning system styles */
+.warning-selector {
+  margin-bottom: 16px;
+}
+
+.warning-dropdown {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.warning-dropdown:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.warning-explanation {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.warning-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.warning-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.step-number {
+  background: #3b82f6;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 30px;
+  text-align: center;
+}
+
+.warning-step.flagging .step-number {
+  background: #ef4444;
+}
+
+.step-text {
+  font-size: 11px;
+  color: #374151;
+  text-align: center;
+}
+
+.warning-arrow {
+  font-size: 16px;
+  color: #6b7280;
+  font-weight: bold;
+}
+
+/* Current value display */
+.current-value {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.current-value span {
+  display: inline-block;
+  background: #3b82f6;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+</style>
+
+<script>
+// JavaScript for monitoring controls with inline error messages
+document.addEventListener('DOMContentLoaded', function() {
+  // Check for backend errors and display them inline
+  displayBackendErrors();
+
+  // Existing switch functionality
+  const switches = document.querySelectorAll('.switch input[type="checkbox"]');
+  
+  switches.forEach(function(switchInput) {
+    const card = switchInput.closest('.setting-card');
+    
+    function updateCardState() {
+      if (switchInput.checked) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    }
+    
+    updateCardState();
+    switchInput.addEventListener('change', updateCardState);
+  });
+
+  // Initialize monitoring controls
+  initializeMonitoringControls();
+});
+
+// Display backend validation errors inline
+function displayBackendErrors() {
+  // Check URL parameters for error information
+  const urlParams = new URLSearchParams(window.location.search);
+  const errorField = urlParams.get('error_field');
+  const errorMessage = urlParams.get('error_message');
+  
+  if (errorField && errorMessage) {
+    showInlineError(errorField, decodeURIComponent(errorMessage));
+  }
+}
+
+// Show inline error message for specific field
+function showInlineError(fieldName, message) {
+  let errorElementId;
+  let controlGroup;
+  
+  // Map field names to error elements
+  switch(fieldName) {
+    case 'violation_duration':
+      errorElementId = 'duration-error';
+      controlGroup = document.getElementById('violation-duration-input').closest('.control-group');
+      break;
+    case 'warning_count':
+      errorElementId = 'warning-error';
+      controlGroup = document.getElementById('warning-count').closest('.control-group');
+      break;
+    case 'max_yaw':
+      errorElementId = 'yaw-error';
+      controlGroup = document.getElementById('max-yaw').closest('.control-group');
+      break;
+    case 'max_pitch':
+      errorElementId = 'pitch-error';
+      controlGroup = document.getElementById('max-pitch').closest('.control-group');
+      break;
+  }
+  
+  if (errorElementId) {
+    const errorElement = document.getElementById(errorElementId);
+    const errorText = errorElement.querySelector('.error-text');
+    
+    errorText.textContent = message;
+    errorElement.style.display = 'flex';
+    
+    // Add error class to control group
+    if (controlGroup) {
+      controlGroup.classList.add('has-error');
+    }
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      hideInlineError(errorElementId);
+      if (controlGroup) {
+        controlGroup.classList.remove('has-error');
+      }
+    }, 5000);
+  }
+}
+
+// Hide inline error message
+function hideInlineError(errorElementId) {
+  const errorElement = document.getElementById(errorElementId);
+  if (errorElement) {
+    errorElement.style.display = 'none';
+  }
+}
+
+// Initialize all monitoring control interactions
+function initializeMonitoringControls() {
+  const durationSlider = document.getElementById('violation-duration-slider');
+  const durationInput = document.getElementById('violation-duration-input');
+  const warningSelect = document.getElementById('warning-count');
+  const yawSlider = document.getElementById('max-yaw');
+  const pitchSlider = document.getElementById('max-pitch');
+  
+  const durationDisplay = document.getElementById('duration-display');
+  const yawDisplay = document.getElementById('yaw-display');
+  const pitchDisplay = document.getElementById('pitch-display');
+
+  // Sync slider and input for duration
+  function syncDurationControls() {
+    const sliderValue = parseFloat(durationSlider.value);
+    const inputValue = parseFloat(durationInput.value);
+    
+    // Hide any existing error for this field
+    hideInlineError('duration-error');
+    durationInput.closest('.control-group').classList.remove('has-error');
+    
+    // If input changed, update slider (within range)
+    if (document.activeElement === durationInput) {
+      if (inputValue >= 1 && inputValue <= 10) {
+        durationSlider.value = inputValue;
+      }
+    }
+    // If slider changed, update input
+    else if (document.activeElement === durationSlider) {
+      durationInput.value = sliderValue;
+    }
+    
+    updateDisplays();
+  }
+
+  // Update warning count display
+  function updateWarningDisplay() {
+    const warnings = parseInt(warningSelect.value);
+    const maxWarningsSpan = document.getElementById('max-warnings');
+    const flaggingSpan = document.getElementById('flagging-occurrence');
+    
+    // Hide any existing error for this field
+    hideInlineError('warning-error');
+    warningSelect.closest('.control-group').classList.remove('has-error');
+    
+    if (maxWarningsSpan) maxWarningsSpan.textContent = warnings;
+    if (flaggingSpan) flaggingSpan.textContent = warnings + 1;
+  }
+
+  // Update all display values
+  function updateDisplays() {
+    const duration = parseFloat(durationInput.value) || 2.0;
+    const yaw = parseInt(yawSlider.value);
+    const pitch = parseInt(pitchSlider.value);
+    
+    // Main displays
+    durationDisplay.textContent = duration + ' seconds';
+    yawDisplay.textContent = yaw + '°';
+    pitchDisplay.textContent = pitch + '°';
+  }
+
+  // Initialize displays
+  updateDisplays();
+  updateWarningDisplay();
+
+  // Add event listeners
+  durationSlider.addEventListener('input', syncDurationControls);
+  durationInput.addEventListener('input', syncDurationControls);
+  warningSelect.addEventListener('change', updateWarningDisplay);
+  
+  yawSlider.addEventListener('input', function() {
+    hideInlineError('yaw-error');
+    this.closest('.control-group').classList.remove('has-error');
+    updateDisplays();
+  });
+  
+  pitchSlider.addEventListener('input', function() {
+    hideInlineError('pitch-error');
+    this.closest('.control-group').classList.remove('has-error');
+    updateDisplays();
+  });
+
+  // Real-time validation for manual input
+  durationInput.addEventListener('blur', function() {
+    const value = parseFloat(this.value);
+    if (isNaN(value) || value < 0.1) {
+      this.value = 0.1;
+      showInlineError('violation_duration', 'Minimum duration is 0.1 seconds');
+    } else if (value > 60) {
+      this.value = 60;
+      showInlineError('violation_duration', 'Maximum duration is 60 seconds');
+    }
+    updateDisplays();
+  });
+}
+
+// Form submission - let backend handle validation
+document.querySelector('.env-form').addEventListener('submit', function(e) {
+  // Clear all existing inline errors
+  hideInlineError('duration-error');
+  hideInlineError('warning-error');
+  hideInlineError('yaw-error');
+  hideInlineError('pitch-error');
+  
+  // Remove error classes
+  document.querySelectorAll('.control-group').forEach(group => {
+    group.classList.remove('has-error');
+  });
+  
+  return true; // Let backend handle validation
+});
+</script>
+
+{% endblock %}

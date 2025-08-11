@@ -7,12 +7,6 @@
 
 <div class="profile-header">
   <h2 style="margin-left: 20px;">Exam Timetable</h2>
-  <div style="float: right; margin-top: -48px; margin-right: 40px;">
-    <div class="cs_tooltip" style="display:inline-block; margin-right: 905px; margin-top: 3px;">
-      <a href="#"><i class="fas fa-calendar-alt"></i></a>
-      <span class="tooltiptext">Exam Schedule</span>
-    </div>
-  </div>
 </div>
 
 <hr style="width: 100%;">
@@ -54,7 +48,18 @@
           <a href="{{ url_for('exam_timetable_edit', assessment_code=timetable.assessment_code) }}"><i class='fas fa-edit'></i></a>
         </td>
         <td class="btnDelete">
-          <a href="#" onclick="return confirm('Delete this timetable?');"><i class='fa fa-solid fa-trash'></i></a>
+          <a href="#" class="delete-timetable-btn"
+            data-code="{{ timetable.assessment_code }}"
+            data-title="{% for a in assessments %}
+            {% if a.assessment_code == timetable.assessment_code %}
+              {{ a.title }}
+            {% endif %}
+          {% endfor %}"
+            data-date="{{ timetable.exam_date }}"
+            data-start="{{ timetable.start_time }}"
+            data-end="{{ timetable.end_time }}">
+            <i class="fas fa-trash"></i>
+          </a>
         </td>
       </tr>
       {% else %}
@@ -65,4 +70,47 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  $(document).on('click', '.delete-timetable-btn', function (e) {
+    e.preventDefault();
+
+    const code = $(this).data('code');
+    const title = $(this).data('title');
+    const date = $(this).data('date');
+    const start = $(this).data('start');
+    const end = $(this).data('end');
+
+    Swal.fire({
+      title: 'Delete Exam Timetable?',
+      html: `
+      <span style="color: #dc2626;">This action cannot be undone.</span>
+        <table style="width:100%; font-size: 16px; text-align: left; padding-left: 80px; line-height: 1.8;">
+            <tr><td style="font-weight: bold;">Assessment Code:</td><td>${code}</td></tr>
+            <tr><td style="font-weight: bold;">Assessment Title:</td><td>${title}</td></tr>
+            <tr><td style="font-weight: bold;">Date:</td><td>${date}</td></tr>
+            <tr><td style="font-weight: bold;">Time:</td><td>${start} - ${end}</td></tr>
+        </table>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: '/lecturer/exam/timetable/delete/' + code,
+          type: 'DELETE',
+          success: res => {
+            Swal.fire('Deleted!', res.message, 'success').then(() => location.reload());
+          },
+          error: xhr => {
+            Swal.fire('Error', xhr.responseJSON?.message || 'Delete failed', 'error');
+          }
+        });
+      }
+    });
+  });
+</script>
 {% endblock %}

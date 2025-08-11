@@ -83,3 +83,17 @@ hr {
     text-decoration: none;
 }
 
+.error {
+  color: red;
+  background-image: url(/static/img/error.png);
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding: 8px;
+  padding-left: 20px;
+  font-size: 10px;
+  display: inline-block;
+}
+
+.swal-wide {
+  width: 500px !important;
+}

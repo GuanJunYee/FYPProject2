@@ -4,70 +4,1202 @@
 {% block breadcrumb %}Dashboard{% endblock %}
 
 {% block content %}
-<div style="margin: 20px;">
-  <h1>Welcome, {{ session.name or "Lecturer" }}</h1>
-  <p>This is your dashboard. Use the sidebar to manage courses, monitor exams, and view student information.</p>
-
-  <div class="dashboard-grid">
-    <div class="dashboard-card">
-      <i class="fas fa-book-open fa-2x"></i>
-      <h3>Manage Courses</h3>
-      <p>Create and update course information</p>
-      <a href="#">Go to Courses</a>
-    </div>
-
-    <div class="dashboard-card">
-      <i class="fas fa-users fa-2x"></i>
-      <h3>Student List</h3>
-      <p>View enrolled students by course</p>
-      <a href="#">View Students</a>
-    </div>
-
-    <div class="dashboard-card">
-      <i class="fas fa-clipboard-list fa-2x"></i>
-      <h3>Manage Exams</h3>
-      <p>Schedule and monitor exams</p>
-      <a href="#">Setup Exam</a>
-    </div>
-  </div>
-</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 30px;
+/* Lecturer Dashboard Styles - Compact Version Like Student Dashboard */
+.welcome-header {
+    background: #004080;  /* Simplified background like student dashboard */
+    color: white;
+    padding: 20px;  /* Reduced from 25px */
+    border-radius: 16px;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);  /* Simplified shadow */
+    text-align: center;
+}
+
+.welcome-header h1 {
+    font-size: 24px;  /* Reduced from 28px */
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.welcome-header p {
+    font-size: 14px;  /* Reduced from 16px */
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* Stats Grid - Compact */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;  /* Reduced from 20px */
+    margin-bottom: 25px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;  /* Reduced from 20px */
+    text-align: center;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #004080;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);  /* Reduced from -5px */
+    box-shadow: 0 8px 30px rgba(0, 64, 128, 0.15);
+}
+
+.stat-icon {
+    width: 50px;  /* Reduced from 60px */
+    height: 50px;  /* Reduced from 60px */
+    margin: 0 auto 12px;  /* Reduced from 15px */
+    background: #004080;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;  /* Reduced from 24px */
+}
+
+.stat-number {
+    font-size: 24px;  /* Reduced from 32px */
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 6px;  /* Reduced from 8px */
+}
+
+.stat-label {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 12px;  /* Reduced from 14px */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-change {
+    font-size: 11px;  /* Reduced from 12px */
+    margin-top: 4px;  /* Reduced from 5px */
+    font-weight: 600;
+}
+
+.change-positive {
+    color: #10b981;
+}
+
+.change-negative {
+    color: #ef4444;
+}
+
+.change-pending {
+    color: #f59e0b;
+}
+
+/* Compact Dashboard Rows */
+.dashboard-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;  /* Reduced from 25px */
+    margin-bottom: 20px;  /* Reduced from 25px */
+}
+
+.dashboard-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;  /* Reduced from 25px */
+    margin-bottom: 20px;  /* Reduced from 25px */
+}
+
+.dashboard-row-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;  /* Reduced from 25px */
+    margin-bottom: 20px;  /* Reduced from 25px */
+}
+
+.dashboard-row-5 {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;  /* Reduced from 25px */
+    margin-bottom: 20px;  /* Reduced from 25px */
 }
 
 .dashboard-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  text-align: center;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  transition: 0.3s ease;
-}
-
-.dashboard-card i {
-  color: #007bff;
-  margin-bottom: 10px;
-}
-
-.dashboard-card h3 {
-  margin-bottom: 5px;
-}
-
-.dashboard-card a {
-  color: #007bff;
-  text-decoration: none;
-  font-weight: 500;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;  /* Reduced from 25px */
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
 }
 
 .dashboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;  /* Reduced from 20px */
+    padding-bottom: 12px;  /* Reduced from 15px */
+    border-bottom: 2px solid #f9fafb;
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;  /* Reduced from 12px */
+    font-size: 16px;  /* Reduced from 18px */
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    background: #004080;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+}
+
+/* Chart Container Sizes - Reduced */
+.chart-container-large {
+    position: relative;
+    height: 280px;  /* Reduced from 350px */
+    margin-top: 16px;  /* Reduced from 20px */
+}
+
+.chart-container-medium {
+    position: relative;
+    height: 220px;  /* Reduced from 280px */
+    margin-top: 16px;  /* Reduced from 20px */
+}
+
+.chart-container-small {
+    position: relative;
+    height: 160px;  /* Reduced from 200px */
+    margin-top: 16px;  /* Reduced from 20px */
+}
+
+/* Quick Actions - More Compact */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;  /* Reduced from 12px */
+    margin-top: 16px;  /* Reduced from 20px */
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;  /* Reduced from 15px 10px */
+    background: white;
+    border: 2px solid #004080;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #004080;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-size: 11px;
+}
+
+.action-btn:hover {
+    background: #004080;
+    color: white;
+    transform: translateY(-2px);  /* Reduced from -3px */
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(0, 64, 128, 0.3);  /* Reduced shadow */
+}
+
+.action-btn i {
+    font-size: 16px;  /* Reduced from 18px */
+    margin-bottom: 5px;  /* Reduced from 6px */
+}
+
+/* Recent Items - More Compact */
+.recent-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;  /* Reduced from 12px */
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.recent-item:last-child {
+    border-bottom: none;
+}
+
+.item-details h4 {
+    margin: 0 0 3px 0;  /* Reduced from 4px */
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.item-details p {
+    margin: 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.student-id {
+    background: #004080;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.status-badge {
+    padding: 4px 8px;  /* Reduced from 4px 10px */
+    border-radius: 16px;  /* Reduced from 20px */
+    font-size: 10px;  /* Reduced from 11px */
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: rgba(251, 191, 36, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.status-completed {
+    background: rgba(34, 197, 94, 0.1);
+    color: #059669;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-flagged {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-approved {
+    background: rgba(34, 197, 94, 0.1);
+    color: #059669;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.status-rejected {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Performance Item - Compact */
+.performance-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;  /* Reduced from 10px */
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.performance-item:last-child {
+    border-bottom: none;
+}
+
+.performance-subject {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 14px;
+}
+
+.performance-stats {
+    display: flex;
+    gap: 12px;  /* Reduced from 15px */
+    font-size: 12px;
+}
+
+.performance-stat {
+    text-align: center;
+}
+
+.performance-number {
+    font-weight: 700;
+    color: #004080;
+}
+
+.performance-label {
+    color: #6b7280;
+    font-size: 10px;
+}
+
+/* Upcoming Exam Item - Compact */
+.exam-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;  /* Reduced from 12px */
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.exam-item:last-child {
+    border-bottom: none;
+}
+
+.exam-date-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 12px;  /* Reduced from 15px */
+    min-width: 70px;  /* Reduced from 80px */
+}
+
+.exam-date {
+    background: #004080;
+    color: white;
+    padding: 5px 8px;  /* Reduced from 6px 10px */
+    border-radius: 6px;  /* Reduced from 8px */
+    font-weight: 600;
+    font-size: 11px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 3px;  /* Reduced from 4px */
+}
+
+.exam-time {
+    background: rgba(0, 64, 128, 0.1);
+    color: #004080;
+    padding: 2px 6px;  /* Reduced from 3px 8px */
+    border-radius: 5px;  /* Reduced from 6px */
+    font-weight: 600;
+    font-size: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.exam-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 16px;  /* Reduced from 20px */
+    padding-left: 8px;  /* Reduced from 10px */
+    justify-content: center;
+}
+
+.exam-details h4 {
+    color: #1f2937;
+    font-weight: 600;
+    margin-bottom: 0px;
+    font-size: 14px;
+}
+
+.exam-details p {
+    color: #6b7280;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* Request Item - Compact */
+.request-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;  /* Reduced from 12px */
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.request-item:last-child {
+    border-bottom: none;
+}
+
+.request-details h4 {
+    margin: 0 0 3px 0;  /* Reduced from 4px */
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.request-details p {
+    margin: 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.request-reason {
+    font-style: italic;
+    color: #9ca3af;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.btn-view {
+    padding: 5px 10px;  /* Reduced from 6px 12px */
+    font-size: 11px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    background: #004080;
+    color: white;
+    border: 1px solid #004080;
+}
+
+.btn-view:hover {
+    background: #003060;
+    color: white;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* Announcements - Compact */
+.announcement-item {
+    padding: 12px 0;  /* Reduced from 15px */
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.announcement-item:last-child {
+    border-bottom: none;
+}
+
+.announcement-date {
+    color: #004080;
+    font-weight: 600;
+    font-size: 11px;
+    margin-bottom: 3px;  /* Reduced from 4px */
+}
+
+.announcement-title {
+    color: #1f2937;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 3px;  /* Reduced from 4px */
+}
+
+.announcement-content {
+    color: #6b7280;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 6px;  /* Reduced from 8px */
+}
+
+.announcement-actions {
+    display: flex;
+    gap: 6px;  /* Reduced from 8px */
+}
+
+.btn-sm {
+    padding: 3px 6px;  /* Reduced from 4px 8px */
+    font-size: 10px;  /* Reduced from 11px */
+    border-radius: 5px;  /* Reduced from 6px */
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-edit {
+    background: #004080;
+    color: white;
+    border: 1px solid #004080;
+}
+
+.btn-edit:hover {
+    background: #003060;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-add {
+    background: #10b981;
+    color: white;
+    border: 1px solid #10b981;
+    padding: 6px 12px;  /* Reduced from 8px 16px */
+    border-radius: 6px;  /* Reduced from 8px */
+    font-size: 11px;  /* Reduced from 12px */
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn-add:hover {
+    background: #059669;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-view-all {
+    background: rgba(0, 64, 128, 0.1);
+    color: #004080;
+    border: 1px solid rgba(0, 64, 128, 0.3);
+    padding: 6px 12px;  /* Reduced from 8px 16px */
+    border-radius: 6px;  /* Reduced from 8px */
+    font-size: 11px;  /* Reduced from 12px */
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.btn-view-all:hover {
+    background: #004080;
+    color: white;
+    text-decoration: none;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    padding: 20px;  /* Reduced from 30px */
+}
+
+.empty-state i {
+    font-size: 40px;  /* Reduced from 48px */
+    margin-bottom: 8px;  /* Reduced from 10px */
+    opacity: 0.5;
+}
+
+/* Responsive - More Compact */
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .dashboard-row-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-row-3, .dashboard-row-4 {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .dashboard-row-5 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dashboard-row-2, .dashboard-row-3, .dashboard-row-4, .dashboard-row-5 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .welcome-header {
+        padding: 16px;  /* Reduced from 20px */
+    }
+    
+    .welcome-header h1 {
+        font-size: 22px;  /* Reduced from 24px */
+    }
+}
+
+/* Animation */
+@keyframes countUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card {
+    animation: countUp 0.6s ease;
 }
 </style>
+
+<div class="dashboard-container">
+    <!-- Welcome Header - Made Compact -->
+    <div class="welcome-header">
+        <h1>Welcome back, {{ session.name }}!</h1>
+        <p>You are logged in as a <strong>{{ user.role|capitalize }}</strong></p>
+    </div>
+
+    <!-- Line 1: Statistics Overview (5 stats) - Now Dynamic -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_students }}</div>
+            <div class="stat-label">Total Students</div>
+            <div class="stat-change change-positive">
+                <i class="fas fa-users"></i> Active users
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-number">{{ stats.active_courses }}</div>
+            <div class="stat-label">Active Courses</div>
+            <div class="stat-change change-positive">
+                <i class="fas fa-book-open"></i> Available
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_exams }}</div>
+            <div class="stat-label">Total Exams</div>
+            <div class="stat-change change-positive">
+                <i class="fas fa-calendar"></i> Assessments
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-number">{{ stats.flagged_activities }}</div>
+            <div class="stat-label">Flagged Activities</div>
+            <div class="stat-change change-negative">
+                <i class="fas fa-eye"></i> Requires attention
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="stat-number">{{ stats.plagiarism_cases }}</div>
+            <div class="stat-label">Plagiarism Cases</div>
+            <div class="stat-change">
+                <i class="fas fa-percentage"></i> Detected
+            </div>
+        </div>
+    </div>
+
+    <!-- Line 2: Quick Actions + Exam Activity Trends - Made Compact -->
+    <div class="dashboard-row-2">
+        <!-- Quick Actions with Dynamic Flask url_for -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    Quick Actions
+                </div>
+            </div>
+            <div class="quick-actions-grid">
+                <a href="{{ url_for('assessment_create') }}" class="action-btn">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Create Exam</span>
+                </a>
+                <a href="{{ url_for('course_manage') }}" class="action-btn">
+                    <i class="fas fa-book-open"></i>
+                    <span>Manage Courses</span>
+                </a>
+                <a href="{{ url_for('lec_register') }}" class="action-btn">
+                    <i class="fas fa-users-cog"></i>
+                    <span>User Registration</span>
+                </a>
+                <a href="{{ url_for('lecturer_submission_overview') }}" class="action-btn">
+                    <i class="fas fa-search"></i>
+                    <span>Check Plagiarism</span>
+                </a>
+                <a href="{{ url_for('global_exam_environment') }}" class="action-btn">
+                    <i class="fas fa-cog"></i>
+                    <span>Exam Settings</span>
+                </a>
+                <a href="{{ url_for('user_registration_report') }}" class="action-btn">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>View Reports</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Exam Activity Trends (larger, 2 places) -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    Exam Activity Trends Over Time
+                </div>
+            </div>
+            <div class="chart-container-large">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line 3: Two equal charts - Made Compact -->
+    <div class="dashboard-row-3">
+        <!-- Bar Chart - Submissions by Course -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    Submissions by Course
+                </div>
+            </div>
+            <div class="chart-container-medium">
+                <canvas id="submissionsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Pie Chart - Cheating Detection Types -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    Cheating Detection Types
+                </div>
+            </div>
+            <div class="chart-container-medium">
+                <canvas id="detectionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Line 4: Course Performance + Upcoming Exams + Recent Resubmission Requests - Made Compact -->
+    <div class="dashboard-row-4">
+       <!-- Course Performance Overview - Now Dynamic -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-area"></i>
+                    </div>
+                    Course Performance
+                </div>
+            </div>
+            
+            {% if course_performance %}
+                {% for course in course_performance %}
+                <div class="performance-item">
+                    <div class="performance-subject">{{ course.course_name }}</div>
+                    <div class="performance-stats">
+                        <div class="performance-stat">
+                            <div class="performance-number">{{ course.student_count }}</div>
+                            <div class="performance-label">Students</div>
+                        </div>
+                        <div class="performance-stat">
+                            <div class="performance-number">{{ course.flagged_count }}</div>
+                            <div class="performance-label">Flagged</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <p>No courses available.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Upcoming Exams - Now Dynamic with Better Date Formatting -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    Upcoming Exams
+                </div>
+            </div>
+            
+            {% if upcoming_exams %}
+                {% for exam in upcoming_exams %}
+                <div class="exam-item">
+                    <div class="exam-date-time">
+                        <div class="exam-date">
+                            {% set exam_date = exam.exam_date %}
+                            {% if exam_date %}
+                                {% set months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                                {% set month_num = exam_date[5:7]|int %}
+                                {% set day_num = exam_date[8:10]|int %}
+                                {{ months[month_num - 1] }} {{ day_num }}
+                            {% else %}
+                                TBD
+                            {% endif %}
+                        </div>
+                        <div class="exam-time">{{ exam.start_time[:5] }}</div>
+                    </div>
+                    <div class="exam-details">
+                        <h4>{{ exam.title }}</h4>
+                        <p>{{ exam.start_time[:5] }} - {{ exam.end_time[:5] }} • {{ exam.student_count }} students</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-calendar-check"></i>
+                    <p>No upcoming exams scheduled.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Resubmission Requests - Now Dynamic -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    Resubmission Requests
+                </div>
+            </div>
+            
+            {% if recent_requests %}
+                {% for request in recent_requests %}
+                <div class="request-item">
+                    <div class="request-details">
+                        <h4>
+                            <span class="student-id">{{ request.student_id }}</span>
+                            {{ request.student_name }}
+                        </h4>
+                        <p>{{ request.assessment_title[:30] }}{% if request.assessment_title|length > 30 %}...{% endif %} • {{ request.requested_at.strftime('%d %b %Y') }}</p>
+                        <div class="request-reason">"{{ request.reason }}"</div>
+                    </div>
+                    {% if request.status == 'Pending' %}
+                        <a href="{{ url_for('lecturer_view_resubmission', submission_id=request.submission_id) }}" class="btn-view">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    {% else %}
+                        <div class="status-badge {% if request.status == 'Approved' %}status-approved{% else %}status-rejected{% endif %}">
+                            {{ request.status }}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-redo"></i>
+                    <p>No resubmission requests.</p>
+                </div>
+            {% endif %}
+        </div>
+   </div>
+
+   <!-- Line 5: Recent Submissions + Announcements - Made Compact -->
+   <div class="dashboard-row-5">
+        <!-- Recent Submissions - Now Dynamic -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    Recent Submissions
+                </div>
+            </div>
+            
+            {% if recent_submissions %}
+                {% for submission in recent_submissions %}
+                <div class="recent-item">
+                    <div class="item-details">
+                        <h4>
+                            <span class="student-id">{{ submission.student_id }}</span>
+                            {{ submission.student_name }}
+                        </h4>
+                        <p>{{ submission.assessment_title[:25] }}{% if submission.assessment_title|length > 25 %}...{% endif %} • {{ submission.submitted_at.strftime('%d %b %Y') }}</p>
+                    </div>
+                    <div class="status-badge 
+                        {% if submission.is_flagged %}status-flagged
+                        {% elif submission.is_checked %}status-completed
+                        {% else %}status-pending{% endif %}">
+                        {% if submission.is_flagged %}Flagged{% elif submission.is_checked %}Checked{% else %}Check Needed{% endif %}
+                    </div>
+
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-file-upload"></i>
+                    <p>No recent submissions.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Announcements Management - Now Dynamic -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <div class="card-icon">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    Announcements
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <a href="{{ url_for('lec_announcements') }}" class="btn-view-all">
+                        <i class="fas fa-list"></i> View All
+                    </a>
+                    <a href="{{ url_for('lec_announcement_create') }}" class="btn-add">
+                        <i class="fas fa-plus"></i> Add New
+                    </a>
+                </div>
+            </div>
+            
+            {% if announcements %}
+                {% for announcement in announcements %}
+                <div class="announcement-item">
+                    <div class="announcement-date">{{ announcement.formatted_date }}</div>
+                    <div class="announcement-title">{{ announcement.title }}</div>
+                    <div class="announcement-content">
+                        {{ announcement.content[:150] }}{% if announcement.content|length > 150 %}...{% endif %}
+                    </div>
+                    <div class="announcement-actions">
+                        <a href="{{ url_for('lec_announcement_edit', announcement_id=announcement._id) }}" class="btn-sm btn-edit">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form method="POST" action="{{ url_for('lec_announcement_delete', announcement_id=announcement._id) }}" 
+                              onsubmit="return confirm('Are you sure you want to delete this announcement?')" 
+                              style="display: inline;">
+                            <button type="submit" class="btn-sm btn-delete">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Fallback if no announcements -->
+                <div class="announcement-item">
+                    <div class="empty-state" style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                      <i class="fas fa-bullhorn" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5; color: #004080;"></i>
+                      <h4 style="font-size: 16px; margin-bottom: 8px; color: #6b7280; font-weight: 600;">No Announcements</h4>
+                      <p style="font-size: 14px; margin: 0; color: #9ca3af;">Create a new announcement to keep your students informed.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+   </div>
+</div>
+
+<script>
+// Chart.js Configuration - Now Dynamic
+document.addEventListener('DOMContentLoaded', function() {
+   
+   // Line Chart - Activity Trends (Dynamic Data)
+   const lineCtx = document.getElementById('activityChart').getContext('2d');
+   new Chart(lineCtx, {
+       type: 'line',
+       data: {
+           labels: {{ chart_data.activity_trends.labels | tojson }},
+           datasets: [{
+               label: 'Exams Taken',
+               data: {{ chart_data.activity_trends.exams_data | tojson }},
+               borderColor: '#004080',
+               backgroundColor: 'rgba(0, 64, 128, 0.1)',
+               tension: 0.4,
+               fill: true,
+               borderWidth: 3
+           }, {
+               label: 'Flagged Activities',
+               data: {{ chart_data.activity_trends.flagged_data | tojson }},
+               borderColor: '#ef4444',
+               backgroundColor: 'rgba(239, 68, 68, 0.1)',
+               tension: 0.4,
+               fill: true,
+               borderWidth: 3
+           }, {
+               label: 'Plagiarism Cases',
+               data: {{ chart_data.activity_trends.plagiarism_data | tojson }},
+               borderColor: '#f59e0b',
+               backgroundColor: 'rgba(245, 158, 11, 0.1)',
+               tension: 0.4,
+               fill: true,
+               borderWidth: 3
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           plugins: {
+               legend: {
+                   position: 'top',
+                   labels: {
+                       usePointStyle: true,
+                       padding: 15,
+                       font: {
+                           size: 12
+                       }
+                   }
+               }
+           },
+           scales: {
+               y: {
+                   beginAtZero: true,
+                   grid: { color: '#f3f4f6' },
+                   ticks: {
+                       font: {
+                           size: 11
+                       }
+                   }
+               },
+               x: {
+                   grid: { color: '#f3f4f6' },
+                   ticks: {
+                       font: {
+                           size: 11
+                       }
+                   }
+               }
+           }
+       }
+   });
+
+   // Bar Chart - Submissions by Course (Dynamic Data)
+   const barCtx = document.getElementById('submissionsChart').getContext('2d');
+   new Chart(barCtx, {
+       type: 'bar',
+       data: {
+           labels: {{ chart_data.submissions_by_course.labels | tojson }},
+           datasets: [{
+               label: 'Submissions',
+               data: {{ chart_data.submissions_by_course.data | tojson }},
+               backgroundColor: '#004080',
+               borderColor: '#003060',
+               borderWidth: 1,
+               borderRadius: 4
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           plugins: {
+               legend: {
+                   display: false
+               }
+           },
+           scales: {
+               y: {
+                   beginAtZero: true,
+                   grid: { color: '#f3f4f6' },
+                   ticks: {
+                       font: {
+                           size: 11
+                       }
+                   }
+               },
+               x: {
+                   grid: { display: false },
+                   ticks: {
+                       font: {
+                           size: 11
+                       }
+                   }
+               }
+           }
+       }
+   });
+
+   // Pie Chart - Cheating Detection Types (Dynamic Data)
+   const pieCtx = document.getElementById('detectionChart').getContext('2d');
+   new Chart(pieCtx, {
+       type: 'doughnut',
+       data: {
+           labels: {{ chart_data.detection_types.labels | tojson }},
+           datasets: [{
+               data: {{ chart_data.detection_types.data | tojson }},
+               backgroundColor: [
+                   '#004080',
+                   '#ef4444',
+                   '#10b981',
+                   '#8b5cf6'
+               ],
+               borderWidth: 0
+           }]
+       },
+       options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           plugins: {
+               legend: {
+                   position: 'bottom',
+                   labels: {
+                       usePointStyle: true,
+                       padding: 12,
+                       font: {
+                           size: 10
+                       }
+                   }
+               }
+           }
+       }
+   });
+
+   // Animate stat numbers (keep existing code)
+   const statNumbers = document.querySelectorAll('.stat-number');
+   statNumbers.forEach(stat => {
+       const finalValue = parseInt(stat.textContent.replace(/,/g, ''));
+       stat.textContent = '0';
+       
+       const increment = finalValue / 50;
+       let current = 0;
+       
+       const timer = setInterval(() => {
+           current += increment;
+           if (current >= finalValue) {
+               stat.textContent = finalValue.toLocaleString();
+               clearInterval(timer);
+           } else {
+               stat.textContent = Math.floor(current).toLocaleString();
+           }
+       }, 30);
+   });
+});
+
+// Add hover effects (keep existing code)
+document.querySelectorAll('.action-btn').forEach(btn => {
+   btn.addEventListener('click', function(e) {
+       this.style.transform = 'scale(0.95)';
+       setTimeout(() => {
+           this.style.transform = '';
+       }, 150);
+   });
+});
+</script>
+
 {% endblock %}
