@@ -1,5 +1,5 @@
 // =====================
-// 🔁 Tab Switching
+// Tab Switching
 // =====================
 function showTab(tabId) {
   const tabs = document.querySelectorAll('.tab-content');
@@ -14,7 +14,7 @@ function showTab(tabId) {
 }
 
 // =====================
-// ➡️ Go to Next Step
+// Go to Next Step
 // =====================
 async function nextStep(step) {
   const current = document.querySelector(`#step-${step}`);
@@ -87,7 +87,7 @@ async function nextStep(step) {
 }
 
 // =====================
-// ⬅️ Go to Previous Step
+// Go to Previous Step
 // =====================
 function prevStep(step) {
   const current = document.getElementById(`step-${step}`);
@@ -101,7 +101,7 @@ function prevStep(step) {
 }
 
 // =====================
-// 📩 Send OTP via Email
+// Send OTP via Email
 // =====================
 function sendVerificationCode() {
   const email = document.querySelector('[name="email"]').value;
@@ -146,7 +146,7 @@ function sendVerificationCode() {
 }
 
 // =====================
-// 🔁 Update Progress Bar
+// Update Progress Bar
 // =====================
 function updateProgressBar(step) {
   const fill = document.getElementById('progress-fill');
@@ -163,7 +163,7 @@ function updateProgressBar(step) {
 }
 
 // =====================
-// ⚠️ Show Inline Error Message
+// Show Inline Error Message
 // =====================
 function showError(id, message) {
   const div = document.getElementById(id);
@@ -183,7 +183,7 @@ function showError(id, message) {
 }
 
 // =====================
-// 👁 Toggle Password Visibility
+// Toggle Password Visibility
 // =====================
 function togglePassword(inputId, icon) {
   const input = document.getElementById(inputId);
@@ -199,14 +199,14 @@ function togglePassword(inputId, icon) {
 }
 
 // =====================
-// 🔐 Show Forgot Password Tab
+// Show Forgot Password Tab
 // =====================
 function showForgotPassword() {
   showTab('forgot-password');
 }
 
 // =====================
-// 🕓 Auto-hide Flash Messages
+// Auto-hide Flash Messages
 // =====================
 setTimeout(() => {
   const messages = document.querySelectorAll('.flash');
@@ -218,7 +218,7 @@ setTimeout(() => {
 }, 5000);   
 
 // =====================
-// 🔍 Check User ID Duplicate
+// Check User ID Duplicate
 // =====================
 async function checkUserIdDuplicate() {
   const userIdInput = document.querySelector('input[name="user_id"]');
@@ -252,7 +252,7 @@ async function checkUserIdDuplicate() {
 }
 
 // =====================
-// 📧 Check Email Duplicate
+// Check Email Duplicate
 // =====================
 async function checkEmailDuplicate() {
   const emailInput = document.querySelector('input[name="email"]');

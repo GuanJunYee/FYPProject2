@@ -6,8 +6,8 @@ class HeadMovementDetector {
     constructor(assessmentCode, studentId, examStartTime = null, examEndTime = null) {
         this.assessmentCode = assessmentCode;
         this.studentId = studentId;
-        this.examStartTime = examStartTime; // NEW: For timeline analysis
-        this.examEndTime = examEndTime;     // NEW: For timeline analysis
+        this.examStartTime = examStartTime; // For timeline analysis
+        this.examEndTime = examEndTime;     // For timeline analysis
         this.video = null;
         this.canvas = null;
         this.ctx = null;
@@ -17,11 +17,11 @@ class HeadMovementDetector {
         this.bufferTimeout = null;              // Buffer timeout reference
         this.violationRecorded = false;
         
-        // 🎨 Visual overlay canvas for bounding box and nose point
+        //  Visual overlay canvas for bounding box and nose point
         this.overlayCanvas = null;
         this.overlayCtx = null;
         
-        // 🔧 Dynamic settings loaded from backend (defaults will be overridden)
+        //  Dynamic settings loaded from backend (defaults will be overridden)
         this.settings = {
             violation_duration: 3000,  // milliseconds - need to look away for 3+ seconds
             warning_count: 5,          // 5 warnings before flagging (will be loaded from database)
@@ -30,7 +30,7 @@ class HeadMovementDetector {
             detection_interval: 1000   // 1 second between detections
         };
         
-        // 🚨 Warning system state
+        //  Warning system state
         this.warningCounts = {}; // Track warnings per violation type
         this.currentWarningCount = 0;
         this.hasShownWarning = false;
@@ -43,11 +43,11 @@ class HeadMovementDetector {
         this.detectionTimer = null;
         this.currentPose = null;
         
-        // 🔧 NEW: No face detection tracking
+        //  No face detection tracking
         this.noFaceStartTime = null;
         this.isNoFaceDetected = false;
         
-        // 🎥 UNIFIED video recording system
+        //  UNIFIED video recording system
         this.mainRecorder = null;
         this.recordedChunks = [];
         this.isRecording = false;
@@ -55,21 +55,21 @@ class HeadMovementDetector {
         this.preRecordDuration = 5000; // 5 seconds before
         this.postRecordDuration = 3000; // 3 seconds after
         
-        // 🔧 NEW: Store violation screenshot captured during actual violation
+        //  Store violation screenshot captured during actual violation
         this.storedViolationScreenshot = null;
         
         this.lastViolationId = null; 
 
-        console.log(`🤖 Enhanced Head Movement Detector initialized for ${assessmentCode}`);
+        console.log(` Enhanced Head Movement Detector initialized for ${assessmentCode}`);
         if (examStartTime && examEndTime) {
-            console.log(`📅 Exam timeline: ${new Date(examStartTime).toLocaleString()} → ${new Date(examEndTime).toLocaleString()}`);
+            console.log(` Exam timeline: ${new Date(examStartTime).toLocaleString()} → ${new Date(examEndTime).toLocaleString()}`);
         }
     }
 
-    // 🕒 NEW: Calculate exam timeline position
+    //  Calculate exam timeline position
     getExamTimelinePosition() {
         if (!this.examStartTime || !this.examEndTime) {
-            console.warn("⚠️ Exam times not provided, cannot determine timeline position");
+            console.warn(" Exam times not provided, cannot determine timeline position");
             return 'unknown';
         }
 
@@ -99,7 +99,7 @@ class HeadMovementDetector {
         }
     }
 
-    // 🕒 NEW: Get exam progress info for logging
+    //  Get exam progress info for logging
     getExamProgressInfo() {
         if (!this.examStartTime || !this.examEndTime) {
             return { position: 'unknown', progress: 0, timeRemaining: 0 };
@@ -120,10 +120,10 @@ class HeadMovementDetector {
         };
     }
 
-    // 🔧 Load dynamic settings from backend API
+    //  Load dynamic settings from backend API
     async loadSettings() {
         try {
-            console.log("⚙️ Loading head movement settings from backend...");
+            console.log(" Loading head movement settings from backend...");
             
             const response = await fetch('/api/get_head_movement_settings');
             if (response.ok) {
@@ -137,41 +137,41 @@ class HeadMovementDetector {
                         detection_interval: 1000 // Keep 1 second detection interval
                     };
                     
-                    console.log("✅ Settings loaded:", this.settings);
+                    console.log(" Settings loaded:", this.settings);
                     console.log(`   Duration: ${this.settings.violation_duration}ms (${this.settings.violation_duration/1000}s)`);
                     console.log(`   Warnings: ${this.settings.warning_count} before flagging`);
                     console.log(`   Angles: ±${this.settings.max_yaw}° yaw, ±${this.settings.max_pitch}° pitch`);
                 } else {
-                    console.warn("⚠️ Invalid settings response, using defaults");
+                    console.warn(" Invalid settings response, using defaults");
                 }
             } else {
-                console.warn("⚠️ Failed to load settings, using defaults");
+                console.warn(" Failed to load settings, using defaults");
             }
         } catch (error) {
-            console.error("❌ Error loading settings:", error);
-            console.log("🔧 Using default settings");
+            console.error(" Error loading settings:", error);
+            console.log(" Using default settings");
         }
     }
 
     async startDetection() {
         try {
-            this.showDetectionStatus("🔧 Loading configuration...");
+            this.showDetectionStatus(" Loading configuration...");
             
             // Load dynamic settings first
             await this.loadSettings();
             
-            this.showDetectionStatus("🔧 Initializing head detection...");
+            this.showDetectionStatus(" Initializing head detection...");
             
             this.video = document.getElementById('webcam-video');
             if (!this.video) {
                 throw new Error("Webcam video element not found");
             }
 
-            this.showDetectionStatus("📹 Connecting to webcam...");
+            this.showDetectionStatus(" Connecting to webcam...");
 
             // Use existing stream or create new one
             if (!this.video.srcObject) {
-                this.showDetectionStatus("🎥 Requesting camera access...");
+                this.showDetectionStatus(" Requesting camera access...");
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
                         width: { ideal: 640 }, 
@@ -180,9 +180,9 @@ class HeadMovementDetector {
                     } 
                 });
                 this.video.srcObject = stream;
-                this.showDetectionStatus("📹 Webcam connected successfully");
+                this.showDetectionStatus(" Webcam connected successfully");
             } else {
-                this.showDetectionStatus("📹 Using existing webcam stream");
+                this.showDetectionStatus(" Using existing webcam stream");
             }
             
             await new Promise((resolve) => {
@@ -193,7 +193,7 @@ class HeadMovementDetector {
                 }
             });
 
-            this.showDetectionStatus("🧠 Setting up AI detection model...");
+            this.showDetectionStatus(" Setting up AI detection model...");
 
             // Setup canvas for frame capture
             this.canvas = document.createElement('canvas');
@@ -223,14 +223,14 @@ class HeadMovementDetector {
                 ? ` (${progressInfo.position}, ${progressInfo.progress.toFixed(1)}% complete)`
                 : '';
             
-            this.showDetectionStatus(`✅ Head monitoring active${timelineMsg} (${this.settings.warning_count} warnings, ${this.settings.violation_duration/1000}s threshold)`);
+            this.showDetectionStatus(` Head monitoring active${timelineMsg} (${this.settings.warning_count} warnings, ${this.settings.violation_duration/1000}s threshold)`);
             
             // Initialize pose indicator with placeholder values
             this.updatePoseIndicator({ yaw: '--', pitch: '--', roll: '--' });
             
         } catch (error) {
-            console.error("❌ Head detection failed:", error);
-            this.showDetectionStatus("❌ Head detection failed");
+            console.error(" Head detection failed:", error);
+            this.showDetectionStatus(" Head detection failed");
         }
     }
 
@@ -261,10 +261,10 @@ class HeadMovementDetector {
                 videoContainer.style.position = 'relative';
                 videoContainer.appendChild(this.overlayCanvas);
                 
-                console.log("🎨 Visual overlay canvas created");
+                console.log(" Visual overlay canvas created");
             }
         } catch (error) {
-            console.error("❌ Failed to setup visual overlay:", error);
+            console.error(" Failed to setup visual overlay:", error);
         }
     }
 
@@ -272,19 +272,18 @@ class HeadMovementDetector {
     async startContinuousRecording() {
         try {
             if (!this.video.srcObject) {
-                console.warn("⚠️ No stream available for recording");
+                console.warn(" No stream available for recording");
                 return;
             }
 
-            console.log('🎥 HEAD recording - setting up video evidence system');
+            console.log(' HEAD recording - setting up video evidence system');
             
-            // 🔧 FIX: Use simple single-session recording instead of chunk combination
-            // This avoids the corruption issues from combining chunks from different sessions
+            // Use simple single-session recording
             this.isRecording = true;
-            console.log('✅ HEAD evidence system ready (video + screenshot)');
+            console.log(' HEAD evidence system ready (video + screenshot)');
 
         } catch (error) {
-            console.error('❌ Failed to setup HEAD evidence system:', error);
+            console.error(' Failed to setup HEAD evidence system:', error);
         }
     }
 
@@ -295,12 +294,12 @@ class HeadMovementDetector {
             testVideo.muted = true;
             
             testVideo.addEventListener('canplay', () => {
-                console.log('✅ HEAD stream ready for recording');
+                console.log(' HEAD stream ready for recording');
                 resolve();
             });
             
             setTimeout(() => {
-                console.log('⏰ HEAD stream timeout, proceeding anyway');
+                console.log(' HEAD stream timeout, proceeding anyway');
                 resolve();
             }, 2000);
         });
@@ -317,13 +316,13 @@ class HeadMovementDetector {
             }
         }, this.settings.detection_interval);
 
-        console.log(`🔄 Head pose detection active (every ${this.settings.detection_interval}ms)`);
+        console.log(` Head pose detection active (every ${this.settings.detection_interval}ms)`);
     }
 
     async captureAndAnalyzeFrame() {
         try {
             if (!this.video || !this.canvas || !this.ctx) {
-                console.warn("⚠️ Video, canvas, or context not ready");
+                console.warn(" Video, canvas, or context not ready");
                 return;
             }
 
@@ -332,7 +331,7 @@ class HeadMovementDetector {
             
             // Convert to base64
             const imageDataUrl = this.canvas.toDataURL('image/jpeg', 0.7);
-            console.log("📸 Frame captured, sending to server...");
+            console.log(" Frame captured, sending to server...");
             
             const response = await fetch('/api/stream_head_pose', {
                 method: 'POST',
@@ -346,14 +345,14 @@ class HeadMovementDetector {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log("🤖 Server response:", result.status);
+                console.log(" Server response:", result.status);
                 this.handleHeadPoseResult(result);
             } else {
                 const errorData = await response.json();
-                console.error("❌ Server error:", errorData);
+                console.error(" Server error:", errorData);
             }
         } catch (error) {
-            console.warn("⚠️ Frame analysis error:", error);
+            console.warn(" Frame analysis error:", error);
         }
     }
 
@@ -372,28 +371,28 @@ class HeadMovementDetector {
             
             if (isLookingAway) {
                 this.handleLookingAway(this.currentPose);
-                this.showDetectionStatus("⚠️ Looking away detected", true); // true = red color
+                this.showDetectionStatus(" Looking away detected", true); // true = red color
             } else {
                 this.handleLookingForward();
-                this.showDetectionStatus("✅ Looking forward", false); // false = green color
+                this.showDetectionStatus(" Looking forward", false); // false = green color
             }
             
-            // 🔧 NEW: Handle face detected (clear no face tracking)
+            // Handle face detected (clear no face tracking)
             this.handleFaceDetected();
             
-            console.log(`📊 HEAD: Yaw=${this.currentPose.yaw.toFixed(1)}° Pitch=${this.currentPose.pitch.toFixed(1)}° Away=${isLookingAway} Backend=${result.is_looking_away}`);
+            console.log(` HEAD: Yaw=${this.currentPose.yaw.toFixed(1)}° Pitch=${this.currentPose.pitch.toFixed(1)}° Away=${isLookingAway} Backend=${result.is_looking_away}`);
             
         } else if (result.status === 'no_face') {
             this.currentPose = null;
             this.showDetectionStatus("👤 No face detected", true); // true = red color for warning
             
-            // 🔧 FIX: Clear ALL visual indicators when no face is detected
+            //  Clear ALL visual indicators when no face is detected
             this.clearVisualIndicators();
             
             // Show pose indicator with placeholder values (matching your screenshot)
             this.updatePoseIndicator({ yaw: '--', pitch: '--', roll: '--' });
             
-            // 🔧 NEW: Treat no face detection as violation after duration threshold
+            //  Treat no face detection as violation after duration threshold
             this.handleNoFaceDetection();
             
             console.log("👤 No face detected in current frame");
@@ -407,18 +406,18 @@ class HeadMovementDetector {
         // Clear previous drawings first
         this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
         
-        // 🔧 FIX: Only draw indicators if face is successfully detected
+        // Only draw indicators if face is successfully detected
         if (result.status === 'success' && result.face_bbox && result.nose_point) {
             // Use actual detection data from backend with DYNAMIC thresholds
             this.drawRealFaceBoundingBox(result);
             this.drawRealNoseDirection(result);
-            console.log("🎨 Drawing bounding box and nose direction for detected face");
+            console.log(" Drawing bounding box and nose direction for detected face");
         } else {
-            console.log("🎨 No face detected - visual indicators cleared");
+            console.log(" No face detected - visual indicators cleared");
         }
     }
 
-    // 🎯 Draw face bounding box using REAL detection data with DYNAMIC thresholds
+    //  Draw face bounding box using REAL detection data with DYNAMIC thresholds
     drawRealFaceBoundingBox(result) {
         const bbox = result.face_bbox;
         const pose = result.pose;
@@ -463,7 +462,7 @@ class HeadMovementDetector {
         this.overlayCtx.fillText(status, x, y - 8);
     }
 
-    // 🎯 Draw corner markers for professional look
+    //  Draw corner markers for professional look
     drawCornerMarkers(x, y, width, height, color) {
         const markerLength = 20;
         const markerWidth = 3;
@@ -500,7 +499,7 @@ class HeadMovementDetector {
         this.overlayCtx.stroke();
     }
 
-    // 🎯 Draw nose point and direction arrow using REAL data with DYNAMIC thresholds
+    //  Draw nose point and direction arrow using REAL data with DYNAMIC thresholds
     drawRealNoseDirection(result) {
         const nosePoint = result.nose_point;
         const pose = result.pose;
@@ -576,11 +575,11 @@ class HeadMovementDetector {
         }
     }
 
-    // 🚨 Enhanced looking away handler with WARNING SYSTEM
+    //  Enhanced looking away handler with WARNING SYSTEM
     handleLookingAway(pose) {
-        // 🔧 FIX: Check if exam is being submitted
+        // Check if exam is being submitted
         if (window.examSubmitting || !this.isDetecting) {
-            console.log('📤 Exam submitting or detection stopped, ignoring head movement');
+            console.log(' Exam submitting or detection stopped, ignoring head movement');
             return;
         }
         
@@ -591,7 +590,7 @@ class HeadMovementDetector {
             this.lookAwayStartTime = now;
             this.violationStartTime = now;
             this.hasShownWarning = false; // Reset warning flag
-            console.log(`👀 HEAD: Looking away started - Yaw: ${pose.yaw.toFixed(1)}°, Pitch: ${pose.pitch.toFixed(1)}°`);
+            console.log(` HEAD: Looking away started - Yaw: ${pose.yaw.toFixed(1)}°, Pitch: ${pose.pitch.toFixed(1)}°`);
         }
 
         const lookAwayDuration = now - this.lookAwayStartTime;
@@ -608,16 +607,16 @@ class HeadMovementDetector {
             
             const description = `Looking away${direction}: yaw=${pose.yaw.toFixed(1)}°, pitch=${pose.pitch.toFixed(1)}°`;
             
-            // 🚨 NEW: Implement warning system
+            //  Implement warning system
             this.handleViolationWithWarnings('looking_away', description);
         }
     }
 
-    // 🔧 NEW: Handle no face detection with warning system
+    //  Handle no face detection with warning system
     handleNoFaceDetection() {
-        // 🔧 FIX: Check if exam is being submitted
+        //  Check if exam is being submitted
         if (window.examSubmitting || !this.isDetecting) {
-            console.log('📤 Exam submitting or detection stopped, ignoring no face detection');
+            console.log(' Exam submitting or detection stopped, ignoring no face detection');
             return;
         }
         
@@ -627,7 +626,7 @@ class HeadMovementDetector {
             this.isNoFaceDetected = true;
             this.noFaceStartTime = now;
             this.violationStartTime = now; // Use same violation start time for consistency
-            console.log(`👤 HEAD: No face detection started`);
+            console.log(` HEAD: No face detection started`);
         }
 
         const noFaceDuration = now - this.noFaceStartTime;
@@ -636,12 +635,12 @@ class HeadMovementDetector {
         if (noFaceDuration > this.settings.violation_duration) {
             const description = `No face detected for ${Math.round(noFaceDuration/1000)} seconds`;
             
-            // � CHANGED: Record as 'looking_away' instead of 'no_face_detected'
+            // Record as 'looking_away' instead of 'no_face_detected'
             this.handleViolationWithWarnings('looking_away', description);
         }
     }
 
-    // 🔧 NEW: Handle face detected (clear no face tracking)
+    //  Handle face detected (clear no face tracking)
     handleFaceDetected() {
         if (this.isNoFaceDetected) {
             this.isNoFaceDetected = false;
@@ -649,7 +648,7 @@ class HeadMovementDetector {
             
             console.log("👤 HEAD: Face detected again");
             
-            // 🔧 Clear any no face warnings if not a full violation
+            //  Clear any no face warnings if not a full violation
             if (this.violationStartTime && !this.violationRecorded) {
                 console.log("⚠️ DEBUG: No face warnings cleared - face detected again");
                 this.violationStartTime = null;
@@ -657,16 +656,16 @@ class HeadMovementDetector {
         }
     }
 
-    // 🚨 NEW: Warning system implementation with COMBINED counting
+    // Warning system implementation with COMBINED counting
     handleViolationWithWarnings(type, description) {
-        // 🔧 NEW: Check if we're in buffer period
+        // Check if we're in buffer period
         if (this.violationBuffer) {
-            console.log("⏸️ In buffer period - ignoring violation detection");
-            this.showDetectionStatus("🔄 Buffer period active - Ignoring detections");
+            console.log("In buffer period - ignoring violation detection");
+            this.showDetectionStatus("Buffer period active - Ignoring detections");
             return;
         }
         
-        // 🔧 COMBINED: Use single warning counter for both looking_away and no_face_detected
+        //  Use single warning counter for both looking_away and no_face_detected
         const combinedViolationType = 'head_movement_violation'; // Unified violation type
         
         // Initialize combined warning count if not exists
@@ -676,30 +675,30 @@ class HeadMovementDetector {
 
         this.warningCounts[combinedViolationType]++;
         
-        console.log(`🚨 HEAD VIOLATION ATTEMPT: ${type} - Combined Count: ${this.warningCounts[combinedViolationType]}/${this.settings.warning_count + 1}`);
-        console.log(`📊 DEBUG: Current settings - warning_count: ${this.settings.warning_count}, violation_duration: ${this.settings.violation_duration}ms`);
+        console.log(`HEAD VIOLATION ATTEMPT: ${type} - Combined Count: ${this.warningCounts[combinedViolationType]}/${this.settings.warning_count + 1}`);
+        console.log(`DEBUG: Current settings - warning_count: ${this.settings.warning_count}, violation_duration: ${this.settings.violation_duration}ms`);
 
         if (this.warningCounts[combinedViolationType] <= this.settings.warning_count) {
             // Show warning message with combined count
             this.showWarningMessage(type, this.warningCounts[combinedViolationType], description);
-            console.log(`⚠️ HEAD WARNING ${this.warningCounts[combinedViolationType]}: ${description}`);
-            console.log(`⚠️ DEBUG: Still in warning phase (${this.warningCounts[combinedViolationType]}/${this.settings.warning_count})`);
+            console.log(` HEAD WARNING ${this.warningCounts[combinedViolationType]}: ${description}`);
+            console.log(` DEBUG: Still in warning phase (${this.warningCounts[combinedViolationType]}/${this.settings.warning_count})`);
         } else {
             // Record actual violation after warnings exceeded
             this.recordEnhancedViolation(type, description);
-            console.log(`🚨 HEAD VIOLATION RECORDED: ${description}`);
-            console.log(`🚨 DEBUG: Full violation recorded after ${this.settings.warning_count} warnings`);
+            console.log(` HEAD VIOLATION RECORDED: ${description}`);
+            console.log(` DEBUG: Full violation recorded after ${this.settings.warning_count} warnings`);
             
             // Reset combined warning count
             this.warningCounts[combinedViolationType] = 0;
         }
     }
 
-    // 🚨 NEW: Show warning message to student with COMBINED counting
+    //  Show warning message to student with COMBINED counting
     showWarningMessage(type, warningNumber, description) {
         const remainingWarnings = this.settings.warning_count - warningNumber + 1;
         
-        // 🔧 COMBINED: Show unified warning title but different messages for context
+        //  Show unified warning title but different messages for context
         let warningTitle = `⚠️ HEAD MOVEMENT WARNING ${warningNumber}/${this.settings.warning_count}`;
         let warningMessage = "";
         
@@ -755,8 +754,8 @@ class HeadMovementDetector {
 
         // Update status display with combined messaging
         const statusMessage = type === 'no_face_detected' 
-            ? `👤 Combined Warning ${warningNumber}/${this.settings.warning_count} - Show your face!`
-            : `⚠️ Combined Warning ${warningNumber}/${this.settings.warning_count} - Look at screen!`;
+            ? ` Combined Warning ${warningNumber}/${this.settings.warning_count} - Show your face!`
+            : ` Combined Warning ${warningNumber}/${this.settings.warning_count} - Look at screen!`;
         this.showDetectionStatus(statusMessage, true);
     }
 
@@ -772,12 +771,12 @@ class HeadMovementDetector {
                 warningElement.style.display = 'none';
             }
             
-            console.log("👀 HEAD: Looking forward again");
+            console.log(" HEAD: Looking forward again");
             
-            // 🔧 FIXED: Video recording is now triggered during violation, not after
-            console.log("🔍 DEBUG: Checking violation state...");
-            console.log(`🔍 DEBUG: violationStartTime exists: ${this.violationStartTime !== null}`);
-            console.log(`🔍 DEBUG: violationRecorded flag: ${this.violationRecorded || false}`);
+            //  Video recording triggered during violation, not after
+            console.log(" DEBUG: Checking violation state...");
+            console.log(` DEBUG: violationStartTime exists: ${this.violationStartTime !== null}`);
+            console.log(` DEBUG: violationRecorded flag: ${this.violationRecorded || false}`);
             
             if (this.violationStartTime) {
                 if (this.violationRecorded) {
@@ -794,11 +793,11 @@ class HeadMovementDetector {
         }
     }
 
-    // 🔥 ENHANCED: Record violation with timeline support
+    //  Record violation with timeline support
     async recordEnhancedViolation(type, description) {
         // Accept 'looking_away' violations (including no face scenarios)
         if (type !== 'looking_away') {
-            console.log(`❌ HEAD DETECTOR: Rejecting non-head violation: ${type}`);
+            console.log(` HEAD DETECTOR: Rejecting non-head violation: ${type}`);
             return;
         }
 
@@ -807,49 +806,49 @@ class HeadMovementDetector {
         const timeSinceLastViolation = now - this.lastViolationTime;
         
         if (timeSinceLastViolation < cooldownPeriod) {
-            console.log(`⏳ HEAD: ${type} in cooldown`);
+            console.log(` HEAD: ${type} in cooldown`);
             return;
         }
         
         this.lastViolationTime = now;
 
-        // 🕒 NEW: Get timeline information
+        //  Get timeline information
         const timelinePosition = this.getExamTimelinePosition();
         const progressInfo = this.getExamProgressInfo();
 
-        console.log(`🚨 HEAD VIOLATION: ${type} - ${description}`);
-        console.log(`📅 Timeline: ${timelinePosition} (${progressInfo.progress.toFixed(1)}% complete)`);
+        console.log(` HEAD VIOLATION: ${type} - ${description}`);
+        console.log(` Timeline: ${timelinePosition} (${progressInfo.progress.toFixed(1)}% complete)`);
 
-        // 🔧 NEW: Capture screenshot immediately while still looking away
-        console.log('📷 Capturing violation screenshot while looking away...');
+        //  Capture screenshot immediately while still looking away
+        console.log(' Capturing violation screenshot while looking away...');
         const violationScreenshot = await this.captureScreenshot();
 
-        // 🔧 NEW: Start video recording immediately during violation (while still looking away)
-        console.log('🎥 Starting violation video recording during actual violation...');
+        //  Start video recording immediately during violation (while still looking away)
+        console.log(' Starting violation video recording during actual violation...');
         this.startViolationVideoRecording();
 
         try {
-            // 🔥 ENHANCED: Send violation data with timeline and pose information
+            //  Send violation data with timeline and pose information
             const violationData = {
                 assessment_code: this.assessmentCode,
                 student_id: this.studentId,
                 violation_type: type,
                 description: description,
                 timestamp: new Date().toISOString(),
-                // 🕒 NEW: Timeline data
+                //  Timeline data
                 exam_timeline_position: timelinePosition,
                 exam_start_time: this.examStartTime,
                 exam_end_time: this.examEndTime,
                 exam_progress_percent: progressInfo.progress,
                 time_remaining_ms: progressInfo.timeRemaining,
                 elapsed_time_ms: progressInfo.elapsedTime,
-                // 🤖 NEW: Current pose data
+                //  Current pose data
                 head_pose_data: this.currentPose ? {
                     yaw: this.currentPose.yaw,
                     pitch: this.currentPose.pitch,
                     roll: this.currentPose.roll
                 } : null,
-                // ⚙️ NEW: Detection settings used
+                //  Detection settings used
                 detection_settings: {
                     max_yaw: this.settings.max_yaw,
                     max_pitch: this.settings.max_pitch,
@@ -867,18 +866,18 @@ class HeadMovementDetector {
             if (response.ok) {
                 const result = await response.json();
                 this.lastViolationId = result.violation_id || null;
-                console.log("✅ HEAD violation recorded with timeline data");
-                console.log("📊 Violation details:", {
+                console.log(" HEAD violation recorded with timeline data");
+                console.log(" Violation details:", {
                     position: timelinePosition,
                     progress: `${progressInfo.progress.toFixed(1)}%`,
                     timeRemaining: `${Math.round(progressInfo.timeRemaining / 60000)}min`,
                     pose: this.currentPose
                 });
                 
-                // 🔧 ADD THIS LINE: Set flag that violation was recorded
+                //   Set flag that violation was recorded
                 this.violationRecorded = true;
                 
-                // 🔧 NEW: Store the screenshot captured during violation
+                //  Store the screenshot captured during violation
                 this.storedViolationScreenshot = violationScreenshot;
                 
                 //Reset warning count and start buffer period
@@ -895,16 +894,16 @@ class HeadMovementDetector {
         }
     }
 
-    // 🔧 NEW: Start video recording immediately during violation
+    //  Start video recording immediately during violation
     async startViolationVideoRecording() {
         try {
             const stream = this.video.srcObject;
             if (!stream) {
-                console.error('❌ No video stream available for violation recording');
+                console.error(' No video stream available for violation recording');
                 return;
             }
 
-            console.log('🎥 Recording violation video (5 seconds) while looking away...');
+            console.log(' Recording violation video (5 seconds) while looking away...');
             
             const chunks = [];
             const recorder = new MediaRecorder(stream, {
@@ -920,19 +919,19 @@ class HeadMovementDetector {
             };
             
             recorder.onstop = async () => {
-                console.log('🎬 HEAD violation recording complete');
+                console.log(' HEAD violation recording complete');
                 const videoBlob = new Blob(chunks, { type: 'video/webm' });
-                console.log(`✅ HEAD violation video: ${videoBlob.size} bytes`);
+                console.log(` HEAD violation video: ${videoBlob.size} bytes`);
                 
                 const isPlayable = await this.testVideoPlayback(videoBlob, 'HEAD violation video');
                 if (isPlayable) {
                     // Always upload as 'looking_away' violation type
                     await this.uploadEnhancedEvidence('looking_away', videoBlob);
-                    console.log('✅ HEAD video evidence uploaded successfully');
+                    console.log(' HEAD video evidence uploaded successfully');
                 } else {
-                    console.error('❌ HEAD video not playable, using screenshot only');
+                    console.error(' HEAD video not playable, using screenshot only');
                     await this.uploadEnhancedEvidence('looking_away', null);
-                    console.log('✅ HEAD screenshot evidence uploaded successfully');
+                    console.log(' HEAD screenshot evidence uploaded successfully');
                 }
             };
             
@@ -944,16 +943,16 @@ class HeadMovementDetector {
             }, 5000);
 
         } catch (error) {
-            console.error('❌ Failed to start violation video recording:', error);
+            console.error(' Failed to start violation video recording:', error);
             // Fallback to screenshot only
             await this.uploadEnhancedEvidence('looking_away', null);
-            console.log('✅ HEAD screenshot fallback uploaded successfully');
+            console.log(' HEAD screenshot fallback uploaded successfully');
         }
     }
 
-    // 🔧 NEW: Add this method to handle violation counting reset with buffer
+    //  Add this method to handle violation counting reset with buffer
     resetViolationCounting() {
-        console.log("🔄 Resetting violation counting with buffer period...");
+        console.log(" Resetting violation counting with buffer period...");
         
         // Reset combined warning count (both looking_away and no_face_detected)
         this.warningCounts = {};
@@ -974,11 +973,11 @@ class HeadMovementDetector {
             this.showDetectionStatus("✅ Head monitoring active - Ready for detection");
         }, this.bufferDuration);
         
-        console.log(`⏰ Combined warning buffer period started: ${this.bufferDuration / 1000} seconds`);
-        this.showDetectionStatus("🔄 Buffer period active - No counting for 5 seconds");
+        console.log(` Combined warning buffer period started: ${this.bufferDuration / 1000} seconds`);
+        this.showDetectionStatus(" Buffer period active - No counting for 5 seconds");
     }
 
-    // 🚨 NEW: Show violation recorded message
+    //  Show violation recorded message
     showViolationRecordedMessage() {
         let violationElement = document.getElementById('head-violation-display');
         if (!violationElement) {
@@ -1004,7 +1003,7 @@ class HeadMovementDetector {
 
         violationElement.innerHTML = `
             <div style="text-align: center;">
-                🚨 VIOLATION RECORDED
+                 VIOLATION RECORDED
             </div>
             <div style="font-size: 14px; margin-top: 4px;">
                 Head movement violation has been recorded with evidence.
@@ -1020,49 +1019,49 @@ class HeadMovementDetector {
         }, 5000);
 
         // Update status display
-        this.showDetectionStatus("🚨 VIOLATION RECORDED - Evidence captured", true);
+        this.showDetectionStatus("VIOLATION RECORDED - Evidence captured", true);
     }
 
-    // 🔧 FIX: Create violation video using new recording approach
+    //  Create violation video using new recording approach
     async captureUnifiedViolationVideo() {
         try {
-            console.log('🎬 Starting dedicated HEAD violation recording...');
+            console.log(' Starting dedicated HEAD violation recording...');
             
             // Skip video recording for now and focus on screenshot evidence
-            console.log('⚠️ Skipping video recording due to compatibility issues');
-            console.log('� Capturing screenshot evidence instead');
+            console.log(' Skipping video recording due to compatibility issues');
+            console.log(' Capturing screenshot evidence instead');
             
             // Always capture screenshot as reliable evidence
             const screenshot = await this.captureScreenshot();
             if (screenshot) {
                 await this.uploadEnhancedEvidence('looking_away', null); // Upload without video
-                console.log('✅ HEAD screenshot evidence uploaded successfully');
+                console.log(' HEAD screenshot evidence uploaded successfully');
             } else {
-                console.error('❌ Failed to capture screenshot evidence');
+                console.error(' Failed to capture screenshot evidence');
             }
 
         } catch (error) {
-            console.error('❌ Failed to capture HEAD evidence:', error);
+            console.error(' Failed to capture HEAD evidence:', error);
         }
     }
 
-    // 🎥 NEW: Enhanced violation video recording method
+    //  Enhanced violation video recording method
     async captureViolationVideoNew() {
         try {
-            console.log('🎬 NEW: Starting HEAD violation video recording...');
+            console.log(' Starting HEAD violation video recording...');
             
             const stream = this.video.srcObject;
             if (!stream) {
-                console.error('❌ No video stream available, using screenshot only');
+                console.error(' No video stream available, using screenshot only');
                 const screenshot = await this.captureScreenshot();
                 if (screenshot) {
                     await this.uploadEnhancedEvidence('looking_away', null);
-                    console.log('✅ HEAD screenshot evidence uploaded successfully');
+                    console.log(' HEAD screenshot evidence uploaded successfully');
                 }
                 return;
             }
 
-            console.log('🎥 Recording fresh violation video (5 seconds)...');
+            console.log(' Recording fresh violation video (5 seconds)...');
             
             const chunks = [];
             const recorder = new MediaRecorder(stream, {
@@ -1073,12 +1072,12 @@ class HeadMovementDetector {
             recorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     chunks.push(event.data);
-                    console.log(`🎥 HEAD violation chunk: ${event.data.size} bytes`);
+                    console.log(` HEAD violation chunk: ${event.data.size} bytes`);
                 }
             };
             
             recorder.onstop = async () => {
-                console.log('🎬 HEAD violation recording complete');
+                console.log(' HEAD violation recording complete');
                 const videoBlob = new Blob(chunks, { type: 'video/webm' });
                 console.log(`✅ HEAD violation video: ${videoBlob.size} bytes`);
                 
@@ -1113,7 +1112,7 @@ class HeadMovementDetector {
         }
     }
 
-    // 🔥 ENHANCED: Upload evidence with timeline and pose data
+    //  Upload evidence with timeline and pose data
     async uploadEnhancedEvidence(violationType, unifiedVideo) {
         try {
             const formData = new FormData();
@@ -1123,7 +1122,7 @@ class HeadMovementDetector {
             formData.append('timestamp', new Date().toISOString());
             formData.append('violation_id', this.lastViolationId); 
 
-            // 🕒 NEW: Add timeline data
+            //  Add timeline data
             const timelinePosition = this.getExamTimelinePosition();
             const progressInfo = this.getExamProgressInfo();
             
@@ -1132,7 +1131,7 @@ class HeadMovementDetector {
             formData.append('exam_end_time', this.examEndTime || '');
             formData.append('exam_progress_percent', progressInfo.progress.toString());
 
-            // 🤖 NEW: Add pose data if available
+            //  Add pose data if available
             if (this.currentPose) {
                 formData.append('head_pose_data', JSON.stringify({
                     yaw: this.currentPose.yaw,
@@ -1141,7 +1140,7 @@ class HeadMovementDetector {
                 }));
             }
 
-            // ⚙️ NEW: Add detection settings
+            //  Add detection settings
             formData.append('detection_settings', JSON.stringify({
                 max_yaw: this.settings.max_yaw,
                 max_pitch: this.settings.max_pitch,
@@ -1152,10 +1151,10 @@ class HeadMovementDetector {
             // Add screenshot (use stored violation screenshot if available)
             let screenshot = this.storedViolationScreenshot;
             if (!screenshot) {
-                console.log('📷 No stored violation screenshot, capturing new one...');
+                console.log(' No stored violation screenshot, capturing new one...');
                 screenshot = await this.captureScreenshot();
             } else {
-                console.log('📷 Using stored violation screenshot from actual violation moment');
+                console.log(' Using stored violation screenshot from actual violation moment');
                 this.storedViolationScreenshot = null; // Clear after use
             }
             
@@ -1163,7 +1162,7 @@ class HeadMovementDetector {
                 const timestamp = Date.now();
                 const screenshotName = `head_looking_away_screenshot_${this.assessmentCode}_${this.studentId}_${timestamp}.png`;
                 formData.append('screenshot', screenshot, screenshotName);
-                console.log('📷 HEAD screenshot added to upload');
+                console.log(' HEAD screenshot added to upload');
             }
 
             // Add unified video (only if available)
@@ -1171,12 +1170,12 @@ class HeadMovementDetector {
                 const timestamp = Date.now();
                 const videoName = `head_looking_away_enhanced_${this.assessmentCode}_${this.studentId}_${timestamp}.webm`;
                 formData.append('video', unifiedVideo, videoName);
-                console.log(`🎬 HEAD unified video added to upload (${unifiedVideo.size} bytes)`);
+                console.log(` HEAD unified video added to upload (${unifiedVideo.size} bytes)`);
             } else {
                 console.log('⚠️ No valid video to upload, sending screenshot only');
             }
 
-            console.log(`📤 Uploading enhanced HEAD evidence for ${violationType} at ${timelinePosition}`);
+            console.log(` Uploading enhanced HEAD evidence for ${violationType} at ${timelinePosition}`);
 
             const response = await fetch('/api/upload_violation_evidence', {
                 method: 'POST',
@@ -1185,13 +1184,13 @@ class HeadMovementDetector {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log("📸 Enhanced HEAD evidence uploaded successfully");
+                console.log(" Enhanced HEAD evidence uploaded successfully");
                 if (unifiedVideo) {
-                    console.log("🎬 Video evidence included");
+                    console.log(" Video evidence included");
                 } else {
-                    console.log("📷 Screenshot-only evidence (video unavailable)");
+                    console.log(" Screenshot-only evidence (video unavailable)");
                 }
-                console.log("📊 Evidence details:", {
+                console.log(" Evidence details:", {
                     timeline: timelinePosition,
                     progress: `${progressInfo.progress.toFixed(1)}%`,
                     files: result.files_uploaded || 'unknown'
@@ -1209,7 +1208,7 @@ class HeadMovementDetector {
     // Test video playability
     async testVideoPlayback(videoBlob, description) {
         return new Promise((resolve) => {
-            console.log(`🧪 Testing ${description} playback...`);
+            console.log(` Testing ${description} playback...`);
             
             const videoURL = URL.createObjectURL(videoBlob);
             const testVideo = document.createElement('video');
@@ -1229,7 +1228,7 @@ class HeadMovementDetector {
             });
             
             setTimeout(() => {
-                console.warn(`⏰ ${description} test timeout`);
+                console.warn(` ${description} test timeout`);
                 URL.revokeObjectURL(videoURL);
                 resolve(false);
             }, 3000);
@@ -1240,13 +1239,13 @@ class HeadMovementDetector {
         try {
             if (!this.video || !this.canvas) return null;
             
-            // 🎯 NEW: Capture screenshot with bounding box overlay
+            //  Capture screenshot with bounding box overlay
             console.log('📷 Capturing screenshot with bounding box overlay...');
             
             // Draw video frame to canvas
             this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
             
-            // 🎯 ADD: Draw the overlay with bounding box on top of the screenshot
+            //  Draw the overlay with bounding box on top of the screenshot
             if (this.overlayCanvas && this.currentPose) {
                 // Create a temporary canvas to combine video + overlay
                 const combinedCanvas = document.createElement('canvas');
@@ -1423,8 +1422,8 @@ class HeadMovementDetector {
             violationElement.style.display = 'none';
         }
         
-        this.showDetectionStatus("🛑 Head detection stopped for submission");
-        console.log("🛑 HEAD detection completely stopped");
+        this.showDetectionStatus(" Head detection stopped for submission");
+        console.log(" HEAD detection completely stopped");
     }
 }
 

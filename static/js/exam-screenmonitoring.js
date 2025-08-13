@@ -19,7 +19,7 @@ class ExamScreenMonitor {
         this.violationCount = 0;
         this.isCapturingEvidence = false;
         
-        // 🔧 NEW: File dialog detection
+        // File dialog detection
         this.fileDialogActive = false;
         this.fileDialogTimer = null;
         
@@ -31,7 +31,7 @@ class ExamScreenMonitor {
         this.lastViolationId = null; // Store latest violation ID
 
         
-        console.log(`🔍 Initializing BEFORE+TRANSITION monitor for ${assessmentCode}`);
+        console.log(`Initializing BEFORE+TRANSITION monitor for ${assessmentCode}`);
         this.init();
     }
 
@@ -50,7 +50,7 @@ class ExamScreenMonitor {
 
     async setupWebcam() {
         try {
-            console.log('📹 Setting up webcam...');
+            console.log('Setting up webcam...');
             this.webcamStream = await navigator.mediaDevices.getUserMedia({ 
                 video: { width: 640, height: 480 }, 
                 audio: false 
@@ -101,7 +101,7 @@ class ExamScreenMonitor {
                 return;
             }
 
-            console.log('🎥 Starting BEFORE evidence pre-recording...');
+            console.log('Starting BEFORE evidence pre-recording...');
             
             await this.waitForStreamReady(streamToRecord);
             
@@ -134,10 +134,10 @@ class ExamScreenMonitor {
                     );
                     
                     if (beforeCount !== this.recordedSegments.length) {
-                        console.log(`🗑️ Removed ${beforeCount - this.recordedSegments.length} old BEFORE segments`);
+                        console.log(`Removed ${beforeCount - this.recordedSegments.length} old BEFORE segments`);
                     }
                     
-                    console.log(`📹 BEFORE evidence: ${this.recordedSegments.length} segments (${event.data.size} bytes)`);
+                    console.log(`BEFORE evidence: ${this.recordedSegments.length} segments (${event.data.size} bytes)`);
                 }
             };
 
@@ -175,7 +175,7 @@ class ExamScreenMonitor {
             });
             
             setTimeout(() => {
-                console.log('⏰ Stream timeout, proceeding anyway');
+                console.log('Stream timeout, proceeding anyway');
                 resolve();
             }, 2000);
         });
@@ -184,42 +184,42 @@ class ExamScreenMonitor {
     setupEventListeners() {
         console.log('👂 Setting up tab switch detection...');
         
-        // 🔧 ENHANCED: File dialog detection to prevent false violations
+        // ENHANCED: File dialog detection to prevent false violations
         this.setupFileDialogDetection();
         
-        // ✅ CRITICAL: Start TRANSITION recording BEFORE tab switch
+        // CRITICAL: Start TRANSITION recording BEFORE tab switch
         window.addEventListener('blur', () => {
             if (this.isMonitoring && !this.isRecordingTransition) {
-                // 🔧 NEW: Check if this is a file dialog before starting transition recording
+                // Check if this is a file dialog before starting transition recording
                 if (this.isFileDialogLikelyActive()) {
-                    console.log('📁 File dialog detected during blur - skipping transition recording');
+                    console.log('File dialog detected during blur - skipping transition recording');
                     return;
                 }
                 
-                console.log('🚨 Window losing focus - START TRANSITION recording NOW');
+                console.log('Window losing focus - START TRANSITION recording NOW');
                 this.startTransitionRecording();
             }
         });
         
         document.addEventListener('visibilitychange', () => {
             if (document.hidden && this.isMonitoring && !this.isCapturingEvidence) {
-                // 🔧 NEW: Check if this is a file dialog before recording violation
+                // Check if this is a file dialog before recording violation
                 if (this.isFileDialogLikelyActive()) {
-                    console.log('📁 File dialog detected - skipping tab switch violation');
+                    console.log('File dialog detected - skipping tab switch violation');
                     return;
                 }
                 
                 this.tabSwitchCount++;
-                console.log(`🚨 TAB SWITCH #${this.tabSwitchCount} - Student LEFT exam`);
+                console.log(`TAB SWITCH #${this.tabSwitchCount} - Student LEFT exam`);
                 this.handleTabSwitchLeaving();
             } else if (!document.hidden && this.isMonitoring) {
-                console.log('🔄 Student returned to exam tab');
+                console.log('Student returned to exam tab');
                 this.stopTransitionRecording();
             }
         });
     }
 
-    // 🔧 NEW: Setup file dialog detection
+    // Setup file dialog detection
     setupFileDialogDetection() {
         this.fileDialogActive = false;
         this.fileDialogTimer = null;
@@ -227,23 +227,23 @@ class ExamScreenMonitor {
         // Listen for file input clicks
         document.addEventListener('click', (event) => {
             if (event.target && event.target.type === 'file') {
-                console.log('📁 File input clicked - activating file dialog detection');
+                console.log('File input clicked - activating file dialog detection');
                 this.markFileDialogActive();
             }
         });
         
-        // 🔧 ENHANCED: Listen for any file input interactions (including programmatic)
+        //  Listen for any file input interactions (including programmatic)
         document.addEventListener('change', (event) => {
             if (event.target && event.target.type === 'file') {
-                console.log('📁 File input changed - activating file dialog detection');
+                console.log('File input changed - activating file dialog detection');
                 this.markFileDialogActive();
             }
         });
         
-        // 🔧 ENHANCED: Listen for form interactions that might trigger file dialogs
+        //  Listen for form interactions that might trigger file dialogs
         document.addEventListener('focus', (event) => {
             if (event.target && event.target.type === 'file') {
-                console.log('📁 File input focused - activating file dialog detection');
+                console.log('File input focused - activating file dialog detection');
                 this.markFileDialogActive();
             }
         });
@@ -252,12 +252,12 @@ class ExamScreenMonitor {
         document.addEventListener('submit', (event) => {
             const form = event.target;
             if (form && form.querySelector('input[type="file"]')) {
-                console.log('📁 Form with file input submitted - activating file dialog detection');
+                console.log('Form with file input submitted - activating file dialog detection');
                 this.markFileDialogActive();
             }
         });
         
-        // 🔧 ENHANCED: Listen for any button clicks that might trigger file operations
+        // Listen for any button clicks that might trigger file operations
         document.addEventListener('click', (event) => {
             const target = event.target;
             if (target) {
@@ -266,7 +266,7 @@ class ExamScreenMonitor {
                 const isFileRelated = /submit|upload|file|attach|browse|choose|send/i.test(elementText);
                 
                 if (isFileRelated) {
-                    console.log(`📁 File-related button clicked: "${elementText}" - activating file dialog detection`);
+                    console.log(`File-related button clicked: "${elementText}" - activating file dialog detection`);
                     this.markFileDialogActive();
                 }
                 
@@ -274,14 +274,14 @@ class ExamScreenMonitor {
                 if (target.tagName === 'BUTTON' || (target.tagName === 'INPUT' && (target.type === 'submit' || target.type === 'button'))) {
                     const form = target.closest('form');
                     if (form && form.querySelector('input[type="file"]')) {
-                        console.log('📁 Submit button in form with file input - activating file dialog detection');
+                        console.log('Submit button in form with file input - activating file dialog detection');
                         this.markFileDialogActive();
                     }
                 }
                 
-                // 🔧 ENHANCED: Check for any submit button click
+                //  Check for any submit button click
                 if (target.type === 'submit' || target.tagName === 'BUTTON' && /submit/i.test(target.textContent || target.value || '')) {
-                    console.log('📁 Submit button clicked - activating extended file dialog protection');
+                    console.log('Submit button clicked - activating extended file dialog protection');
                     this.markFileDialogActive();
                 }
             }
@@ -290,7 +290,7 @@ class ExamScreenMonitor {
         // Listen for focus events that might indicate file dialog
         window.addEventListener('focus', () => {
             if (this.fileDialogActive) {
-                console.log('📁 Window regained focus - file dialog likely closed');
+                console.log('Window regained focus - file dialog likely closed');
                 // Don't clear immediately, give it a delay in case of multiple focus events
                 setTimeout(() => {
                     this.clearFileDialogActive();
@@ -299,7 +299,7 @@ class ExamScreenMonitor {
         });
     }
 
-    // 🔧 NEW: Mark file dialog as active
+    //  Mark file dialog as active
     markFileDialogActive() {
         this.fileDialogActive = true;
         
@@ -310,12 +310,12 @@ class ExamScreenMonitor {
         
         // Auto-clear after 60 seconds (increased timeout for file operations)
         this.fileDialogTimer = setTimeout(() => {
-            console.log('📁 File dialog auto-timeout - clearing detection');
+            console.log('File dialog auto-timeout - clearing detection');
             this.clearFileDialogActive();
         }, 60000);
     }
 
-    // 🔧 NEW: Clear file dialog active state
+    //  Clear file dialog active state
     clearFileDialogActive() {
         this.fileDialogActive = false;
         if (this.fileDialogTimer) {
@@ -324,29 +324,29 @@ class ExamScreenMonitor {
         }
     }
 
-    // 🔧 NEW: Check if file dialog is likely active
+    //  Check if file dialog is likely active
     isFileDialogLikelyActive() {
         return this.fileDialogActive;
     }
 
     startMonitoring() {
         this.isMonitoring = true;
-        console.log('🚀 BEFORE+TRANSITION monitoring started');
+        console.log('BEFORE+TRANSITION monitoring started');
     }
 
-    // ✅ Start TRANSITION recording when window loses focus (BEFORE tab switch)
+    //  Start TRANSITION recording when window loses focus (BEFORE tab switch)
     async startTransitionRecording() {
         if (this.isRecordingTransition) {
-            console.log('🔄 TRANSITION recording already active');
+            console.log('TRANSITION recording already active');
             return;
         }
 
         try {
-            console.log('🔴 Starting TRANSITION recording to catch the switch...');
+            console.log('Starting TRANSITION recording to catch the switch...');
             
             const streamToRecord = this.screenStream || this.webcamStream;
             if (!streamToRecord) {
-                console.error('❌ No stream for TRANSITION recording');
+                console.error('No stream for TRANSITION recording');
                 return;
             }
 
@@ -359,16 +359,16 @@ class ExamScreenMonitor {
             this.transitionRecorder.ondataavailable = (event) => {
                 if (event.data.size > 0) {
                     this.transitionChunks.push(event.data);
-                    console.log(`📹 TRANSITION chunk: ${event.data.size} bytes`);
+                    console.log(`TRANSITION chunk: ${event.data.size} bytes`);
                 }
             };
 
             this.transitionRecorder.onstop = async () => {
-                console.log('⏹️ TRANSITION recording complete');
+                console.log('TRANSITION recording complete');
                 
                 if (this.transitionChunks.length > 0) {
                     const transitionBlob = new Blob(this.transitionChunks, { type: 'video/webm;codecs=vp8' });
-                    console.log(`✅ TRANSITION video: ${transitionBlob.size} bytes`);
+                    console.log(`TRANSITION video: ${transitionBlob.size} bytes`);
 
                     // Test and upload
                     const isValid = await this.testVideoPlayback(transitionBlob, 'TRANSITION video');
@@ -390,52 +390,52 @@ class ExamScreenMonitor {
             this.transitionRecorder.start(500);
             this.isRecordingTransition = true;
             
-            console.log('✅ TRANSITION recording started - capturing the switch!');
+            console.log('TRANSITION recording started - capturing the switch!');
 
         } catch (error) {
-            console.error('❌ Failed to start TRANSITION recording:', error);
+            console.error('Failed to start TRANSITION recording:', error);
             this.isRecordingTransition = false;
         }
     }
 
-    // ✅ Stop TRANSITION recording
+    // Stop TRANSITION recording
     stopTransitionRecording() {
         if (!this.isRecordingTransition || !this.transitionRecorder) {
             return;
         }
 
         try {
-            console.log('⏹️ Stopping TRANSITION recording...');
+            console.log('Stopping TRANSITION recording...');
             
             // Stop after delay to capture return to exam
             setTimeout(() => {
                 if (this.transitionRecorder && this.transitionRecorder.state === 'recording') {
                     this.transitionRecorder.stop();
-                    console.log('⏹️ TRANSITION recording stopped');
+                    console.log('TRANSITION recording stopped');
                 }
             }, 1500); // 1.5 second delay to capture return
 
         } catch (error) {
-            console.error('❌ Failed to stop TRANSITION recording:', error);
+            console.error('Failed to stop TRANSITION recording:', error);
         }
     }
 
     async handleTabSwitchLeaving() {
         if (this.isCapturingEvidence) {
-            console.log('⚠️ Already capturing evidence, skipping...');
+            console.log('Already capturing evidence, skipping...');
             return;
         }
 
-        // 🔧 ENHANCED: Double-check file dialog protection
+        // Double-check file dialog protection
         if (this.isFileDialogLikelyActive()) {
-            console.log('📁 File dialog still active during tab switch handling - skipping all violation recording');
+            console.log('File dialog still active during tab switch handling - skipping all violation recording');
             return;
         }
 
         this.isCapturingEvidence = true;
         
-        console.log(`🚨 CAPTURING: Student switched AWAY from exam`);
-        console.log(`📊 BEFORE segments available: ${this.recordedSegments.length}`);
+        console.log(`CAPTURING: Student switched AWAY from exam`);
+        console.log(`BEFORE segments available: ${this.recordedSegments.length}`);
 
         // Record violation
         const violation = {
@@ -445,7 +445,7 @@ class ExamScreenMonitor {
         };
 
         this.recordViolation(violation.type, violation.description);
-        this.showViolationWarning('⚠️ Tab switch detected! Return to exam immediately.');
+        this.showViolationWarning('Tab switch detected! Return to exam immediately.');
 
         // Capture screenshot immediately
         await this.captureScreenshot('tab_switch');
@@ -456,17 +456,17 @@ class ExamScreenMonitor {
         // Reset flag after a delay
         setTimeout(() => {
             this.isCapturingEvidence = false;
-            console.log('✅ Evidence capture complete, ready for next violation');
+            console.log('Evidence capture complete, ready for next violation');
         }, 2000);
     }
 
-    // ✅ Create BEFORE video from pre-recorded segments
+    // Create BEFORE video from pre-recorded segments
     async createBeforeVideo(violationType) {
         try {
-            console.log('📹 Creating BEFORE video from pre-recorded segments...');
+            console.log('Creating BEFORE video from pre-recorded segments...');
 
             if (this.recordedSegments.length === 0) {
-                console.warn('⚠️ No BEFORE segments available');
+                console.warn('No BEFORE segments available');
                 return;
             }
 
@@ -476,7 +476,7 @@ class ExamScreenMonitor {
             
             const beforeDuration = this.recordedSegments.length * 2; // 2 seconds per segment
             
-            console.log(`✅ BEFORE video created: ${beforeBlob.size} bytes (${beforeDuration}s)`);
+            console.log(`BEFORE video created: ${beforeBlob.size} bytes (${beforeDuration}s)`);
 
             // Test video before uploading
             const isValid = await this.testVideoPlayback(beforeBlob, 'BEFORE video');
@@ -497,10 +497,10 @@ class ExamScreenMonitor {
         }
     }
 
-    // ✅ Test if video blob is playable
+    // Test if video blob is playable
     async testVideoPlayback(videoBlob, description) {
         return new Promise((resolve) => {
-            console.log(`🧪 Testing ${description} playback...`);
+            console.log(`Testing ${description} playback...`);
             
             const videoURL = URL.createObjectURL(videoBlob);
             const testVideo = document.createElement('video');
@@ -526,7 +526,7 @@ class ExamScreenMonitor {
             
             // Timeout after 3 seconds
             setTimeout(() => {
-                console.warn(`⏰ ${description} test timeout - assuming invalid`);
+                console.warn(`${description} test timeout - assuming invalid`);
                 URL.revokeObjectURL(videoURL);
                 resolve(false);
             }, 3000);
@@ -544,11 +544,11 @@ class ExamScreenMonitor {
             }
 
             if (screenshot) {
-                console.log('📷 Screenshot captured');
+                console.log('Screenshot captured');
                 await this.uploadScreenshot(screenshot, violationType);
             }
         } catch (error) {
-            console.error('❌ Screenshot failed:', error);
+            console.error('Screenshot failed:', error);
         }
     }
 
@@ -579,7 +579,7 @@ class ExamScreenMonitor {
                 });
             });
         } catch (error) {
-            console.error('❌ Screen screenshot failed:', error);
+            console.error('Screen screenshot failed:', error);
             return null;
         }
     }
@@ -604,14 +604,14 @@ class ExamScreenMonitor {
                 }, 'image/png');
             });
         } catch (error) {
-            console.error('❌ Webcam screenshot failed:', error);
+            console.error('Webcam screenshot failed:', error);
             return null;
         }
     }
 
     async uploadVideoWithMetadata(videoBlob, violationType, extension, evidenceType, expectedDuration) {
         try {
-            console.log(`📤 Uploading ${evidenceType} video (${expectedDuration}s)...`);
+            console.log(`Uploading ${evidenceType} video (${expectedDuration}s)...`);
             
             const formData = new FormData();
             formData.append('assessment_code', this.assessmentCode);
@@ -631,12 +631,12 @@ class ExamScreenMonitor {
             });
 
             if (response.ok) {
-                console.log(`✅ ${evidenceType} video uploaded: ${filename}`);
+                console.log(`${evidenceType} video uploaded: ${filename}`);
             } else {
-                console.error(`❌ Video upload failed:`, response.statusText);
+                console.error(` Video upload failed:`, response.statusText);
             }
         } catch (error) {
-            console.error('❌ Video upload error:', error);
+            console.error(' Video upload error:', error);
         }
     }
 
@@ -713,7 +713,7 @@ class ExamScreenMonitor {
     }
 
     showViolationWarning(message) {
-        console.log(`🚨 Showing warning: ${message}`);
+        console.log(`Showing warning: ${message}`);
         
         let warningDiv = document.getElementById('violation-warning');
         if (!warningDiv) {
@@ -752,7 +752,7 @@ class ExamScreenMonitor {
         this.isPreRecording = false;
         if (this.preRecorder && this.preRecorder.state !== 'inactive') {
             this.preRecorder.stop();
-            console.log('🛑 Pre-recording stopped');
+            console.log(' Pre-recording stopped');
         }
     }
 
@@ -769,12 +769,12 @@ class ExamScreenMonitor {
             this.screenStream.getTracks().forEach(track => track.stop());
         }
 
-        console.log('🛑 Monitoring stopped');
+        console.log(' Monitoring stopped');
     }
 }
 
 // Initialize when page loads
-window.screenMonitor = null; // 🔥 MAKE IT GLOBAL
+window.screenMonitor = null; // MAKE IT GLOBAL
 
 document.addEventListener('DOMContentLoaded', () => {
     const assessmentCodeElement = document.getElementById('assessment-code');
@@ -784,8 +784,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const assessmentCode = assessmentCodeElement.value;
         const studentId = studentIdElement.value;
         
-        console.log(`🚀 Starting BEFORE+TRANSITION monitor for ${assessmentCode}`);
-        window.screenMonitor = new ExamScreenMonitor(assessmentCode, studentId); // 🔥 EXPOSE GLOBALLY
+        console.log(` Starting BEFORE+TRANSITION monitor for ${assessmentCode}`);
+        window.screenMonitor = new ExamScreenMonitor(assessmentCode, studentId); // EXPOSE GLOBALLY
     }
 });
 

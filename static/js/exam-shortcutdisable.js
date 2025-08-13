@@ -1,9 +1,9 @@
-console.log("🟢 Shortcut block script fully loaded and running...");
+console.log(" Shortcut block script fully loaded and running...");
 
 // Wait for screenMonitor to be fully initialized
 let shortcutDetectionReady = false;
 
-// 🔥 NEW: Pre-capture system to capture BEFORE violation happens
+//  Pre-capture system to capture BEFORE violation happens
 let preScreenshotInterval = null;
 let latestScreenshot = null;
 let screenshotUpdateInterval = 2000; // Update every 2 seconds
@@ -12,7 +12,7 @@ let lastViolationId = null;
 
 // Function to continuously capture screenshots in background
 async function startPreScreenshotCapture() {
-  console.log('📸 Starting pre-screenshot capture system...');
+  console.log(' Starting pre-screenshot capture system...');
   
   // Clear any existing interval
   if (preScreenshotInterval) {
@@ -45,19 +45,19 @@ async function updateLatestScreenshot() {
     
     let screenshot = null;
     
-    // 🔥 EXACT SAME METHOD AS TAB SWITCH: Copy captureScreenScreenshot() logic
+    //  EXACT SAME METHOD AS TAB SWITCH: Copy captureScreenScreenshot() logic
     if (window.screenMonitor && window.screenMonitor.screenStream) {
       try {
         console.log('📹 Using EXACT same method as tab switch captureScreenScreenshot()...');
         screenshot = await captureScreenScreenshotExact(window.screenMonitor.screenStream);
         
         if (screenshot) {
-          console.log('✅ Screen screenshot captured using EXACT tab switch method!');
+          console.log(' Screen screenshot captured using EXACT tab switch method!');
         } else {
-          console.warn('⚠️ Exact method returned null');
+          console.warn(' Exact method returned null');
         }
       } catch (exactMethodError) {
-        console.warn('⚠️ Exact tab switch method failed:', exactMethodError);
+        console.warn(' Exact tab switch method failed:', exactMethodError);
       }
     }
     
@@ -67,18 +67,18 @@ async function updateLatestScreenshot() {
       const activeTrack = tracks.find(track => track.readyState === 'live');
       
       if (activeTrack) {
-        console.log('📹 Fallback: Using direct screen stream...');
+        console.log(' Fallback: Using direct screen stream...');
         screenshot = await captureFromScreenStream(window.screenMonitor.screenStream);
         
         if (screenshot) {
-          console.log('✅ Direct screen stream capture successful!');
+          console.log('Direct screen stream capture successful!');
         }
       }
     }
     
     // Last resort: HTML2Canvas
     if (!screenshot) {
-      console.log('📱 Last resort: Using HTML2Canvas...');
+      console.log(' Last resort: Using HTML2Canvas...');
       screenshot = await captureWithHtml2Canvas();
     }
     
@@ -86,13 +86,13 @@ async function updateLatestScreenshot() {
       latestScreenshot = screenshot;
     }
   } catch (error) {
-    console.error('❌ Pre-screenshot update failed:', error);
+    console.error(' Pre-screenshot update failed:', error);
   }
 }
 
-// 🔥 NEW: Wait for screenMonitor to be fully initialized
+//  Wait for screenMonitor to be fully initialized
 async function waitForScreenMonitor() {
-  console.log('⏳ Waiting for screenMonitor to be ready...');
+  console.log(' Waiting for screenMonitor to be ready...');
   
   return new Promise((resolve) => {
     let attempts = 0;
@@ -101,25 +101,25 @@ async function waitForScreenMonitor() {
     const checkForScreenMonitor = () => {
       attempts++;
       
-      // 🔥 LESS STRICT: Just check if screenMonitor exists, don't require screenStream
+      //  Just check if screenMonitor exists, don't require screenStream
       if (window.screenMonitor) {
-        console.log(`✅ ScreenMonitor found (${attempts} attempts)`);
+        console.log(` ScreenMonitor found (${attempts} attempts)`);
         
         // Give it a moment for screenStream to be ready if not already
         if (window.screenMonitor.screenStream) {
-          console.log(`✅ ScreenStream also ready!`);
+          console.log(` ScreenStream also ready!`);
         } else {
-          console.log(`🔄 ScreenMonitor exists but screenStream not ready yet - continuing anyway`);
+          console.log(` ScreenMonitor exists but screenStream not ready yet - continuing anyway`);
         }
         
         resolve();
         return;
       }
       
-      console.log(`🔄 Waiting for screenMonitor... (attempt ${attempts})`);
+      console.log(` Waiting for screenMonitor... (attempt ${attempts})`);
       
       if (attempts >= maxAttempts) {
-        console.warn(`⚠️ Timeout waiting for screenMonitor after ${attempts} attempts - continuing anyway`);
+        console.warn(` Timeout waiting for screenMonitor after ${attempts} attempts - continuing anyway`);
         resolve(); // Continue anyway
         return;
       }
@@ -136,12 +136,12 @@ function stopPreScreenshotCapture() {
   if (preScreenshotInterval) {
     clearInterval(preScreenshotInterval);
     preScreenshotInterval = null;
-    console.log('🛑 Pre-screenshot capture stopped');
+    console.log(' Pre-screenshot capture stopped');
   }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // 🔥 WAIT for screenMonitor to be ready before starting
+  // WAIT for screenMonitor to be ready before starting
   await waitForScreenMonitor();
   
   setTimeout(async () => {
@@ -149,20 +149,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const response = await fetch('/api/exam_environment_rules');
       const rules = await response.json();
 
-      console.log('✅ Loaded rules:', rules);  // DEBUG
-      console.log('📱 ScreenMonitor available:', !!window.screenMonitor); // DEBUG
-      console.log('📱 ScreenStream available:', !!(window.screenMonitor && window.screenMonitor.screenStream)); // DEBUG
+      console.log(' Loaded rules:', rules);  // DEBUG
+      console.log(' ScreenMonitor available:', !!window.screenMonitor); // DEBUG
+      console.log(' ScreenStream available:', !!(window.screenMonitor && window.screenMonitor.screenStream)); // DEBUG
 
       shortcutDetectionReady = true;
       
-      // 🔥 REMOVED: Pre-screenshot capture system (no longer needed)
       // await startPreScreenshotCapture();
 
       // Right-click blocking
       if (rules.block_right_click) {
         document.addEventListener('contextmenu', (e) => {
           e.preventDefault();
-          console.log('❌ Right click blocked');  // DEBUG
+          console.log(' Right click blocked');  // DEBUG
           recordShortcutViolation('FORBIDDEN_SHORTCUT', 'Right-click attempted');
         });
       }
@@ -199,13 +198,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (blocked) {
         e.preventDefault();
         e.stopPropagation();
-        console.log(`❌ Blocked shortcut: ${description}`);
+        console.log(` Blocked shortcut: ${description}`);
         
         // Only record if detection is ready
         if (shortcutDetectionReady) {
           recordShortcutViolation(violationType, description);
         } else {
-          console.warn('⚠️ Shortcut detection not ready yet, skipping violation recording');
+          console.warn(' Shortcut detection not ready yet, skipping violation recording');
         }
         
         return false;
@@ -213,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, true); // Use capture phase
 
     } catch (err) {
-      console.error('❌ Failed to fetch exam environment rules:', err);
+      console.error(' Failed to fetch exam environment rules:', err);
     }
   }, 1500); // Slightly longer delay but not too long
 });
@@ -221,15 +220,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Helper function to record shortcut violations
 async function recordShortcutViolation(type, description) {
   try {
-    console.log(`🔍 Recording shortcut violation: ${type} - ${description}`);
-    showShortcutWarning(`⚠️ ${description}`);
+    console.log(` Recording shortcut violation: ${type} - ${description}`);
+    showShortcutWarning(` ${description}`);
     await new Promise(resolve => setTimeout(resolve, 500));
 
     const assessmentCodeElement = document.getElementById('assessment-code');
     const studentIdElement = document.getElementById('student-id');
     
     if (!assessmentCodeElement || !studentIdElement) {
-      console.error('❌ Assessment code or student ID elements not found');
+      console.error(' Assessment code or student ID elements not found');
       return;
     }
 
@@ -244,7 +243,7 @@ async function recordShortcutViolation(type, description) {
       timestamp: new Date().toISOString()
     };
 
-    // ✅ Save violation and get ID
+    //  Save violation and get ID
     const response = await fetch('/api/record_violation', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -254,47 +253,47 @@ async function recordShortcutViolation(type, description) {
     if (response.ok) {
       const result = await response.json();
       lastViolationId = result.violation_id || null;
-      console.log('✅ Violation recorded with ID:', lastViolationId);
+      console.log(' Violation recorded with ID:', lastViolationId);
     } else {
-      console.warn('⚠️ Failed to record violation');
+      console.warn(' Failed to record violation');
       lastViolationId = null;
     }
 
-    // ✅ Capture screenshot AFTER violation logged
+    //  Capture screenshot AFTER violation logged
     const screenshot = await captureScreenshotWithWarning();
     if (screenshot) {
       await uploadShortcutScreenshot(screenshot, type, assessmentCode, studentId);
     } else {
-      console.warn(`⚠️ Screenshot capture failed for ${type}`);
+      console.warn(` Screenshot capture failed for ${type}`);
     }
 
   } catch (error) {
-    console.error('❌ Error recording shortcut violation:', error);
+    console.error(' Error recording shortcut violation:', error);
   }
 }
 
 
-// 🔥 NEW: Capture screenshot WITH warning message visible
+// Capture screenshot WITH warning message visible
 async function captureScreenshotWithWarning() {
   try {
-    console.log('📸 Capturing screenshot with warning message visible...');
+    console.log(' Capturing screenshot with warning message visible...');
     
     let screenshot = null;
     
-    // Method 1: Try screen stream capture first (best quality)
+    // Try screen stream capture first (best quality)
     if (window.screenMonitor && window.screenMonitor.screenStream) {
-      console.log('📹 Using screen stream capture WITH warning...');
+      console.log(' Using screen stream capture WITH warning...');
       screenshot = await captureFromScreenStream(window.screenMonitor.screenStream);
       
       if (screenshot) {
-        console.log('✅ Screen stream capture successful with warning!');
+        console.log(' Screen stream capture successful with warning!');
         return screenshot;
       }
     }
     
-    // Method 2: Try HTML2Canvas capture (captures full page including warnings)
+    //  Try HTML2Canvas capture (captures full page including warnings)
     if (typeof html2canvas !== 'undefined') {
-      console.log('📱 Using html2canvas WITH warning...');
+      console.log(' Using html2canvas WITH warning...');
       
       const canvas = await html2canvas(document.body, {
         useCORS: true,
@@ -312,19 +311,19 @@ async function captureScreenshotWithWarning() {
       });
       
       if (screenshot) {
-        console.log('✅ HTML2Canvas capture successful with warning!');
+        console.log(' HTML2Canvas capture successful with warning!');
         return screenshot;
       }
     }
     
-    // Method 3: Fallback to basic page capture
-    console.log('📱 Using fallback capture method...');
+    //  Fallback to basic page capture
+    console.log(' Using fallback capture method...');
     screenshot = await capturePageWithWarning();
     
     return screenshot;
     
   } catch (error) {
-    console.error('❌ Screenshot with warning capture failed:', error);
+    console.error(' Screenshot with warning capture failed:', error);
     return null;
   }
 }
@@ -392,7 +391,7 @@ async function capturePageWithWarning() {
 // Helper function to capture screenshot directly for shortcut violations
 async function captureShortcutScreenshot(violationType) {
   try {
-    console.log(`📸 Capturing direct screenshot for ${violationType}...`);
+    console.log(` Capturing direct screenshot for ${violationType}...`);
     
     // Get assessment and student info
     const assessmentCodeElement = document.getElementById('assessment-code');
@@ -410,18 +409,18 @@ async function captureShortcutScreenshot(violationType) {
     let screenshot = null;
     
     if (window.screenMonitor && window.screenMonitor.screenStream) {
-      console.log('📹 Using screen stream for screenshot...');
+      console.log(' Using screen stream for screenshot...');
       screenshot = await captureFromScreenStream(window.screenMonitor.screenStream);
     } else if (window.screenMonitor && window.screenMonitor.webcamStream) {
-      console.log('📹 Using webcam stream for screenshot...');
+      console.log(' Using webcam stream for screenshot...');
       screenshot = await captureFromWebcamStream();
     } else {
-      console.log('📱 No streams available, using html2canvas fallback...');
+      console.log(' No streams available, using html2canvas fallback...');
       screenshot = await captureFromPage();
     }
     
     if (screenshot) {
-      console.log(`📤 Uploading screenshot for ${violationType}...`);
+      console.log(` Uploading screenshot for ${violationType}...`);
       await uploadShortcutScreenshot(screenshot, violationType, assessmentCode, studentId);
     } else {
       console.error('❌ Failed to capture screenshot');
@@ -432,7 +431,7 @@ async function captureShortcutScreenshot(violationType) {
   }
 }
 
-// 🔥 EXACT COPY of captureScreenScreenshot() from tab switch system
+// EXACT COPY of captureScreenScreenshot() from tab switch system
 async function captureScreenScreenshotExact(screenStream) {
   if (!screenStream) return null;
 
@@ -460,7 +459,7 @@ async function captureScreenScreenshotExact(screenStream) {
       });
     });
   } catch (error) {
-    console.error('❌ Exact screen screenshot failed:', error);
+    console.error(' Exact screen screenshot failed:', error);
     return null;
   }
 }
@@ -468,7 +467,7 @@ async function captureScreenScreenshotExact(screenStream) {
 // Capture screenshot from screen stream
 async function captureFromScreenStream(screenStream) {
   try {
-    console.log('📹 Setting up screen stream capture...');
+    console.log(' Setting up screen stream capture...');
     const video = document.createElement('video');
     video.srcObject = screenStream;
     video.muted = true;
@@ -478,7 +477,7 @@ async function captureFromScreenStream(screenStream) {
       let resolved = false;
       
       video.addEventListener('loadedmetadata', () => {
-        console.log(`📺 Screen stream video loaded: ${video.videoWidth}x${video.videoHeight}`);
+        console.log(` Screen stream video loaded: ${video.videoWidth}x${video.videoHeight}`);
         
         if (video.videoWidth === 0 || video.videoHeight === 0) {
           console.error('❌ Screen stream has invalid dimensions');
@@ -572,10 +571,10 @@ async function captureFromWebcamStream() {
   }
 }
 
-// 🔥 NEW: Capture real page content using html2canvas-like approach
+// Capture real page content using html2canvas-like approach
 async function captureWithHtml2Canvas() {
   try {
-    console.log('📸 Attempting to capture real page content...');
+    console.log(' Attempting to capture real page content...');
     
     // Hide warnings temporarily
     const warningDivs = document.querySelectorAll('#shortcut-violation-warning, #violation-warning');
@@ -833,7 +832,7 @@ async function uploadShortcutScreenshot(screenshotBlob, violationType, assessmen
 
 // Helper function to show shortcut warnings
 function showShortcutWarning(message) {
-  console.log(`🚨 Shortcut warning: ${message}`);
+  console.log(` Shortcut warning: ${message}`);
   
   // Try to use screenMonitor's warning system if available (keeps same position)
   if (window.screenMonitor && typeof window.screenMonitor.showViolationWarning === 'function') {
@@ -880,9 +879,9 @@ function showShortcutWarning(message) {
   }, 5000);
 }
 
-// 🔥 NEW: Function to check and restart screen sharing if needed
+// Function to check and restart screen sharing if needed
 async function ensureScreenSharing() {
-  console.log('🔍 Checking screen sharing status...');
+  console.log(' Checking screen sharing status...');
   
   if (!window.screenMonitor) {
     console.warn('⚠️ ScreenMonitor not available');

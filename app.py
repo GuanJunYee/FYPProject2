@@ -1,17 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_pymongo import PyMongo
 from flask import send_from_directory 
+from flask import make_response
+from flask import jsonify, request, session, send_file, render_template, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, abort
+from flask import jsonify
+from flask import render_template, session, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import smtplib, random, os
 from dotenv import load_dotenv
 from email.mime.text import MIMEText
-from flask import jsonify
 import re
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from bson import ObjectId
 import json
-import pytz 
 from pytz import timezone
 import requests
 import time
@@ -25,22 +28,21 @@ import cv2
 import base64
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-from flask import make_response
 import io
 import calendar
 from dateutil.relativedelta import relativedelta
 import threading
 from datetime import datetime, date
-from flask import render_template, session, redirect, url_for, flash
-from datetime import datetime, timedelta
 from datetime import datetime, timedelta
 from bson import ObjectId
 import os
 import csv
-import io
-from flask import jsonify, request, session, send_file, render_template, redirect, url_for, send_from_directory
-from flask import Flask, render_template, request, abort
-import logging
+import traceback
+import docx
+from datetime import datetime, timedelta
+from collections import defaultdict
+from datetime import datetime, timedelta
+import pytz
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  #  will be used for securely signing the session
@@ -2713,7 +2715,6 @@ PLAGIARISM_API_TOKEN = "U-BRbaec9Pcf36p8JWVfYPrsGr2ce2Dl"
 # =======================
 def extract_text_from_docx(docx_path):
     try:
-        import docx
         doc = docx.Document(docx_path)
         text_content = "\n".join([para.text for para in doc.paragraphs]).strip()
         print(f"DEBUG: Extracted text length: {len(text_content)}")
@@ -2776,7 +2777,6 @@ def check_plagiarism(file_path):
             print(f"ERROR: Response: {response.text}")
     except Exception as e:
         print(f"ERROR: Exception during plagiarism check: {e}")
-        import traceback
         traceback.print_exc()
     return None
 
@@ -2803,7 +2803,6 @@ def check_plagiarism_status(text_id):
             print(f"ERROR: Response: {response.text}")
     except Exception as e:
         print(f"ERROR: Exception during status check: {e}")
-        import traceback
         traceback.print_exc()
     return None
 
@@ -2912,7 +2911,6 @@ def fetch_plagiarism_report(text_id):
             time.sleep(10)
         except Exception as e:
             print(f"ERROR: During report fetch: {e}")
-            import traceback
             traceback.print_exc()
             break
 
@@ -2991,7 +2989,6 @@ def check_plagiarism_request(submission_id):
 
     except Exception as e:
         print(f"ERROR: check_plagiarism_request: {e}")
-        import traceback
         traceback.print_exc()
         flash("Internal error during plagiarism check.", "danger")
 
@@ -3439,7 +3436,7 @@ def student_exam_interface(assessment_code):
         timetable=timetable,
         start_time=start_dt.strftime('%Y-%m-%d %H:%M:%S'),
         end_time=end_dt.strftime('%Y-%m-%d %H:%M:%S'),
-        # NEW: Add ISO format for JavaScript timeline analysis
+        # Add ISO format for JavaScript timeline analysis
         exam_start_iso=start_dt.isoformat(),  # For JavaScript detector
         exam_end_iso=end_dt.isoformat(),      # For JavaScript detector
     )
@@ -3676,7 +3673,7 @@ def upload_violation_evidence():
         violation_type = request.form.get('violation_type')
         timestamp_str = request.form.get('timestamp')
         
-        # NEW: Get enhanced timeline data
+        # Get enhanced timeline data
         exam_timeline_position = request.form.get('exam_timeline_position')
         exam_start_time = request.form.get('exam_start_time')
         exam_end_time = request.form.get('exam_end_time')
@@ -3788,13 +3785,13 @@ def upload_violation_evidence():
                 'violation_type': violation_type,
                 'timestamp': datetime.now(),
                 
-                # NEW: Timeline data for lecturer analysis
+                # Timeline data for lecturer analysis
                 'exam_timeline_position': exam_timeline_position,
                 'exam_start_time': exam_start_time,
                 'exam_end_time': exam_end_time,
                 'exam_progress_percent': float(exam_progress_percent) if exam_progress_percent else None,
                 
-                # NEW: Head pose context when evidence was captured
+                # Head pose context when evidence was captured
                 'head_pose_data': head_pose_data,
                 'detection_settings': detection_settings,
                 
@@ -3836,7 +3833,6 @@ def upload_violation_evidence():
             
     except Exception as e:
         print(f"Error uploading enhanced evidence: {e}")
-        import traceback
         traceback.print_exc()
         return jsonify({
             'error': 'Failed to upload evidence', 
@@ -4624,7 +4620,7 @@ def get_assessment_coverage_analysis(assessment_filter):
                 'coverage_rate': coverage_rate,
                 'self_enrolled': self_enrolled_count,
                 'lecturer_enrolled': lecturer_enrolled_count,
-                'left_out_students': left_out_students,  # NEW FIELD
+                'left_out_students': left_out_students,
                 'status': status  # Keep for compatibility
             })
         
@@ -5733,8 +5729,6 @@ def get_date_filter(date_range_filter, start_date, end_date):
     """
     Build date filter based on parameters
     """
-    from datetime import datetime, timedelta
-    
     date_filter = {}
     
     if date_range_filter == 'today':
@@ -5896,8 +5890,6 @@ def get_violations_timeline_data(student_filter, violation_type_filter, date_ran
     Get violations timeline data for chart - MONTHLY instead of daily
     """
     try:
-        from datetime import datetime, timedelta
-        from collections import defaultdict
         
         # Build match criteria
         match_criteria = {}
@@ -6005,7 +5997,6 @@ def get_violations_by_assessment(student_filter, violation_type_filter, date_ran
     Get violations grouped by assessment for bar chart
     """
     try:
-        from collections import defaultdict
         
         # Build match criteria
         match_criteria = {}
@@ -6271,7 +6262,6 @@ def get_plagiarism_overview_data():
         
     except Exception as e:
         print(f"Error in get_plagiarism_overview_data: {e}")
-        import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -6307,7 +6297,6 @@ def export_plagiarism_csv():
                 'Report URL': item['report_url']
             })
         
-        from datetime import datetime
         return jsonify({
             'success': True,
             'csv_data': csv_data,
@@ -6347,7 +6336,6 @@ def export_similarity_csv():
                 'Requested Date': item['requested_at']
             })
         
-        from datetime import datetime
         return jsonify({
             'success': True,
             'csv_data': csv_data,
@@ -6409,8 +6397,6 @@ def get_plagiarism_date_filter(date_from, date_to):
     """
     Build date filter for plagiarism queries with proper Malaysia timezone handling
     """
-    from datetime import datetime, timedelta
-    import pytz
     
     # Use Malaysia timezone
     malaysia_tz = pytz.timezone('Asia/Kuala_Lumpur')
@@ -6558,7 +6544,6 @@ def get_plagiarism_submissions_data(student_filter, assessment_filter, plagiaris
         
     except Exception as e:
         print(f"Error in get_plagiarism_submissions_data: {e}")
-        import traceback
         traceback.print_exc()
         return []
 
@@ -6647,7 +6632,6 @@ def get_similarity_resubmissions_data(student_filter, assessment_filter, date_fr
         
     except Exception as e:
         print(f"Error in get_similarity_resubmissions_data: {e}")
-        import traceback
         traceback.print_exc()
         return []
 
