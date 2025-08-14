@@ -636,6 +636,8 @@ function exportTableData(tableId, filename) {
     a.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
+
+    Swal.fire('Success', 'Report exported successfully as CSV!', 'success');
 }
 
 // Test function to check if data is loaded - FOR DEBUGGING
@@ -924,6 +926,7 @@ function exportTablePDF(tableId, title) {
         }, 1000);
         
         console.log('PDF generated successfully');
+        Swal.fire('Success', 'Report exported successfully as PDF!', 'success');
         
     } catch (error) {
         console.error('PDF Export Error:', error);

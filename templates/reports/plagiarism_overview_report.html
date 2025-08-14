@@ -5,7 +5,15 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/user_registration_report.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-
+<style>
+    .badge{
+        display: inline-block;
+        font-size: 0.85em;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 12px;
+    }
+</style>
 <div class="profile-header">
     <h2 style="margin-left: 20px;">Plagiarism & Similarity Analytics Report</h2>
 </div>
@@ -951,13 +959,13 @@ function updatePlagiarismTable(plagiarismData) {
         let status = 'Original';
         
         if (totalPlagiarismScore > 80) {
-            plagiarismClass = 'plagiarism-very-high';  // Red (81-100%)
+            plagiarismClass = 'badge plagiarism-very-high';  // Red (81-100%)
             status = 'Very High Risk';
         } else if (totalPlagiarismScore > 50) {
-            plagiarismClass = 'plagiarism-high';       // Orange (51-80%)
+            plagiarismClass = 'badge plagiarism-high';       // Orange (51-80%)
             status = 'High Risk';
         } else if (totalPlagiarismScore > 20) {
-            plagiarismClass = 'plagiarism-medium';     // Yellow (21-50%)
+            plagiarismClass = 'badge plagiarism-medium';     // Yellow (21-50%)
             status = 'Review Required';
         }
         
@@ -1011,17 +1019,17 @@ function updateSimilarityTable(similarityData) {
         
         // Determine similarity level and class - MATCH CHART COLORS
         const similarityScore = comparison.similarity_score || 0;
-        let similarityClass = 'similarity-different';    // Green (0-30%)
+        let similarityClass = ' badge similarity-different';    // Green (0-30%)
         let similarityLevel = 'Very Different';
         
         if (similarityScore >= 81) {
-            similarityClass = 'similarity-identical';        // Red (81-100%)
+            similarityClass = 'badge similarity-identical';        // Red (81-100%)
             similarityLevel = 'Nearly Identical';
         } else if (similarityScore >= 61) {
-            similarityClass = 'similarity-very-similar';     // Orange (61-80%)
+            similarityClass = 'badge similarity-very-similar';     // Orange (61-80%)
             similarityLevel = 'Very Similar';
         } else if (similarityScore >= 31) {
-            similarityClass = 'similarity-somewhat-similar'; // Yellow (31-60%)
+            similarityClass = 'badge similarity-somewhat-similar'; // Yellow (31-60%)
             similarityLevel = 'Somewhat Similar';
         }
         
@@ -1141,6 +1149,8 @@ function exportTableData(tableId, filename) {
    a.click();
    document.body.removeChild(a);
    window.URL.revokeObjectURL(url);
+
+   Swal.fire('Success', 'Report exported successfully as CSV!', 'success');
 }
 
 // Export table as PDF
@@ -1205,6 +1215,8 @@ function exportTablePDF(tableId, title) {
        setTimeout(() => {
            printWindow.print();
        }, 1000);
+
+       Swal.fire('Success', 'Report exported successfully as PDF!', 'success');
        
    } catch (error) {
        console.error('PDF Export Error:', error);

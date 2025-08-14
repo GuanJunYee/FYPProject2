@@ -1275,6 +1275,8 @@ function exportTableData(tableId, filename) {
    a.download = `${filename}_${new Date().toISOString().split('T')[0]}.csv`;
    a.click();
    window.URL.revokeObjectURL(url);
+
+   Swal.fire('Success', 'Report exported successfully as CSV!', 'success');
 }
 
 // Export table as PDF
@@ -1376,6 +1378,7 @@ function exportTablePDF(tableId, title) {
            printWindow.print();
        }, 1000);
        
+       Swal.fire('Success', 'Report exported successfully as PDF!', 'success');
    } catch (error) {
        console.error('PDF Export Error:', error);
        Swal.fire('Error', 'Failed to generate PDF: ' + error.message, 'error');
