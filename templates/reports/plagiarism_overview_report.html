@@ -46,29 +46,6 @@
                    <option value="low">Low (≤20%)</option>
                </select>
            </div>
-           <div class="control-group">
-               <label for="date-range">Date Range</label>
-               <select id="date-range" onchange="handleDateRangeChange()">
-                   <option value="all">All Time</option>
-                   <option value="today">Today</option>
-                   <option value="week">Last 7 Days</option>
-                   <option value="month">Last 30 Days</option>
-                   <option value="custom">Custom Range</option>
-               </select>
-           </div>
-           <div class="control-group custom-date-inputs" id="custom-date-inputs" style="display: none;">
-               <div class="date-input-group">
-                   <label for="start-date">From Date</label>
-                   <input type="date" id="start-date" onchange="validateDateRange()">
-               </div>
-               <div class="date-input-group">
-                   <label for="end-date">To Date</label>
-                   <input type="date" id="end-date" onchange="validateDateRange()">
-               </div>
-               <div id="date-validation-error" class="date-error" style="display: none;">
-                   To Date cannot be earlier than From Date
-               </div>
-           </div>
        </div>
        <div class="control-actions">
            <button class="btn btn-secondary" onclick="resetFilters()">Reset Filters</button>
@@ -406,70 +383,6 @@
    font-size: 0.8em;
 }
 
-/* Custom date inputs */
-.custom-date-inputs {
-   display: grid;
-   grid-template-columns: repeat(2, 1fr);
-   gap: 20px;
-   margin-top: 15px;
-   padding: 15px;
-   background: #f8fafc;
-   border-radius: 8px;
-   border: 1px solid #e5e7eb;
-}
-
-.date-input-group {
-   display: flex;
-   flex-direction: column;
-   gap: 8px;
-}
-
-.date-input-group label {
-   font-weight: 600;
-   color: #374151;
-   font-size: 14px;
-   margin-bottom: 0;
-}
-
-.date-input-group input {
-   padding: 10px 12px;
-   margin-bottom: 15px;
-   border: 1px solid #d1d5db;
-   border-radius: 6px;
-   font-size: 14px;
-   height: 42px;
-   box-sizing: border-box;
-   background: white;
-   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.date-input-group input:focus {
-   outline: none;
-   border-color: #3b82f6;
-   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.date-input-group input:hover {
-   border-color: #9ca3af;
-}
-
-.date-input-group input.error {
-   border-color: #ef4444;
-   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-}
-
-.date-error {
-   color: #dc2626;
-   font-size: 12px;
-   margin-top: 5px;
-   grid-column: span 2;
-   text-align: center;
-   background: #fef2f2;
-   padding: 8px 12px;
-   border-radius: 4px;
-   border: 1px solid #fecaca;
-}
-
 /* Modal Styles */
 .modal {
    position: fixed;
@@ -522,32 +435,6 @@
    overflow-y: auto;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-   .controls-grid {
-       grid-template-columns: 1fr;
-   }
-   
-   .charts-section {
-       grid-template-columns: 1fr;
-   }
-   
-   .custom-date-inputs {
-       grid-template-columns: 1fr;
-       gap: 15px;
-   }
-}
-
-@media (max-width: 480px) {
-   .custom-date-inputs {
-       padding: 10px;
-   }
-   
-   .date-input-group input {
-       height: 40px;
-       padding: 8px 10px;
-   }
-}
 </style>
 
 <script>
@@ -719,130 +606,61 @@ function initCharts() {
    });
 }
 
-// Handle date range changes and validation
-function handleDateRangeChange() {
-   const dateRange = document.getElementById('date-range').value;
-   const customInputs = document.getElementById('custom-date-inputs');
-   const dateError = document.getElementById('date-validation-error');
-   
-   if (dateRange === 'custom') {
-       customInputs.style.display = 'block';
-       // Set default dates for better UX
-       const today = new Date();
-       const weekAgo = new Date();
-       weekAgo.setDate(today.getDate() - 7);
-       
-       document.getElementById('start-date').value = weekAgo.toISOString().split('T')[0];
-       document.getElementById('end-date').value = today.toISOString().split('T')[0];
-   } else {
-       customInputs.style.display = 'none';
-       dateError.style.display = 'none';
-       // Clear validation errors
-       document.getElementById('start-date').classList.remove('error');
-       document.getElementById('end-date').classList.remove('error');
-       updateReport(); // Auto-update for preset ranges
-   }
-}
-
-// Validate custom date range
-function validateDateRange() {
-   const startDate = document.getElementById('start-date').value;
-   const endDate = document.getElementById('end-date').value;
-   const dateError = document.getElementById('date-validation-error');
-   const startInput = document.getElementById('start-date');
-   const endInput = document.getElementById('end-date');
-   
-   if (startDate && endDate) {
-       const start = new Date(startDate);
-       const end = new Date(endDate);
-       
-       if (end < start) {
-           // Show error
-           dateError.style.display = 'block';
-           startInput.classList.add('error');
-           endInput.classList.add('error');
-           return false;
-       } else {
-           // Clear error and update report
-           dateError.style.display = 'none';
-           startInput.classList.remove('error');
-           endInput.classList.remove('error');
-           updateReport();
-           return true;
-       }
-   }
-   return true;
-}
 
 // Update report based on filters
 async function updateReport() {
-   const studentFilter = document.getElementById('student-filter').value;
-   const assessmentFilter = document.getElementById('assessment-filter').value;
-   const plagiarismLevelFilter = document.getElementById('plagiarism-level').value;
-   const dateRangeFilter = document.getElementById('date-range').value;
-   const startDate = document.getElementById('start-date').value;
-   const endDate = document.getElementById('end-date').value;
-   
-   // Validate custom date range if selected
-   if (dateRangeFilter === 'custom') {
-       if (!validateDateRange()) {
-           return; // Don't update if validation fails
-       }
-   }
-   
-   // Show loading state
-   showLoadingState();
+    const studentFilter = document.getElementById('student-filter').value;
+    const assessmentFilter = document.getElementById('assessment-filter').value;
+    const plagiarismLevelFilter = document.getElementById('plagiarism-level').value;
+    
+    // Show loading state
+    showLoadingState();
 
-   try {
-       // Build API URL with correct parameter names to match backend
-       let apiUrl = `/api/reports/plagiarism-overview?student_id=${studentFilter}&assessment_code=${assessmentFilter}&plagiarism_level=${plagiarismLevelFilter}`;
-       
-       // Handle different date range options
-       if (dateRangeFilter === 'custom' && startDate && endDate) {
-           apiUrl += `&date_from=${startDate}&date_to=${endDate}`;
-       } else if (['today', 'week', 'month'].includes(dateRangeFilter)) {
-           apiUrl += `&date_from=${dateRangeFilter}`;
-       }
+    try {
+        // Build API URL with correct parameter names to match backend
+        let apiUrl = `/api/reports/plagiarism-overview?student_id=${studentFilter}&assessment_code=${assessmentFilter}&plagiarism_level=${plagiarismLevelFilter}`;
+        
+        // No date filtering - remove all date-related parameters
 
-       console.log('API URL:', apiUrl);
+        console.log('API URL:', apiUrl);
 
-       // Fetch data from backend
-       const response = await fetch(apiUrl);
-       const result = await response.json();
+        // Fetch data from backend
+        const response = await fetch(apiUrl);
+        const result = await response.json();
 
-       console.log('API Response:', result);
+        console.log('API Response:', result);
 
-       if (result.success) {
-           // Update charts with real data
-           updateChartsWithData(result);
-           
-           // Update summary statistics
-           updateSummaryStats(result.summary_stats);
-           
-           // Update data tables
-           updatePlagiarismTable(result.plagiarism_table);
-           updateSimilarityTable(result.similarity_table);
-           
-           // Update alerts
-           updateAlerts(result.alerts);
-           
-           // Update last updated time
-           document.getElementById('last-updated').textContent = new Date().toLocaleString();
-           
-           // Store data for export functions
-           currentReportData = result;
-           
-       } else {
-           console.error('API Error:', result.error);
-           alert('Error loading report data: ' + result.error);
-       }
+        if (result.success) {
+            // Update charts with real data
+            updateChartsWithData(result);
+            
+            // Update summary statistics
+            updateSummaryStats(result.summary_stats);
+            
+            // Update data tables
+            updatePlagiarismTable(result.plagiarism_table);
+            updateSimilarityTable(result.similarity_table);
+            
+            // Update alerts
+            updateAlerts(result.alerts);
+            
+            // Update last updated time
+            document.getElementById('last-updated').textContent = new Date().toLocaleString();
+            
+            // Store data for export functions
+            currentReportData = result;
+            
+        } else {
+            console.error('API Error:', result.error);
+            alert('Error loading report data: ' + result.error);
+        }
 
-   } catch (error) {
-       console.error('Network Error:', error);
-       alert('Error connecting to server. Please try again.');
-   } finally {
-       hideLoadingState();
-   }
+    } catch (error) {
+        console.error('Network Error:', error);
+        alert('Error connecting to server. Please try again.');
+    } finally {
+        hideLoadingState();
+    }
 }
 
 // Show loading state
@@ -1105,17 +923,10 @@ function closeReportModal() {
 
 // Reset all filters
 function resetFilters() {
-   document.getElementById('student-filter').value = 'all';
-   document.getElementById('assessment-filter').value = 'all';
-   document.getElementById('plagiarism-level').value = 'all';
-   document.getElementById('date-range').value = 'all';
-   document.getElementById('custom-date-inputs').style.display = 'none';
-   document.getElementById('date-validation-error').style.display = 'none';
-   document.getElementById('start-date').value = '';
-   document.getElementById('end-date').value = '';
-   document.getElementById('start-date').classList.remove('error');
-   document.getElementById('end-date').classList.remove('error');
-   updateReport();
+    document.getElementById('student-filter').value = 'all';
+    document.getElementById('assessment-filter').value = 'all';
+    document.getElementById('plagiarism-level').value = 'all';
+    updateReport();
 }
 
 // Export table data as CSV
@@ -1306,9 +1117,6 @@ document.addEventListener('DOMContentLoaded', function() {
    initCharts();
    loadFilterOptions();
    updateReport();
-   
-   // Set up date range change handler
-   document.getElementById('date-range').addEventListener('change', handleDateRangeChange);
 });
 
 // Close modal when clicking outside

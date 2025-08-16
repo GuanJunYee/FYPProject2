@@ -77,10 +77,10 @@
           {% if exam.assessment_code in submitted_codes %}
             <td><button class="btn-submitted" disabled style="padding: 5px 12px;">Submitted</button></td>
           {% else %}
-            <td><a href="{{ url_for('student_exam_interface', assessment_code=exam.assessment_code) }}" class="btn-save" style="padding: 5px 12px;">Join</a></td>
+            <td><a href="{{ url_for('student_exam_instructions', assessment_code=exam.assessment_code) }}" class="btn-save" style="padding: 5px 12px;">Join</a></td>
           {% endif %}
         {% else %}
-          <td><button class="btn-reset" disabled style="padding: 5px 12px;">Not Available</button></td>
+          <td><button class="btn-reset" disabled style="padding: 4px 10px;">Not Available</button></td>
         {% endif %}
 
       </tr>

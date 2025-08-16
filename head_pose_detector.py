@@ -120,13 +120,13 @@ class HeadPoseDetector:
         
         print(f"Loading HopeNet model from {model_path}")
         
-        # Load model exactly like your test code
+        # Load model exactly 
         saved_state_dict = torch.load(model_path, map_location=self.device, weights_only=False)
         self.model.load_state_dict(saved_state_dict)
         self.model.to(self.device)
         self.model.eval()  # Set model to evaluation mode (no training behavior)
         
-        # Image preprocessing pipeline for HopeNet (matching your test code)
+        # Image preprocessing pipeline for HopeNet
         self.transform = transforms.Compose([
             transforms.Resize(224),  # Resize to 224x224
             transforms.CenterCrop(224),
@@ -134,7 +134,7 @@ class HeadPoseDetector:
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
         
-        # Index tensor for regression (matching your test code)
+        # Index tensor for regression
         self.idx_tensor = torch.FloatTensor([idx for idx in range(66)]).to(self.device)
         
         print("HopeNet Head Pose Detector initialized successfully")
@@ -207,7 +207,7 @@ class HeadPoseDetector:
             # Convert BGR to RGB and create PIL Image exactly like your test code
             face_img = Image.fromarray(cv2.cvtColor(face_img, cv2.COLOR_BGR2RGB))
             
-            # Preprocess for HopeNet exactly like your test code
+            # Preprocess for HopeNet
             input_tensor = self.transform(face_img).unsqueeze(0).to(self.device)
             
             # Get head pose prediction from HopeNet
@@ -331,7 +331,7 @@ class HeadPoseDetector:
     def get_detection_info(self):
         """Get information about the detector"""
         return {
-            'detector_type': 'HopeNet Deep Learning (Original Implementation)',
+            'detector_type': 'HopeNet Deep Learning',
             'face_detection': 'OpenCV haarcascade_frontalface_default.xml',
             'pose_estimation': 'HopeNet ResNet-50 Neural Network with Bottleneck blocks',
             'model_file': 'hopenet_robust_alpha1.pkl',

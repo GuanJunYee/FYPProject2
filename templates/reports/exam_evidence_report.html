@@ -43,7 +43,7 @@
                 <select id="status-filter" onchange="loadViolations()">
                     <option value="">All Status</option>
                     <option value="pending">Pending</option>
-                    <option value="reviewed">Reviewed</option>
+                    <option value="reviewed">Violation Confirmed</option>
                     <option value="dismissed">Dismissed</option>
                 </select>
             </div>
@@ -153,14 +153,14 @@
                             <textarea id="modal-notes" rows="4" placeholder="Add your review notes here..."></textarea>
                         </div>
                         <div class="review-actions">
-                            <button class="btn btn-success" onclick="reviewViolation('reviewed')">
-                                <i class="fas fa-check"></i> Mark as Reviewed
+                            <button class="btn btn-success" onclick="reviewViolation('reviewed')" style="font-weight: 600; font-size: 16px;">
+                                 Mark as Violation
                             </button>
-                            <button class="btn btn-secondary" onclick="reviewViolation('dismissed')">
-                                <i class="fas fa-times"></i> Dismiss
+                            <button class="btn btn-secondary" onclick="reviewViolation('dismissed')" style="font-weight: 600; font-size: 16px;">
+                                Mark as Dismiss (False Positive)
                             </button>
-                            <button class="btn btn-warning" onclick="reviewViolation('pending')">
-                                <i class="fas fa-undo"></i> Mark as Pending
+                            <button class="btn btn-warning" onclick="reviewViolation('pending')" style="font-weight: 600; font-size: 16px;">
+                                Mark as Pending
                             </button>
                         </div>
                     </div>
@@ -775,7 +775,7 @@ function createViolationCard(violation) {
                     <h6>${violation.student_name || 'Unknown Student'}</h6>
                     <small>${violation.assessment_code} - ${violation.assessment_title || 'Unknown Assessment'}</small>
                 </div>
-                <span class="status-badge ${statusClass}">${violation.status.replace('_', ' ').toUpperCase()}</span>
+                <span class="status-badge ${statusClass}">${getStatusDisplayText(violation.status)}</span>
             </div>
             <div class="violation-body">
                 <div class="violation-content">
@@ -807,6 +807,20 @@ function createViolationCard(violation) {
             </div>
         </div>
     `;
+}
+
+// Helper function to get display text for status
+function getStatusDisplayText(status) {
+    switch(status) {
+        case 'reviewed':
+            return 'VIOLATION CONFIRMED';
+        case 'pending':
+            return 'PENDING';
+        case 'dismissed':
+            return 'DISMISSED';
+        default:
+            return status.replace('_', ' ').toUpperCase();
+    }
 }
 
 async function openEvidenceModal(violationId) {

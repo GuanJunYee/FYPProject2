@@ -4,6 +4,125 @@
 
 {% block content %}
 <style>
+/* NEW: Peer comparison styles */
+.peer-analysis {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.peer-analysis h3 {
+    color: black;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+.risk-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.risk-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid;
+}
+
+.risk-card.high { border-left-color: #dc3545; }
+.risk-card.moderate { border-left-color: #ffc107; }
+.risk-card.low { border-left-color: #28a745; }
+
+.risk-card h5 {
+    margin: 0 0 5px 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.risk-card .value {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.risk-card.high .value { color: #dc3545; }
+.risk-card.moderate .value { color: #ffc107; }
+.risk-card.low .value { color: #28a745; }
+
+.peer-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.peer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: #fefefe;
+}
+
+.peer-item.high-risk {
+    border-left: 4px solid #dc3545;
+    background: #fff5f5;
+}
+
+.peer-item.moderate-risk {
+    border-left: 4px solid #ffc107;
+    background: #fffbf0;
+}
+
+.peer-info {
+    flex-grow: 1;
+}
+
+.peer-info strong {
+    color: #495057;
+}
+
+.peer-info small {
+    color: #6c757d;
+    display: block;
+    margin-top: 2px;
+}
+
+.peer-similarity {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.peer-similarity.high { 
+    background: #dc3545; 
+    color: white; 
+}
+
+.peer-similarity.moderate { 
+    background: #ffc107; 
+    color: #212529; 
+}
+
+.peer-similarity.low { 
+    background: #6c757d; 
+    color: white; 
+}
+
+.no-similarities {
+    text-align: center;
+    color: #6c757d;
+    padding: 30px;
+    font-style: italic;
+}
+
 .report-container {
     max-width: 1300px;
     margin: 20px auto;
@@ -157,7 +276,7 @@
     </div>
 
     <!-- Legend -->
-    <div class="legend">
+    <div class="legend" style="margin-bottom: 20px;">
         <div class="legend-item">
             <div class="legend-color legend-match"></div> <span>Matching Text</span>
         </div>
@@ -166,7 +285,63 @@
         </div>
     </div>
 
+    <!-- Peer Comparison Analysis -->
+    <div class="peer-analysis">
+        <h3>Peer Comparison Analysis (Resubmission Document)</h3>
+        <p><small>Compared resubmission document against {{ total_peers }} other student submissions in {{ resub.assessment_code }}</small></p>
+        
+        <div class="risk-summary">
+            <div class="risk-card {{ risk_level }}">
+                <h5>Overall Risk Level</h5>
+                <div class="value">{{ risk_level.title() }}</div>
+            </div>
+            <div class="risk-card {{ 'high' if high_similarity_count > 0 else 'low' }}">
+                <h5>High Similarities (≥30%)</h5>
+                <div class="value">{{ high_similarity_count }}</div>
+            </div>
+            <div class="risk-card {{ 'high' if max_peer_similarity >= 50 else 'moderate' if max_peer_similarity >= 30 else 'low' }}">
+                <h5>Highest Peer Match</h5>
+                <div class="value">{{ max_peer_similarity }}%</div>
+            </div>
+            <div class="risk-card low">
+                <h5>Total Peers Checked</h5>
+                <div class="value">{{ total_peers }}</div>
+            </div>
+        </div>
+
+        {% if peer_comparisons %}
+            <h4>Detailed Peer Similarities (Top 10)</h4>
+            <div class="peer-list">
+                {% for peer in peer_comparisons %}
+                    <div class="peer-item {% if peer.similarity >= 50 %}high-risk{% elif peer.similarity >= 30 %}moderate-risk{% endif %}">
+                        <div class="peer-info">
+                            <strong>Student {{ peer.student_id }}</strong>
+                            <small>{{ peer.filename }}</small>
+                        </div>
+                        <div class="peer-similarity {{ peer.status }}">
+                            {{ peer.similarity }}%
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-similarities">
+                <p>No significant similarities found with peer submissions.</p>
+                <small>All comparisons below 15% threshold.</small>
+            </div>
+        {% endif %}
+        
+        {% if high_similarity_count > 0 %}
+            <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px;">
+                <strong>Attention Required:</strong> 
+                {{ high_similarity_count }} submission(s) show high similarity (≥30%). 
+                Manual review recommended.
+            </div>
+        {% endif %}
+    </div>
+
     <br>
+
     
 </div>
 {% endblock %}

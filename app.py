@@ -1,48 +1,61 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+# Flask Core & Web Framework
+from flask import (
+    Flask, render_template, request, redirect, url_for, session, flash,
+    send_from_directory, make_response, jsonify, send_file, abort
+)
 from flask_pymongo import PyMongo
-from flask import send_from_directory 
-from flask import make_response
-from flask import jsonify, request, session, send_file, render_template, redirect, url_for, send_from_directory
-from flask import Flask, render_template, request, abort
-from flask import jsonify
-from flask import render_template, session, redirect, url_for, flash
+
+# Security & Password Management
 from werkzeug.security import generate_password_hash, check_password_hash
-import smtplib, random, os
-from dotenv import load_dotenv
-from email.mime.text import MIMEText
-import re
-from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
+
+# Date & Time Management
+from datetime import datetime, timedelta, date
+from dateutil.relativedelta import relativedelta
+import pytz
+from pytz import timezone
+import calendar
+
+# Database & Data Handling
 from bson import ObjectId
 import json
-from pytz import timezone
-import requests
-import time
+
+# File & Document Processing
 import docx
 import mimetypes
-from utils.text_extractor import extract_text
-from utils.similarity import calculate_similarity,  calculate_cosine_similarity, highlight_matches
-from head_pose_detector import head_pose_detector
-import numpy as np
-import cv2
-import base64
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 import io
-import calendar
-from dateutil.relativedelta import relativedelta
-import threading
-from datetime import datetime, date
-from datetime import datetime, timedelta
-from bson import ObjectId
 import os
 import csv
+
+# Email & Communication
+import smtplib
+from email.mime.text import MIMEText
+
+# Environment & Configuration
+from dotenv import load_dotenv
+
+# Utility & Processing
+import re
+import random
+import time
+import threading
 import traceback
-import docx
-from datetime import datetime, timedelta
 from collections import defaultdict
-from datetime import datetime, timedelta
-import pytz
+
+# Computer Vision & AI
+import numpy as np
+import cv2
+import base64
+
+# HTTP Requests
+import requests
+
+# Custom Utilities (From .py files)
+from utils.text_extractor import extract_text
+from utils.similarity import calculate_similarity, calculate_cosine_similarity, highlight_matches
+from head_pose_detector import head_pose_detector
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  #  will be used for securely signing the session
@@ -1109,9 +1122,14 @@ def lec_dashboard():
             submission['assessment_title'] = assessment.get('title', 'Unknown Assessment') if assessment else 'Unknown Assessment'
 
             # Determine if plagiarism is already checked
-            total_score = (submission.get('plagiarism_score') or 0) + (submission.get('quotes_score') or 0)
-            submission['is_checked'] = total_score > 0
-            submission['is_flagged'] = total_score > 20
+            # Check if plagiarism check was actually performed
+            submission['is_checked'] = submission.get('plagiarism_score') is not None
+
+            if submission['is_checked']:
+                total_score = (submission.get('plagiarism_score') or 0) + (submission.get('quotes_score') or 0)
+                submission['is_flagged'] = total_score > 20
+            else:
+                submission['is_flagged'] = False
         
         # Recent Resubmission Requests (last 10)
         recent_requests = list(mongo.db.resubmission_requests.find({}).sort('requested_at', -1).limit(10))
@@ -1125,7 +1143,6 @@ def lec_dashboard():
             request['assessment_title'] = assessment.get('title', 'Unknown Assessment') if assessment else 'Unknown Assessment'
         
         # Upcoming Exams (next 5)
-        from datetime import datetime
         today = datetime.now().strftime('%Y-%m-%d')
         upcoming_exams = list(mongo.db.exam_timetables.find({
             'exam_date': {'$gte': today}
@@ -2633,11 +2650,6 @@ def lecturer_view_resubmission(submission_id):
                     {'$set': {'filename': resub['new_filename']}}
                 )
 
-                # Delete the old file
-                old_path = os.path.join(app.root_path, 'static', 'uploads', 'submissions', resub['old_filename'])
-                if os.path.exists(old_path):
-                    os.remove(old_path)
-
             elif action == 'Rejected':
                 pass # No file deletion
 
@@ -2679,36 +2691,217 @@ def check_similarity(submission_id):
 
     cosine = calculate_cosine_similarity(text1, text2)
     sequence = calculate_similarity(text1, text2)
-    highlighted1, highlighted2 = highlight_matches(text1, text2)
 
-    # Save to DB (update only similarity and timestamp)
+    # Compare against all other students in same assessment
+    other_submissions = mongo.db.submissions.find({
+        'assessment_code': resub['assessment_code'],
+        'student_id': {'$ne': resub['student_id']}
+    })
+    
+    peer_comparisons = []
+    high_similarity_count = 0
+    
+    for submission in other_submissions:
+        try:
+            peer_path = os.path.join(app.root_path, 'static', 'uploads', 'submissions', submission['filename'])
+            if not os.path.exists(peer_path):
+                continue
+                
+            peer_text = extract_text(peer_path)
+            
+            # Use SEQUENCE MATCHING (same as your original method)
+            peer_similarity = calculate_similarity(text2, peer_text)  # text2 is resubmitted file
+            
+            if peer_similarity >= 30:  # High probability threshold
+                high_similarity_count += 1
+                peer_comparisons.append({
+                    'student_id': submission['student_id'],
+                    'similarity': round(peer_similarity, 1),
+                    'filename': submission['filename'],
+                    'status': 'high' if peer_similarity >= 50 else 'moderate'
+                })
+            elif peer_similarity >= 15:  # Include moderate similarities
+                peer_comparisons.append({
+                    'student_id': submission['student_id'],
+                    'similarity': round(peer_similarity, 1),
+                    'filename': submission['filename'],
+                    'status': 'low'
+                })
+                
+        except Exception as e:
+            print(f"Error comparing with {submission['filename']}: {e}")
+            continue
+    
+    # Sort by similarity (highest first)
+    peer_comparisons.sort(key=lambda x: x['similarity'], reverse=True)
+    
+    # Calculate statistics
+    max_peer_similarity = max([comp['similarity'] for comp in peer_comparisons], default=0)
+    risk_level = 'high' if (high_similarity_count >= 2 or max_peer_similarity >= 70) else \
+                'moderate' if (high_similarity_count >= 1 or max_peer_similarity >= 50) else 'low'
+    
+    total_peers = mongo.db.submissions.count_documents({
+        'assessment_code': resub['assessment_code'],
+        'student_id': {'$ne': resub['student_id']}
+    })
+
+    # Save to DB
     mongo.db.resubmission_requests.update_one(
         {'_id': resub['_id']},
         {'$set': {
-            'similarity_score': sequence,
+            'similarity_score': sequence, 
+            'peer_similarities': peer_comparisons[:10],  # top 10 only
+            'high_similarity_count': high_similarity_count, 
+            'max_peer_similarity': max_peer_similarity,  
+            'risk_level': risk_level,  
+            'total_peers_checked': total_peers, 
             'similarity_checked_at': datetime.now()
         }}
     )
     
     return render_template("similarity_report.html",
-                                resub=resub,
-                                similarity=sequence,
-                                cosine_score=cosine,
-                                original_text=highlighted1,
-                                resubmitted_text=highlighted2
-                            )
+                          resub=resub,
+                          similarity=sequence,  
+                          cosine_score=cosine,  
+                          original_text=highlighted1,
+                          resubmitted_text=highlighted2,
+                          peer_comparisons=peer_comparisons[:10],  # Show top 10
+                          high_similarity_count=high_similarity_count,
+                          max_peer_similarity=max_peer_similarity,
+                          risk_level=risk_level,
+                          total_peers=total_peers)
 
 # ============================
 # Plagiarism Detection
 # ============================
+# =======================
+# AJAX endpoint to start plagiarism check
+# =======================
+@app.route('/lecturer/plagiarism/start/<submission_id>', methods=['POST'])
+def start_plagiarism_check(submission_id):
+    if 'user_id' not in session or session.get('role') != 'lecturer':
+        return jsonify({'success': False, 'error': 'Unauthorized'})
+    
+    try:
+        # Fetch submission
+        submission = mongo.db.submissions.find_one({'_id': ObjectId(submission_id)})
+        if not submission:
+            return jsonify({'success': False, 'error': 'Submission not found'})
 
+        # Update status to "checking"
+        mongo.db.submissions.update_one(
+            {'_id': ObjectId(submission_id)},
+            {'$set': {'plagiarism_status': 'checking', 'plagiarism_started_at': datetime.now()}}
+        )
+
+        # Start the plagiarism check in background (simplified)
+        file_path = os.path.join(app.root_path, 'static', 'uploads', 'submissions', submission['filename'])
+        
+        # Submit to API
+        text_id = check_plagiarism(file_path)
+        if not text_id:
+            mongo.db.submissions.update_one(
+                {'_id': ObjectId(submission_id)},
+                {'$set': {'plagiarism_status': 'failed'}}
+            )
+            return jsonify({'success': False, 'error': 'Failed to submit to plagiarism API'})
+
+        # Store text_id and update status
+        mongo.db.submissions.update_one(
+            {'_id': ObjectId(submission_id)},
+            {'$set': {
+                'plagiarism_text_id': text_id,
+                'plagiarism_status': 'processing'
+            }}
+        )
+
+        return jsonify({'success': True, 'text_id': text_id, 'message': 'Plagiarism check started'})
+        
+    except Exception as e:
+        print(f"ERROR: start_plagiarism_check: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+
+# =======================
+# AJAX endpoint to check plagiarism progress
+# =======================
+@app.route('/lecturer/plagiarism/status/<submission_id>', methods=['GET'])
+def get_plagiarism_status(submission_id):
+    if 'user_id' not in session or session.get('role') != 'lecturer':
+        return jsonify({'success': False, 'error': 'Unauthorized'})
+    
+    try:
+        submission = mongo.db.submissions.find_one({'_id': ObjectId(submission_id)})
+        if not submission:
+            return jsonify({'success': False, 'error': 'Submission not found'})
+
+        current_status = submission.get('plagiarism_status', 'not_started')
+        text_id = submission.get('plagiarism_text_id')
+        
+        if current_status == 'processing' and text_id:
+            # Check API status
+            api_status = check_plagiarism_status(text_id)
+            
+            if api_status == 5:  # Complete
+                # Fetch the report
+                result = fetch_plagiarism_report(text_id)
+                
+                if result:
+                    plagiarism_score = result['plagiarism_score']
+                    quotes_score = result['quotes_score']
+                    sources = result['sources']
+                    report_data = result.get('report_data', {})
+                    report_url = f"https://plagiarismcheck.org/profile/check-document-report/{text_id}"
+
+                    # Update database
+                    mongo.db.submissions.update_one(
+                        {'_id': ObjectId(submission_id)},
+                        {'$set': {
+                            'plagiarism_score': plagiarism_score,
+                            'quotes_score': quotes_score,
+                            'sources': sources,
+                            'plagiarism_report_url': report_url,
+                            'report_data': report_data,
+                            'plagiarism_status': 'completed'
+                        }}
+                    )
+                    
+                    return jsonify({
+                        'success': True,
+                        'status': 'completed',
+                        'plagiarism_score': plagiarism_score,
+                        'quotes_score': quotes_score,
+                        'total_score': plagiarism_score + quotes_score
+                    })
+                else:
+                    mongo.db.submissions.update_one(
+                        {'_id': ObjectId(submission_id)},
+                        {'$set': {'plagiarism_status': 'failed'}}
+                    )
+                    return jsonify({'success': True, 'status': 'failed', 'error': 'Failed to fetch report'})
+            
+            elif api_status == 4:  # Error
+                mongo.db.submissions.update_one(
+                    {'_id': ObjectId(submission_id)},
+                    {'$set': {'plagiarism_status': 'failed'}}
+                )
+                return jsonify({'success': True, 'status': 'failed', 'error': 'API processing error'})
+            
+            else:  # Still processing (status 3 or other)
+                return jsonify({'success': True, 'status': 'processing', 'message': 'Still processing...'})
+        
+        return jsonify({'success': True, 'status': current_status})
+        
+    except Exception as e:
+        print(f"ERROR: get_plagiarism_status: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+    
 # =======================
 # API Token (***Change here if using other account from PlagiarismCheck.org)
 # =======================
-PLAGIARISM_API_TOKEN = "U-BRbaec9Pcf36p8JWVfYPrsGr2ce2Dl"
-# WUURDwIYym3NXwROp0ZxsQG9QF4roldY (1 chance) -- peili.yee01@gmail.com
-# TdyW28a9ghkXlvMVHZ5dq8gj7wO9gJ2n (1 chance) -- on94anime@gmail.com
-
+PLAGIARISM_API_TOKEN = "_CEvsxdtj4yi-hK0A6yMH5X4HedV9GOv" # 0 chance
+# SCjvT1TSL2gzYhMvoETxfA2r7pM9H5-G -- 1 chance 
+# 0ooRYapXUxbhI5oyRtEWiyVEJYwKeUMy -- 1 chance
+# pN9yifdrE26KuOn_BVwFiycnotnmRkMi -- 1 chance
 
 # =======================
 # Extract text from .docx
@@ -2810,7 +3003,7 @@ def check_plagiarism_status(text_id):
 # Fetch report from API
 # =======================
 def fetch_plagiarism_report(text_id):
-    url = f"https://plagiarismcheck.org/api/v1/text/report/{text_id}"
+    url = f"https://plagiarismcheck.org/api/v1/text/report/{text_id}" # exactly same report foramt as in PlagiarismCheck.org
     headers = {'X-API-TOKEN': PLAGIARISM_API_TOKEN}
     max_tries = 30
 
@@ -3393,6 +3586,81 @@ def join_exam():
                            today=today,
                            now=now)
 
+# ============================
+# Exam Instructions Page
+# ============================
+@app.route('/student/exam/<assessment_code>/instructions')
+def student_exam_instructions(assessment_code):
+    if 'user_id' not in session or session.get('role') != 'student':
+        flash("Unauthorized access.", "danger")
+        return redirect(url_for('login'))
+
+    student_id = session['user_id']
+
+    # Check if student is enrolled in this assessment
+    assessment = mongo.db.assessments.find_one({'assessment_code': assessment_code})
+    if not assessment or student_id not in assessment.get('students', []):
+        flash("You are not enrolled in this assessment.", "error")
+        return redirect(url_for('join_exam'))
+
+    # Get exam timetable
+    timetable = mongo.db.exam_timetables.find_one({'assessment_code': assessment_code})
+    if not timetable:
+        flash("No exam scheduled for this assessment.", "error")
+        return redirect(url_for('join_exam'))
+
+    # Timing validation - only show instructions during exam time
+    now = datetime.now()
+    exam_date = datetime.strptime(timetable['exam_date'], '%Y-%m-%d')
+    start_time = datetime.strptime(timetable['start_time'], '%H:%M')
+    end_time = datetime.strptime(timetable['end_time'], '%H:%M')
+
+    start_dt = datetime.combine(exam_date.date(), start_time.time())
+    end_dt = datetime.combine(exam_date.date(), end_time.time())
+
+    if not (start_dt <= now <= end_dt):
+        flash("You can only access exam instructions during the scheduled time.", "error")
+        return redirect(url_for('join_exam'))
+
+    # Get exam environment rules and head movement settings
+    exam_rules = mongo.db.exam_environment_rules.find_one({}, {'_id': 0})
+    if not exam_rules:
+        # Default rules if none exist
+        exam_rules = {
+            'block_f12': True,
+            'block_ctrl_shift_i': False,
+            'block_ctrl_u': False,
+            'block_right_click': True,
+            'block_copy': False,
+            'block_paste': False,
+            'head_movement_settings': {
+                'violation_duration': 2000,
+                'warning_count': 3,
+                'max_yaw': 20,
+                'max_pitch': 10
+            }
+        }
+
+    # Get head movement settings
+    head_movement_settings = exam_rules.get('head_movement_settings', {
+        'violation_duration': 2000,
+        'warning_count': 3,
+        'max_yaw': 20,
+        'max_pitch': 10
+    })
+
+    # Calculate duration in minutes
+    duration = int((end_dt - start_dt).total_seconds() / 60)
+
+    return render_template('student_exam_instructions.html',
+                         assessment_code=assessment_code,
+                         assessment_title=assessment.get('title', 'Unknown Assessment'),
+                         exam_date=timetable['exam_date'],
+                         start_time=timetable['start_time'],
+                         end_time=timetable['end_time'],
+                         duration=duration,
+                         exam_rules=exam_rules,
+                         head_movement_settings=head_movement_settings)
 
 # ============================
 # Student Exam Interface - Updated with Head Detection
@@ -3518,7 +3786,7 @@ os.makedirs(SCREENSHOTS_FOLDER, exist_ok=True)
 os.makedirs(VIDEOS_FOLDER, exist_ok=True)
 
 # ============================
-# API Route: Enhanced Record Violation with Timeline Support
+# API Route: Enhanced Record Violation with Timeline Support //for head movement
 # ============================
 @app.route('/api/record_violation', methods=['POST'])
 def record_violation():
@@ -6153,9 +6421,6 @@ def get_individual_student_analysis(student_id):
         most_common_type = max(type_counts.keys(), key=lambda k: type_counts[k]) if type_counts else 'N/A'
         
         # Prepare timeline data (monthly for individual)
-        from datetime import datetime
-        from collections import defaultdict
-        
         monthly_counts = defaultdict(int)
         
         for violation in violations:

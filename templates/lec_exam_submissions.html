@@ -58,7 +58,7 @@
       {% endif %}
     </td>
     <td>
-      {% if s.plagiarism_score is defined  %}
+      {% if s.plagiarism_score is defined %}
         {% set bg_color = (
           'red' if s.plagiarism_score > 30 else
           'green'
@@ -69,9 +69,15 @@
           {{ s.plagiarism_score + s.quotes_score }}%
         </a>
       {% else %}
-        <form method="POST" action="{{ url_for('check_plagiarism_request', submission_id=s._id) }}">
-            <button type="submit" class="btn-request" style="padding:4px 10px;">Check</button>
-          </form>
+        <button type="button" 
+                class="btn-request plagiarism-check-btn" 
+                data-submission-id="{{ s._id }}"
+                onclick="startPlagiarismCheck('{{ s._id }}')">
+          <span class="btn-text">Check</span>
+          <span class="btn-spinner" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Checking...
+          </span>
+        </button>
       {% endif %}
     </td>
     </tr>
@@ -123,4 +129,148 @@
     border: 1px solid #ccc;
   }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+let checkingSubmissions = new Set();
+
+function startPlagiarismCheck(submissionId) {
+    if (checkingSubmissions.has(submissionId)) {
+        return; // Already checking
+    }
+    
+    checkingSubmissions.add(submissionId);
+    const button = document.querySelector(`[data-submission-id="${submissionId}"]`);
+    const btnText = button.querySelector('.btn-text');
+    const btnSpinner = button.querySelector('.btn-spinner');
+    
+    // Show loading state
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline';
+    button.disabled = true;
+    
+    // Show initial alert
+    Swal.fire({
+        title: 'Starting Plagiarism Check',
+        text: 'Submitting document to plagiarism API...',
+        icon: 'info',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    // Start the check
+    fetch(`/lecturer/plagiarism/start/${submissionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Start polling for status
+            pollPlagiarismStatus(submissionId);
+        } else {
+            handlePlagiarismError(submissionId, data.error);
+        }
+    })
+    .catch(error => {
+        handlePlagiarismError(submissionId, 'Network error: ' + error.message);
+    });
+}
+
+function pollPlagiarismStatus(submissionId) {
+    let pollCount = 0;
+    const maxPolls = 60; // 10 minutes max (60 * 10 seconds)
+    
+    const pollInterval = setInterval(() => {
+        pollCount++;
+        
+        // Update progress message
+        Swal.update({
+            title: 'Processing Document',
+            text: `Analyzing for plagiarism... (${pollCount * 10}s)`,
+            icon: 'info'
+        });
+        
+        fetch(`/lecturer/plagiarism/status/${submissionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.status === 'completed') {
+                    clearInterval(pollInterval);
+                    handlePlagiarismComplete(submissionId, data);
+                } else if (data.status === 'failed') {
+                    clearInterval(pollInterval);
+                    handlePlagiarismError(submissionId, data.error || 'Processing failed');
+                } else if (data.status === 'processing') {
+                    // Continue polling
+                    if (pollCount >= maxPolls) {
+                        clearInterval(pollInterval);
+                        handlePlagiarismError(submissionId, 'Timeout: Processing took too long');
+                    }
+                } else {
+                    // Unknown status, continue polling
+                }
+            } else {
+                clearInterval(pollInterval);
+                handlePlagiarismError(submissionId, data.error);
+            }
+        })
+        .catch(error => {
+            clearInterval(pollInterval);
+            handlePlagiarismError(submissionId, 'Status check failed: ' + error.message);
+        });
+    }, 10000); // Poll every 10 seconds
+}
+
+function handlePlagiarismComplete(submissionId, data) {
+    checkingSubmissions.delete(submissionId);
+    
+    const bgColor = data.total_score > 30 ? 'red' : 'green';
+    
+    Swal.fire({
+        title: 'Plagiarism Check Complete!',
+        html: `
+            <div style="font-size: 16px; margin: 10px 0;">
+                <strong>Total Score: ${data.total_score}%</strong><br>
+                <small>Plagiarism: ${data.plagiarism_score}% | Quotes: ${data.quotes_score}%</small>
+            </div>
+        `,
+        icon: data.total_score > 30 ? 'warning' : 'success',
+        confirmButtonText: 'View Report'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Redirect to report
+            window.location.href = `/lecturer/plagiarism/report/${submissionId}`;
+        } else {
+            // Just reload to show updated results
+            window.location.reload();
+        }
+    });
+}
+
+function handlePlagiarismError(submissionId, errorMessage) {
+    checkingSubmissions.delete(submissionId);
+    
+    const button = document.querySelector(`[data-submission-id="${submissionId}"]`);
+    const btnText = button.querySelector('.btn-text');
+    const btnSpinner = button.querySelector('.btn-spinner');
+    
+    // Reset button state
+    btnText.style.display = 'inline';
+    btnSpinner.style.display = 'none';
+    button.disabled = false;
+    
+    Swal.fire({
+        title: 'Plagiarism Check Failed',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonText: 'Try Again'
+    });
+}
+</script>
 {% endblock %}
