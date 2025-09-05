@@ -1,29 +1,210 @@
 {
   "report": {
-    "id": 27904535,
+    "id": 27907073,
     "version": null,
-    "created_at": "1755330428000",
-    "source_count": 0,
-    "percent": "0.00",
-    "text_id": 28040817,
+    "created_at": "1755352680000",
+    "source_count": 2,
+    "percent": "81.69",
+    "text_id": 28043355,
     "group_id": null
   },
   "report_data": {
     "version": "1.1",
-    "length": 1097,
-    "created_at": "2025-08-16 02:47:08",
+    "length": 901,
+    "created_at": "2025-08-16 08:57:59",
     "nodes": [
       {
         "enabled": true,
         "start": 0,
-        "end": 1096,
-        "sources": [],
-        "sources_improved": [],
+        "end": 192,
+        "text": "Plagiarism is taking credit for someone else's writing as your own, including their language and ideas, without providing adequate credit.[1]\nThe University of Cambridge defines plagiarism as: ",
+        "sources": [
+          0,
+          1
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 0.98
+          },
+          {
+            "source": 1,
+            "cos": 0.98
+          }
+        ],
         "references": [],
         "headers": [],
         "quotes": [],
-        "text": "In recent years, online education has experienced an exponential growth and this exponential growth of online education has been significantly influenced by the rapid adoption of mobile technologies (Evanick, 2024). According to the data from Statista, the number of users participating in online education has grown substantially. In the year 2017 there were 269.3 million users involved in online education and the number of users has increased to 783.7 million in the year 2024 this shows an astounding growth of approximately 191% over the past 8 years. This equates to an average yearly growth rate of about 16.2%, showcasing consistent and substantial increases in player registrations annually. Furthermore, it was predicted to hit 995.9 million users in the year 2029 (Statista, 2024).  Moreover, online education is experiencing this exponential growth because it offers learners a more flexible and accessible method of acquiring knowledge. One study conducted by Thi Trang et al. (2022) shows that online education is fundamentally characterized by its flexibility and being chargeless.",
-        "destinations_clusters": []
+        "destinations_clusters": [
+          0,
+          1
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 193,
+        "end": 356,
+        "text": "&quot;submitting as one's own work, irrespective of intent to deceive, that which derives in part or in its entirety from the work of others without due acknowledgement.",
+        "sources": [
+          0,
+          1
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 0.98
+          },
+          {
+            "source": 1,
+            "cos": 0.98
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [
+          0
+        ],
+        "destinations_clusters": [
+          0,
+          1
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 357,
+        "end": 357,
+        "text": "&quot;",
+        "sources": [
+          0,
+          1
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [
+          0
+        ],
+        "destinations_clusters": [
+          0,
+          1
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 358,
+        "end": 459,
+        "text": "[2]\nWikipedia has three core content policies, of which two make it easy to plagiarize inadvertently. ",
+        "sources": [
+          0,
+          1
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 460,
+        "end": 613,
+        "text": "No original research prohibits us from adding our own ideas to articles, and Verifiability requires that articles be based on reliable published sources. ",
+        "sources": [
+          0,
+          1
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 614,
+        "end": 764,
+        "text": "These policies mean that Wikipedians are highly vulnerable to accusations of plagiarism because we must stick closely to sources, but not too closely.\n",
+        "sources": [
+          0,
+          1
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1
+        ]
+      },
+      {
+        "enabled": true,
+        "start": 765,
+        "end": 900,
+        "text": "Because plagiarism can occur without an intention to deceive, concerns should focus on educating the editor and cleaning up the article.",
+        "sources": [
+          0,
+          1
+        ],
+        "sources_improved": [
+          {
+            "source": 0,
+            "cos": 1
+          },
+          {
+            "source": 1,
+            "cos": 1
+          }
+        ],
+        "references": [],
+        "headers": [],
+        "quotes": [],
+        "destinations_clusters": [
+          0,
+          1
+        ]
       }
     ],
     "indexes": [
@@ -46,12 +227,820 @@
     ],
     "references": [],
     "header": [],
-    "quotes": [],
-    "sources": [],
-    "sources_count": 0,
-    "matched_length": 0,
-    "matched_percent": 0,
+    "quotes": [
+      {
+        "id": 0,
+        "length": 165
+      }
+    ],
+    "sources": [
+      {
+        "dst_pos_success": true,
+        "content_type": "text/html",
+        "index": 0,
+        "source": "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_WikiFundi_Content/Wikipedia:Plagiarism",
+        "length": 1802,
+        "percent": 200,
+        "link": {
+          "name": "en.wikipedia.org",
+          "urls": [
+            "https://en.wikipedia.org/wiki/Wikipedia:WikiProject_WikiFundi_Content/Wikipedia:Plagiarism"
+          ]
+        },
+        "tf_idf": false,
+        "plagiarism_length": 736,
+        "plagiarism_percent": 81.69
+      },
+      {
+        "dst_pos_success": true,
+        "content_type": "text/html",
+        "index": 0,
+        "source": "https://en.wikipedia.org/wiki/Wikipedia:Plagiarism",
+        "length": 1802,
+        "percent": 200,
+        "link": {
+          "name": "en.wikipedia.org",
+          "urls": [
+            "https://en.wikipedia.org/wiki/Wikipedia:Plagiarism"
+          ]
+        },
+        "tf_idf": false,
+        "plagiarism_length": 736,
+        "plagiarism_percent": 81.69
+      }
+    ],
+    "sources_count": 2,
+    "matched_length": 736,
+    "matched_percent": 81.69,
     "external_queries": 3,
-    "destinations_clusters": []
+    "destinations_clusters": [
+      {
+        "source": 0,
+        "id": 0,
+        "offsets": [
+          {
+            "start": 47382,
+            "end": 47596,
+            "cos": 0.98
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 1
+          },
+          {
+            "start": 47749,
+            "end": 47846,
+            "cos": 1
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 1
+          },
+          {
+            "start": 47957,
+            "end": 48013,
+            "cos": 1
+          },
+          {
+            "start": 48086,
+            "end": 48098,
+            "cos": 1
+          },
+          {
+            "start": 48103,
+            "end": 48166,
+            "cos": 1
+          },
+          {
+            "start": 48167,
+            "end": 48305,
+            "cos": 1
+          },
+          {
+            "start": 48309,
+            "end": 48319,
+            "cos": 1
+          },
+          {
+            "start": 48324,
+            "end": 48325,
+            "cos": 1
+          },
+          {
+            "start": 48326,
+            "end": 48462,
+            "cos": 1
+          },
+          {
+            "start": 47382,
+            "end": 47596,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47597,
+            "end": 47597,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47942,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 47933,
+            "end": 47952,
+            "cos": 0.4
+          },
+          {
+            "start": 48167,
+            "end": 48180,
+            "cos": 0.4
+          },
+          {
+            "start": 48167,
+            "end": 48305,
+            "cos": 0.4
+          },
+          {
+            "start": 48326,
+            "end": 48462,
+            "cos": 0.4
+          }
+        ]
+      },
+      {
+        "source": 1,
+        "id": 1,
+        "offsets": [
+          {
+            "start": 76033,
+            "end": 76247,
+            "cos": 0.98
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 1
+          },
+          {
+            "start": 76400,
+            "end": 76413,
+            "cos": 1
+          },
+          {
+            "start": 76502,
+            "end": 76528,
+            "cos": 1
+          },
+          {
+            "start": 76533,
+            "end": 76589,
+            "cos": 1
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 1
+          },
+          {
+            "start": 76700,
+            "end": 76763,
+            "cos": 1
+          },
+          {
+            "start": 76836,
+            "end": 76848,
+            "cos": 1
+          },
+          {
+            "start": 76853,
+            "end": 76916,
+            "cos": 1
+          },
+          {
+            "start": 76917,
+            "end": 77054,
+            "cos": 1
+          },
+          {
+            "start": 77058,
+            "end": 77068,
+            "cos": 1
+          },
+          {
+            "start": 77073,
+            "end": 77074,
+            "cos": 1
+          },
+          {
+            "start": 77075,
+            "end": 77211,
+            "cos": 1
+          },
+          {
+            "start": 76033,
+            "end": 76247,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76248,
+            "end": 76248,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76692,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76676,
+            "end": 76695,
+            "cos": 0.4
+          },
+          {
+            "start": 76917,
+            "end": 77054,
+            "cos": 0.4
+          },
+          {
+            "start": 76917,
+            "end": 76930,
+            "cos": 0.4
+          },
+          {
+            "start": 77075,
+            "end": 77211,
+            "cos": 0.4
+          }
+        ]
+      }
+    ]
   }
 }
