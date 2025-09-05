@@ -2898,8 +2898,8 @@ def get_plagiarism_status(submission_id):
 # =======================
 # API Token (***Change here if using other account from PlagiarismCheck.org)
 # =======================
-PLAGIARISM_API_TOKEN = "_CEvsxdtj4yi-hK0A6yMH5X4HedV9GOv" # 0 chance
-# SCjvT1TSL2gzYhMvoETxfA2r7pM9H5-G -- 1 chance 
+PLAGIARISM_API_TOKEN = "SCjvT1TSL2gzYhMvoETxfA2r7pM9H5-G" # 0 chance
+#  -- 1 chance 
 # 0ooRYapXUxbhI5oyRtEWiyVEJYwKeUMy -- 1 chance
 # pN9yifdrE26KuOn_BVwFiycnotnmRkMi -- 1 chance
 
